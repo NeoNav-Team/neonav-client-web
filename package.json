@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "sdev": "node server/development-index.js",
     "build": "next build",
     "start": "next start",
+    "deploy": "pm2 start npm --name nn-auth -- run start -- -p 3000",
     "lint": "next lint"
   },
   "dependencies": {
@@ -13,8 +15,10 @@
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
+    "dotenv": "^16.0.3",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.5",
+    "js-cookie": "^3.0.1",
     "next": "13.1.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
