@@ -1,0 +1,60 @@
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.menu {
+    background: transparent;
+    top:4px;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 100;
+    animation: fadein 2s;
+    transition: width 1s ease-in-out;
+    filter: drop-shadow(0px 0px 6px var(--form-color-2));
+}
+.content {
+    padding: 10px 16px;
+    filter: none;
+    min-height: 50px;
+}
+.menu .pitchMixinPane {
+    --aug-tr: 5px;
+    --aug-tl: 5px;
+    --aug-bl: 5px;
+    --aug-br: 5px;
+    --aug-b-extend1: 50%;
+    --aug-border-all: 1px;
+    --aug-border-bg: radial-gradient(var(--form-color-2), var(--form-color-2)) 100% 100% / 100% 100%;
+    --aug-inlay-all: 4px;
+    --aug-inlay-bg: radial-gradient(ellipse at top, var(--form-color-2), transparent)  50% 50% / 100% 100%;
+    --aug-inlay-opacity: 0.5;
+}
+
+.title {
+    height: 16px;
+    margin: 0 6px;
+    filter: drop-shadow(0px 0px 15px #fff);
+    border-bottom: 1px solid var(--form-color-2);
+}
+.title h2 {
+    margin: 0;
+    padding:0;
+    color: #fff;
+    text-indent: 20px;
+    font-size: 10px;
+    line-height: 14px;
+    letter-spacing: 0.25em;
+}
+
+.button {
+    color: var(--form-color-1);
+    border: 1px solid var(--form-color-1);
+}
+
+.button:hover {
+    color: var(--form-color-3);
+    border: 1px solid var(--form-color-3);
+}
