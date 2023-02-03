@@ -11,6 +11,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fontsource/jura": "^4.5.13",
+    "@fontsource/roboto": "^4.5.8",
     "@mui/material": "^5.11.7",
     "@next/font": "13.1.5",
     "@types/node": "18.11.18",

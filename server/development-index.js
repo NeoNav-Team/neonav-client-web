@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv').config();
 
-const port = 3000;
+const port = process.env.LOCAL_PORT || 3000;
 const dev = process.env.NODE_ENV !== "production";
 const certPath = process.env.CERT_PATH || 'localhost';
 const localDomain = process.env.LOCAL_DOMAIN || 'localhost';
