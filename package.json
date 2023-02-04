@@ -11,6 +11,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "@fontsource/jura": "^4.5.13",
     "@fontsource/roboto": "^4.5.8",
     "@mui/material": "^5.11.7",

@@ -9,8 +9,10 @@ import '../styles/vars.css'
 import '../styles/globals.css'
 import '../styles/augmented-ui.min.css'
 import type { AppProps } from 'next/app'
+import { ThemeProvider } from '@mui/material/styles'
+import { theme } from './utilites/theme'
 
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return <ThemeProvider theme={theme} ><Component {...pageProps} /></ThemeProvider>;
 }

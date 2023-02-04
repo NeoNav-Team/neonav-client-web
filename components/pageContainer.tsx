@@ -1,5 +1,6 @@
 import Head from 'next/head';
-import styles from '../styles/Page.module.css';
+import { Container } from '@mui/material';
+import HeaderContainer from './headerContainer';
 
 interface PageContainerProps {
   title?: string;
@@ -13,15 +14,16 @@ export default function PageContainer(props:PageContainerProps):JSX.Element {
     mixedTitle = mixedTitle + `  [ ${title} ]`;
   }
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>{mixedTitle}</title>
         <meta name="description" content="NeoNav Web Client" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
+      <Container>
+      <HeaderContainer />
         {children}
-      </main>
-    </div>
+      </Container>
+    </>
   )
 }
