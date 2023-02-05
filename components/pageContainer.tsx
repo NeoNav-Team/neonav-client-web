@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { Container } from '@mui/material';
 import HeaderContainer from './headerContainer';
+import HomeView from './homeView';
 
 interface PageContainerProps {
   title?: string;
@@ -22,6 +23,7 @@ export default function PageContainer(props:PageContainerProps):JSX.Element {
       </Head>
       <Container>
       <HeaderContainer />
+        <HomeView />
         {children}
       </Container>
     </>

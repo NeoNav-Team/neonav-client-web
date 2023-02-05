@@ -1,0 +1,104 @@
+.iconFrame {
+    position: relative;
+    margin: 0 auto;
+    opacity: 1;
+}
+.augment {
+    position: absolute;
+    transition: all 0.25s ease-out;
+    opacity: 0.66;
+    margin-left: 6px;
+    margin-top: 6px;
+    --aug-all-width: 88%;
+    --reticle-color: var(--color-3);
+    --aug-border-all: 1px;
+    --reticle-size: calc(var(--aug-all-width) * 0.25);
+    --aug-border-bg: radial-gradient(
+      circle at top center,
+      var(--reticle-color) var(--reticle-size),
+      transparent var(--reticle-size)
+    ), radial-gradient(
+      circle at bottom 13.92% right 6.89%,
+      var(--reticle-color) var(--reticle-size),
+      transparent var(--reticle-size)
+    ), radial-gradient(
+      circle at bottom 13.92% left 6.89%,
+      var(--reticle-color) var(--reticle-size),
+      transparent var(--reticle-size)
+    );
+}
+.abg {
+    position: absolute;
+    margin-left: 6px;
+    margin-top: 6px;
+    top: 6px;
+    transition: all 0.25s ease-out;
+    opacity: 0.5;
+    --aug-all-width: 88%;
+    --aug-border-all: 1px;
+    --reticle-size: var(--aug-all-width);
+    --aug-border-bg: radial-gradient(
+      circle at top center,
+      var(--reticle-color) var(--reticle-size),
+      transparent var(--reticle-size)
+    ), radial-gradient(
+      circle at bottom 13.92% right 6.89%,
+      var(--reticle-color) var(--reticle-size),
+      transparent var(--reticle-size)
+    ), radial-gradient(
+      circle at bottom 13.92% left 6.89%,
+      var(--reticle-color) var(--reticle-size),
+      transparent var(--reticle-size)
+    );
+}
+.iconButton {
+    background-color: transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    outline:none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-55%);
+}
+.iconFrame:hover {
+    filter: drop-shadow(var(--color-3) 0 0 4px);
+}
+.iconFrame:hover .augment {
+    opacity: 1;
+    scale: 110%;
+    --aug-border-all: 2px;
+}
+.iconFrame:disabled {
+    opacity:.25;
+    pointer-events: none;
+}
+
+.iconFrame.even .augment, .iconframe.even .abg {
+    transform: rotateZ(180deg);
+}
+.iconFrame.even.abg {
+    margin-top: 0;
+}
+
+.iconName {
+    display:inline-block;
+    text-align: center;
+    padding: 0 12px;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-family: 'Jura';
+}
+.iconName span {
+    color: #fff;
+    padding: 2px;
+    margin: 0;
+    filter: drop-shadow(#fff 0 0 5px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 96px;
+    line-height: 24px;
+}

@@ -1,8 +1,8 @@
 :root {
-    --form-color-0: #ff00a0;
-    --form-color-1: #fe75fe;
-    --form-color-2: #7a04eb;
-    --form-color-3: #42c6ff;
+    --color-0: #ff00a0;
+    --color-1: #fe75fe;
+    --color-2: #7a04eb;
+    --color-3: #42c6ff;
     --background-color:#120458;
     --text-color: #fff;
     --error-color: #ff124f;

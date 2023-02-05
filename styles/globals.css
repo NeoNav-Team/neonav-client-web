@@ -2,7 +2,16 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;height: 100%;overflow: hidden;min-height: 100vh;max-height: 100vh;min-width: 100vw;background-color: #120458;background-image: radial-gradient(rgba(18, 4, 88, 0), rgba(18, 4, 88, 1)), linear-gradient(rgba(93, 28, 149, 0.8) 1px,transparent 0), linear-gradient(#5d1c95 1px,transparent 0), linear-gradient(90deg,rgba(93, 28, 149, 0.8) 1px,transparent 0), linear-gradient(90deg,#5d1c95 1px,transparent 0), linear-gradient(transparent 3px,#120458 0,#120458 94px,transparent 0), linear-gradient(90deg,#5d1c95 3px,transparent 0,transparent 94px,#5d1c95 0);background-size: 100vw, 100vh, 24px 24px,96px 96px,24px 24px,96px 96px,96px 96px,96px 96px;}
+  font-family: -apple-system, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  height: 100%;
+  overflow: hidden;
+  min-height: 100vh;
+  max-height: 100vh;
+  min-width: 100vw;
+  background-color: #120458;
+  background-image: radial-gradient(rgba(18, 4, 88, 0), rgba(18, 4, 88, 1)), linear-gradient(rgba(93, 28, 149, 0.8) 1px,transparent 0), linear-gradient(#5d1c95 1px,transparent 0), linear-gradient(90deg,rgba(93, 28, 149, 0.8) 1px,transparent 0), linear-gradient(90deg,#5d1c95 1px,transparent 0), linear-gradient(transparent 3px,#120458 0,#120458 94px,transparent 0), linear-gradient(90deg,#5d1c95 3px,transparent 0,transparent 94px,#5d1c95 0);
+  background-size: 100vw, 100vh, 24px 24px,96px 96px,24px 24px,96px 96px,96px 96px,96px 96px;
+}
 
 a {
   color: inherit;
