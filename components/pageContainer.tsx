@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import { Container } from '@mui/material';
 import HeaderContainer from './headerContainer';
-import HomeView from './homeView';
 
 interface PageContainerProps {
   title?: string;
@@ -21,9 +20,8 @@ export default function PageContainer(props:PageContainerProps):JSX.Element {
         <meta name="description" content="NeoNav Web Client" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container>
+      <Container disableGutters>
       <HeaderContainer />
-        <HomeView />
         {children}
       </Container>
     </>

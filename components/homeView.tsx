@@ -16,9 +16,9 @@ import Notifcations from './svgr/notifications';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
 
-interface PageContainerProps {}
+interface HomeViewProps {}
 
-export default function HomeView(props:PageContainerProps):JSX.Element {
+export default function HomeView(props:HomeViewProps):JSX.Element {
     //TODO: refact this to dynamically take an array of "app" data -- icon, label, link
     const fixedHeight = '16vh';
 

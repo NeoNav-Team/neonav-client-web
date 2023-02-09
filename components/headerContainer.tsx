@@ -25,13 +25,13 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
           className={styles.indigoPane}
           data-augmented-ui="tl-clip tr-clip both"
         >
-        <Container>
+        <Container disableGutters>
           <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1 }}>
+          <Box>
             <Grid container spacing={1} minHeight={64}>
               <Grid display="flex" justifyContent="center" alignItems="bottom">
                 <IconButton disableRipple={true}>
-                  <Logo sx={{ fontSize: 48, marginTop: 1 }} />
+                  <Logo sx={{ fontSize: 48, marginTop: 1, marginLeft: 2 }} />
                 </IconButton>
               </Grid>
               <Grid 
@@ -67,7 +67,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
           <Box>
             <Grid container spacing={1} minHeight={64}>
               <Grid display="flex" justifyContent="center" alignItems="bottom">
-                <IconButton disableRipple={true}>
+                <IconButton>
                   <AppsIcon sx={{ fontSize: 48, marginTop: 1 }} />
                 </IconButton>
               </Grid>
