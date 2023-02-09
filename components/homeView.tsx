@@ -1,6 +1,8 @@
+'use client';
 import { useContext, useEffect } from 'react';
-import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues } from '../components/context/nnTypes';
+import Link from 'next/link';
+import { Context as NnContext } from './context/nnContext';
+import { NnProviderValues } from './context/nnTypes';
 import { 
     Box,
     Container,
@@ -60,7 +62,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<Channels fontSize="inherit" />} title="Channels"/>
+                        <Link href="/">
+                            <IconFrame icon={<Channels fontSize="inherit" />} title="Channels"/>
+                        </Link>
                     </Box>
                     </Grid>
                     <Grid item xs={4}>
@@ -70,7 +74,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<Cash fontSize="inherit" />} title="Credits"/>
+                        <Link href="/cash">
+                            <IconFrame icon={<Cash fontSize="inherit" />} title="Credits"/>
+                        </Link>
                     </Box>
                 </Grid>
                 </Grid>

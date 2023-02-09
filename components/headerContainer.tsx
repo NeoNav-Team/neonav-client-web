@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { 
     AppBar,
     Badge,
@@ -30,9 +31,11 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
           <Box>
             <Grid container spacing={1} minHeight={64}>
               <Grid display="flex" justifyContent="center" alignItems="bottom">
-                <IconButton disableRipple={true}>
-                  <Logo sx={{ fontSize: 48, marginTop: 1, marginLeft: 2 }} />
-                </IconButton>
+                <Link href="/">
+                  <IconButton disableRipple={true}>
+                    <Logo sx={{ fontSize: 48, marginTop: 1, marginLeft: 2 }} />
+                  </IconButton>
+                </Link>
               </Grid>
               <Grid 
                 display="flex"

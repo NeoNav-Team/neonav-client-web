@@ -1,3 +1,4 @@
+'use client';
 import { useContext, useEffect } from 'react';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';

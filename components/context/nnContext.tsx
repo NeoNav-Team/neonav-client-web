@@ -1,3 +1,4 @@
+'use client';
 import DataContextCreator from "./dataContextCreator";
 import { NnProviderValues } from "./nnTypes";
 

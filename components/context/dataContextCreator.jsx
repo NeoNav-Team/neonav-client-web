@@ -1,11 +1,12 @@
-import React, { createContext, useReducer } from "react";
+'use client';
+import React from "react";
 
 const DataContextCreator = (
     reducer, actions, initialState
 ) => {
-    const Context = createContext({state: initialState});
+    const Context = React.createContext({state: initialState});
     const Provider = ({children}) => {
-        const [state, dispatch] = useReducer(reducer, initialState);
+        const [state, dispatch] = React.useReducer(reducer, initialState);
         const boundActions = {};
         for (let key in actions) {
             boundActions[key] = actions[key](dispatch);
