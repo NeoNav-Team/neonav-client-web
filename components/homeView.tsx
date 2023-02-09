@@ -1,3 +1,6 @@
+import { useContext, useEffect } from 'react';
+import { Context as NnContext } from '../components/context/nnContext';
+import { NnProviderValues } from '../components/context/nnTypes';
 import { 
     Box,
     Container,
@@ -18,10 +21,23 @@ import UserSettings from './svgr/usersettings';
 
 interface HomeViewProps {}
 
+const fixedHeight = '16vh';
+
 export default function HomeView(props:HomeViewProps):JSX.Element {
     //TODO: refact this to dynamically take an array of "app" data -- icon, label, link
-    const fixedHeight = '16vh';
 
+    const {
+        state,
+        fetchNetworkStatus = () => {},
+      }: NnProviderValues = useContext(NnContext);
+    
+      const { network } = state;
+      const { location } = network;
+    
+      useEffect(() => {
+        fetchNetworkStatus();
+      }, []);
+      
   return (
         <Container sx={{marginTop: '64px', minHeight: 'calc(100vh - 128px)'}}>
             <Grid container spacing={1}>
@@ -149,7 +165,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      justifyContent="center"
                      alignItems="center"
                      minHeight={fixedHeight}
-                    ></Box>
+                    >
+                        <IconFrame icon={<Kitty fontSize="inherit" />} title={location}/>
+                    </Box>
                 </Grid>
                 </Grid>
             </Grid>
