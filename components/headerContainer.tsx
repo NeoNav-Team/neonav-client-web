@@ -1,3 +1,7 @@
+'use client';
+import { useContext, useEffect, useState } from 'react';
+import { Context as NnContext } from '../components/context/nnContext';
+import { NnProviderValues } from '../components/context/nnTypes';
 import Link from 'next/link';
 import { 
     AppBar,
@@ -19,6 +23,23 @@ import Logo from './svgr/logo';
 interface PageContainerProps {}
 
 export default function HeaderContainer(props:PageContainerProps):JSX.Element {
+
+  const {
+    state, 
+    initContext = () => {},
+    fetchNetworkStatus = () => {},
+  }: NnProviderValues = useContext(NnContext);  
+  const [ initialized, setInitialized ] = useState(false)
+
+  useEffect(() => {
+    //get inital values on page load
+    if(!initialized) { 
+      initContext();
+      fetchNetworkStatus();
+      setInitialized(true);
+    }
+  }, []);
+
   return (
 
       <AppBar color='secondary'>

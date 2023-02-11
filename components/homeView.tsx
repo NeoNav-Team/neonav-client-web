@@ -1,8 +1,5 @@
 'use client';
-import { useContext, useEffect } from 'react';
 import Link from 'next/link';
-import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues } from './context/nnTypes';
 import { 
     Box,
     Container,
@@ -27,18 +24,6 @@ const fixedHeight = '16vh';
 
 export default function HomeView(props:HomeViewProps):JSX.Element {
     //TODO: refact this to dynamically take an array of "app" data -- icon, label, link
-
-    const {
-        state,
-        fetchNetworkStatus = () => {},
-      }: NnProviderValues = useContext(NnContext);
-    
-      const { network } = state;
-      const { location } = network;
-    
-      useEffect(() => {
-        fetchNetworkStatus();
-      }, []);
       
   return (
         <Container sx={{marginTop: '64px', minHeight: 'calc(100vh - 128px)'}}>
@@ -171,9 +156,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      justifyContent="center"
                      alignItems="center"
                      minHeight={fixedHeight}
-                    >
-                        <IconFrame icon={<Kitty fontSize="inherit" />} title={location}/>
-                    </Box>
+                    ></Box>
                 </Grid>
                 </Grid>
             </Grid>

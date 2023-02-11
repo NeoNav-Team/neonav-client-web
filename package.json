@@ -35,6 +35,7 @@
     "typescript": "4.9.4"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.2",
     "@types/styled-components": "^5.1.26"
   }
 }

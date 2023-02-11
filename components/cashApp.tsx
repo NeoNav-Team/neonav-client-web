@@ -1,5 +1,5 @@
 'use client';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 import { 
@@ -12,17 +12,25 @@ interface CashAppProps {
 
 export default function CashApp(props:CashAppProps):JSX.Element {
 
-    const {
+    const { 
         state,
-        fetchNetworkStatus = () => {},
-      }: NnProviderValues = useContext(NnContext);
-    
-      const { network } = state;
-      const { location } = network;
-    
-      useEffect(() => {
-        fetchNetworkStatus();
-      }, []);
+        fetchUserWallets = () => {},
+     }: NnProviderValues = useContext(NnContext);
+    const userid = state?.user?.profile?.auth?.userid;
+    const wallets = state?.user?.wallets;
+    const [ fetched, setFetched ] = useState(false);
+
+    const goFetchUserWallets = useCallback(() => {
+        if (!fetched) {
+            setFetched(true)
+            fetchUserWallets();
+        }
+    }, [fetchUserWallets, fetched])
+
+    useEffect(() => {
+        const walletSize = wallets && wallets.length;
+        walletSize === 0 && goFetchUserWallets();
+    }, [wallets, fetchUserWallets, fetched, goFetchUserWallets]);
 
     return (
         <Container disableGutters sx={{marginTop: '74px'}}>
@@ -33,7 +41,8 @@ export default function CashApp(props:CashAppProps):JSX.Element {
                     minHeight: 'calc(100vh - 84px)'
                 }}
             >
-                <h1>{location}</h1>
+                <h1>{userid}</h1>
+                <h1>{JSON.stringify(wallets)}</h1>
             </div>
         </Container>
     )

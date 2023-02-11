@@ -1,4 +1,4 @@
-import isBrowser from '../utils/isBrowser';
+import isBrowser from './isBrowser';
 
 interface IlocalStorage {
     method:string;
