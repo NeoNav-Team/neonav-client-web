@@ -56,12 +56,12 @@ export type NnWallet = {
     owner?: string,
     name?: string,
     balance: number,
+    transactions?: NnWalletTransaction[],
 }
 
 export type NnUser = {
     profile?: NnUserProfile,
     wallets?: NnWallet[],
-    walletHistory: NnWalletTransaction[],
     contacts?: [],
     channels?: [],
     notifcations?: [],

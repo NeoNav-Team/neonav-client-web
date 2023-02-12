@@ -1,5 +1,6 @@
 import { 
     Container,
+    Grid,
 } from '@mui/material';
 import styles from '../styles/generic.module.css';
 
@@ -19,7 +20,20 @@ export default function AppView(props:AppViewProps):JSX.Element {
                     minHeight: 'calc(100vh - 84px)'
                 }}
             >
-                {children}
+                <Grid
+                 container
+                 spacing={0}
+                 direction="column"
+                 alignItems="center"
+                 justifyContent="center"
+                 style={{ minHeight: 'calc(100vh - 74px)' }}
+                >
+                    <Grid
+                     item xs={3}
+                    >
+                        {children}
+                    </Grid>
+                </Grid>
             </div>
         </Container>
     )

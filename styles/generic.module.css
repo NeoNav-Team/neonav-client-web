@@ -27,3 +27,32 @@
     --aug-inlay-bg: radial-gradient(ellipse at top, #fff, transparent)  50% 50% / 100% 100%;
     --aug-inlay-opacity: 0.5;
 }
+
+.presentValue {
+    --aug-tr: 4px;
+    --aug-b-extend1: 50%;
+    --aug-border-all: 2px;
+    --aug-border-bg: radial-gradient(var(--background-color), var(--color-1)) 100% 100% / 100% 100%;
+    --aug-inlay-all: 2px;
+    --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-0), transparent)  50% 50% / 100% 100%;
+    --aug-inlay-opacity: 0.75;
+}
+
+.togglePanel {
+    --aug-tr: 4px;
+    --aug-b-extend1: 50%;
+    --aug-border-all: 4px;
+    --aug-border-bg: radial-gradient(var(--background-color), var(--color-3)) 100% 100% / 100% 100%;
+    --aug-inlay-all: 2px;
+    --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-2), transparent)  50% 50% / 100% 100%;
+    --aug-inlay-opacity: 0.5;
+}
+
+.selectMenu {
+    background-color: rgba(8,4,88, 0.8);
+    max-height: 33vh;
+}
+
+.selectItem[selected="true"] {
+    background-color: rgba(254,117,254, 0.8);
+}

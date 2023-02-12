@@ -32,7 +32,6 @@ export const nnSchema:NnStore = {
       contacts: [],
       channels: [],
       wallets: [],
-      walletHistory: [],
       notifcations: [],
       factions: [],
     },

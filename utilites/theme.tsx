@@ -12,6 +12,7 @@ export const themeOptions: ExtendedThemeOptions = {
         mode: 'dark',
         primary: {
             main: '#42c6ff',
+            contrastText: "var(--color-0)"
         },
         secondary: {
             main: '#ff00a0',

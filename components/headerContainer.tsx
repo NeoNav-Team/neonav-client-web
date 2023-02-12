@@ -38,7 +38,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
       fetchNetworkStatus();
       setInitialized(true);
     }
-  }, []);
+  }, [fetchNetworkStatus, initContext, initialized]);
 
   return (
 
