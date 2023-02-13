@@ -28,6 +28,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     state, 
     initContext = () => {},
     fetchNetworkStatus = () => {},
+    fetchUserContacts = () => {},
   }: NnProviderValues = useContext(NnContext);  
   const [ initialized, setInitialized ] = useState(false)
 
@@ -36,9 +37,10 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     if(!initialized) { 
       initContext();
       fetchNetworkStatus();
+      fetchUserContacts();
       setInitialized(true);
     }
-  }, [fetchNetworkStatus, initContext, initialized]);
+  }, [fetchNetworkStatus, fetchUserContacts, initContext, initialized]);
 
   return (
 
@@ -91,9 +93,11 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
           <Box>
             <Grid container spacing={1} minHeight={64}>
               <Grid display="flex" justifyContent="center" alignItems="bottom">
-                <IconButton>
-                  <AppsIcon sx={{ fontSize: 48, marginTop: 1 }} />
-                </IconButton>
+                <Link href="/">
+                  <IconButton>
+                    <AppsIcon sx={{ fontSize: 48, marginTop: 1 }} />
+                  </IconButton>
+                </Link>
               </Grid>
             </Grid>
           </Box>

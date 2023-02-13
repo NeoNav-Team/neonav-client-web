@@ -1,11 +1,15 @@
 'use client';
+import merge from 'deepmerge';
 import DataContextCreator from "./dataContextCreator";
 import { NnProviderValues, NnStore } from "./nnTypes";
 import { nnSchema } from "./nnSchema";
 import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/cookieContext";
 import executeApi from '@/utilites/executeApi';
 
-type ActionTypes = 'setNetwork' | 'setUserWallets' | 'initContext';
+type ActionTypes = 'setNetwork' | 
+  'setUserWallets' | 
+  'setUserContacts' | 
+  'initContext';
 
 interface Action {
   type: ActionTypes,
@@ -32,7 +36,7 @@ interface APIResponse {
 
 type DispatchFunc = (dispatch: Action) => void;
 
-const defaultNnContext:NnStore = Object.assign({}, nnSchema);
+const defaultNnContext:NnStore = merge({}, nnSchema);
 
 export const nnReducer = (state:NnProviderValues, action: Action) => {
   const {payload = {}, type = null} = action;
@@ -42,13 +46,16 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       newState = payload
       break;
     case 'setUserWallets':
-      newState = Object.assign(state, { user: { wallets: payload } });
+      newState = merge(state, { user: { wallets: payload } });
+      break;
+    case 'setUserContacts':
+      newState = merge(state, { user: { contacts: payload } });
       break;
     case 'setNetwork':
-      newState = Object.assign(state,  { network: { location: payload } });
+      newState = merge(state,  { network: { location: payload } });
       break;
   }
-  console.log(type, newState);
+  console.log(type, payload, newState);
   setCookieContext(newState);
   return newState;
 };
@@ -67,7 +74,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
       },
     };
     //creates empt default context with just the userID
-    Object.assign(onLoadUserContext, defaultNnContext, {user: userByJWT});
+    merge.all([onLoadUserContext, defaultNnContext, { user: userByJWT }]);
     setCookieContext(onLoadUserContext);
   } else {
     onLoadUserContext = cookieContextData;
@@ -94,6 +101,35 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
   executeApi('wallets', {token}, onSuccess, onError);
 }
 
+export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setUserContacts',
+      payload: data,
+    })
+  };
+  const onError = (err:object) => {
+    console.log('error', err);
+  };
+  executeApi('contacts', {token}, onSuccess, onError);
+}
+
+export const sendPayment = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    // dispatch({
+    //   type: 'setUserContacts',
+    //   payload: data,
+    // })
+  };
+  const onError = (err:object) => {
+    console.log('error', err);
+  };
+  executeApi('contacts', {token}, onSuccess, onError);
+}
 
 export const fetchNetworkStatus = (dispatch: DispatchFunc) => async () => {
   const onSuccess = (response:APIResponse) => {
@@ -116,6 +152,7 @@ export const { Context, Provider } = DataContextCreator(
   { 
     fetchNetworkStatus,
     fetchUserWallets,
+    fetchUserContacts,
     initContext,
   },
   defaultNnContext,

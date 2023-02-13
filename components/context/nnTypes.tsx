@@ -59,18 +59,26 @@ export type NnWallet = {
     transactions?: NnWalletTransaction[],
 }
 
+export type nnContact = {
+    id: string,
+    username?: string,
+    status?: string,
+}
+
 export type NnUser = {
     profile?: NnUserProfile,
     wallets?: NnWallet[],
-    contacts?: [],
+    contacts?: nnContact[],
     channels?: [],
     notifcations?: [],
     factions?: [],
+    scannedUsers?: nnContact[],
 }
 
 export type NnProviderDispatch = {
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
+    fetchUserContacts: () => void;
     initContext: () => void;
 }
 

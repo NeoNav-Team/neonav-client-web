@@ -1,5 +1,7 @@
-import * as React from 'react';
+import React, { useContext, useState } from 'react';
 import { Theme, useTheme } from '@mui/material/styles';
+import { Context as NnContext } from '../components/context/nnContext';
+import { NnProviderValues } from '../components/context/nnTypes';
 import styles from '../styles/generic.module.css';
 import {
     Box,
@@ -26,6 +28,11 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import WorkIcon from '@mui/icons-material/Work';
 import ThreePIcon from '@mui/icons-material/ThreeP';
 
+interface InputUserProps {
+    changeHandler: Function;
+    error?: boolean;
+}
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -36,20 +43,7 @@ const MenuProps = {
     },
   },
 };
-
 const options = ['scanned', 'contacts', 'chat', 'faction']; //TODO:  add faction to list if in factions
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
 
 function getStyles(name: string, userName: readonly string[], theme: Theme) {
   return {
@@ -60,12 +54,15 @@ function getStyles(name: string, userName: readonly string[], theme: Theme) {
   };
 }
 
-export default function InputUser() {
+export default function InputUser(props:InputUserProps):JSX.Element {
+  const { changeHandler, error } = props;
   const theme = useTheme();
   const [userName, setUserName] = React.useState<string[]>([]);
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const { state }: NnProviderValues = useContext(NnContext); 
+  const contacts = state.user?.contacts || []; 
 
   const handleChange = (event: SelectChangeEvent<typeof userName>) => {
     const {
@@ -75,12 +72,10 @@ export default function InputUser() {
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
+    changeHandler(value);
   };
 
   // UI Handlers
-  const handleClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`);
-  };
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
@@ -116,10 +111,20 @@ export default function InputUser() {
             return <PsychologyAltIcon />
     }
   }
+  
+  const nameById = (id:string) => {
+    const constacts = state.user?.contacts || [];
+    const scannedUsers = state.user?.scannedUsers || [];
+    const allKnownUsers = [...constacts, ...scannedUsers] || [];
+    if(allKnownUsers.length !== 0) {
+        const user = allKnownUsers.find(user => user.id === id);
+        return user ? user.username : id;
+    }
+  }
 
 
   return (
-      <FormControl fullWidth>
+      <FormControl fullWidth error={error}>
             <InputLabel shrink>Users</InputLabel>
             <Select
                 labelId="users"
@@ -135,7 +140,7 @@ export default function InputUser() {
                 renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {selected.map((value) => (
-                        <Chip key={value} label={value} />
+                        <Chip key={value} label={nameById(value)} />
                     ))}
                     </Box>
                 )}
@@ -148,7 +153,7 @@ export default function InputUser() {
                         aria-label="select merge strategy"
                         aria-haspopup="menu"
                         onClick={handleToggle}
-                        >
+                    >
                         {collectionIcon(options[selectedIndex])}
                     </Button>
                 </ButtonGroup>
@@ -192,13 +197,13 @@ export default function InputUser() {
 
                 </InputAdornment>}
                 >
-                {names.map((name) => (
+                {contacts.map((user, index) => (
                     <MenuItem
-                    key={name}
-                    value={name}
-                    style={getStyles(name, userName, theme)}
+                        key={`${user.id}_${index}`}
+                        value={user.id}
+                        style={getStyles(user.id, (user.username as unknown as string[] || user.id), theme)}
                     >
-                    {name}
+                    {(user.username as unknown as string[] || user.id)}
                     </MenuItem>
                 ))}
             </Select>

@@ -1,11 +1,13 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import z from 'zod';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import { 
     Container,
+    CircularProgress,
     Typography,
     Box,
     Grid,
@@ -18,19 +20,14 @@ import {
     OutlinedInput,
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import InputUser from './inputUser';
 
 
-interface CashAppProps {
-}
-
-type HTMLElementEvent<T extends HTMLElement> = Event & {
-    target: T;
-  }
+interface CashAppProps {};
 
 const flexContainer = {
     height: '100%',
@@ -64,7 +61,7 @@ const flexFooter = {
     width: '100%',
 };
 
-export default function CashApp(props:CashAppProps):JSX.Element {
+export default function CashApp(props: CashAppProps):JSX.Element {
 
     const { 
         state,
@@ -73,11 +70,13 @@ export default function CashApp(props:CashAppProps):JSX.Element {
 
     const wallets = state?.user?.wallets;
     const [ fetched, setFetched ] = useState(false);
+    const [ loading, setLoading ] = useState(false);
     const [ selected, setSelected ] = useState(0);
-    const [ transaction, setTransaction ] = useState('pay');
-    const [ userSelectType, setUserSelectType ] = useState('pay');
+    const [ processTypeValue, setProcessTypeValue ] = useState('pay');
     const [ transactionValue, setTransactionValue ] = useState<number | string>(0);
-    const balance = wallets && wallets[selected]?.balance;
+    const [ recpientsValue, setRecpientsValue ] = useState<String[]>([]);
+    const [ errFields, setErrFields ] = useState<(String | Number)[]>([]);
+    const balance = wallets ? wallets[selected]?.balance : '';
 
     const goFetchUserWallets = useCallback(() => {
         if (!fetched) {
@@ -87,11 +86,12 @@ export default function CashApp(props:CashAppProps):JSX.Element {
     }, [fetchUserWallets, fetched])
 
     const handleRequestToggle = (event: React.MouseEvent<HTMLElement>, nextTransaction: string) => {
-        setTransaction(nextTransaction);
+        setProcessTypeValue(nextTransaction);
     }
     const handleTransactionAmount = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        const newValue = event.currentTarget.value;
+        const newValue = parseInt(event.currentTarget.value, 10);
         setTransactionValue(newValue as unknown as number);
+        scrubErr('amount');
     }
     const handleFocusClear = () => {
         setTransactionValue('');
@@ -99,11 +99,79 @@ export default function CashApp(props:CashAppProps):JSX.Element {
     const handleBlurReZero = () => {
         transactionValue === '' && setTransactionValue(0);
     }
+    const handleRecipient = (recipientArr: Array<String>) => {
+        setRecpientsValue(recipientArr);
+        scrubErr('recipients');
+    }
+    const handleSubmit = () => {
+        //check for errors and submit
+        if (loading) {
+            return;
+        } else {
+            sendPayload();
+        }
+    }
+
+    const scrubErr = (errStr:string) => {
+        const newErrFields = errFields;
+        const scrubdex = errFields.indexOf(errStr);
+        newErrFields.splice(scrubdex, 1);
+        setErrFields(newErrFields);
+    }
+    const hasErr = (errStr:string) => {
+        return errFields.indexOf(errStr) !== -1;
+    }
+
+    const sendPayload = () => {
+        //validate payload
+        const data = z.object({
+            recipients: z.array(z.string()).nonempty(),
+            amount: z.number().min(1),
+        }).safeParse({ 
+            recipients: recpientsValue,
+            amount: transactionValue === '' ? 0 : transactionValue as number,
+        });
+        // show errors or do process
+        if (!data.success) {
+            let errFields: (string | number)[] = [];
+            data.error.issues.map(errObj => {
+                errFields = [...errFields, ...errObj.path]
+            });
+            setErrFields(errFields);
+            console.log('data.error.issues', data.error.issues);
+        } else {
+            setErrFields([]);
+            processTransactionQueue();
+            setLoading(true);
+        }
+    }
+
+    const processTransactionQueue = () => {
+        const transactionQueue = recpientsValue;
+        const promises:Function[] = [];
+        const payUser = (user:string) => {
+
+        }
+        const requestPaymentFromUser = (recipient:string, amount: string) => {
+        }
+        transactionQueue.map( userObj => {
+            switch (processTypeValue) {
+                case 'pay':
+                break;
+                case 'recieve':
+                break;
+            }
+        });
+
+        Promise.all(promises).then(function(values) {
+            console.log(values);
+          });
+    }
 
     useEffect(() => {
         const walletSize = wallets && wallets.length;
         walletSize === 0 && goFetchUserWallets();
-    }, [wallets, fetchUserWallets, fetched, goFetchUserWallets]);
+    }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected]);
 
     return (
         <Container disableGutters style={{height: '100%'}}>
@@ -137,7 +205,10 @@ export default function CashApp(props:CashAppProps):JSX.Element {
                                 alignItems="baseline"
                             >
                                 <Grid>
-                                    <Typography variant='h2' sx={{ fontSize: { xs: '2.5rem', sm: '3rem', md: '3.75rem' }}}>&nbsp;{balance}</Typography>
+                                    <Typography
+                                        variant='h2' sx={{ fontSize: { xs: '2.5rem', sm: '3rem', md: '3.75rem' }}}>
+                                        &nbsp;{balance}
+                                    </Typography>
                                 </Grid>
                                 <Grid>
                                     <Typography variant='h4' sx={{
@@ -166,14 +237,14 @@ export default function CashApp(props:CashAppProps):JSX.Element {
                             >
                                 <ToggleButton 
                                     value="pay"
-                                    selected={transaction == 'pay'}
+                                    selected={processTypeValue == 'pay'}
                                     sx={{width: '50%'}}
                                 >
                                 <Typography variant='h6'>Pay </Typography><TrendingDownIcon sx={{marginLeft: '10px'}}/> 
                                 </ToggleButton>
                                 <ToggleButton
                                     value="request"
-                                    selected={transaction == 'request'}
+                                    selected={processTypeValue == 'request'}
                                     sx={{width: '50%'}}
                                 >
                                 <Typography variant='h6'>Request </Typography><TrendingUpIcon sx={{marginLeft: '10px'}} /> 
@@ -181,7 +252,7 @@ export default function CashApp(props:CashAppProps):JSX.Element {
                             </ToggleButtonGroup>
                         </div>
                         <div style={{padding: '2vh'}}>
-                            <FormControl fullWidth>
+                            <FormControl fullWidth error={hasErr('amount')}>
                                 <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
                                 <OutlinedInput
                                     id="outlined-adornment-amount"
@@ -201,7 +272,7 @@ export default function CashApp(props:CashAppProps):JSX.Element {
                             </FormControl>
                         </div>
                         <div style={{padding: '2vh'}}>
-                            <InputUser />
+                            <InputUser changeHandler={handleRecipient} error={hasErr('recipients')} />
                         </div>
                     </SimpleScrollContainer>
                 </Box>
@@ -216,14 +287,23 @@ export default function CashApp(props:CashAppProps):JSX.Element {
                     </div>
                     <div style={{ height: 0, marginTop: '-135px', textAlign: 'center' }}>
                         <Box sx={{ '& > :not(style)': { m: 2 } }}>
-                            <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(-20deg)'}}>
+                            <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(-10deg)'}}>
                                 <QrCodeScannerIcon  sx={{ fontSize: '40px'}} />
                             </Fab>
-                            <Fab color="secondary" aria-label="send" sx={{ height: '100px', width: '100px'}}>
-                                <CurrencyExchangeIcon sx={{ fontSize: '70px'}} />
+                            <Fab color="secondary"
+                                aria-label="send"
+                                disabled={loading}
+                                sx={{ height: '100px', width: '100px'}}
+                                onClick={handleSubmit}
+                            >
+                                {loading ? (
+                                    <CircularProgress sx={{ fontSize: '70px'}} />
+                                ) : (
+                                    <CurrencyExchangeIcon sx={{ fontSize: '70px'}} />
+                                )}
                             </Fab>
-                            <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(20deg)'}}>
-                                <ReceiptLongIcon  sx={{ fontSize: '40px'}} />
+                            <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(10deg)'}}>
+                                <QueryStatsIcon  sx={{ fontSize: '40px'}} />
                             </Fab>
                         </Box>
                     </div>

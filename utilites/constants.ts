@@ -32,5 +32,9 @@ export const authApiEnpoints = {
     wallets: {
         method: "get",
         path: "/api/user/walletlist"  
+    },
+    contacts: {
+        method: "get",
+        path: "/api/user/friends"       
     }
 };
