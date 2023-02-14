@@ -3,6 +3,11 @@ import { NnStore } from "./nnTypes";
 export const nnSchema:NnStore = {
     network: { 
       location: 'loading...',
+      alert: {
+        severity: '',
+        message: '',
+        show: false,
+      },
       APILastFetch: {
         profile: '',
         wallets: '',

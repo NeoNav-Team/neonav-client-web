@@ -7,6 +7,7 @@ import { Context as NnContext, sendPayment } from '../components/context/nnConte
 import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import { 
+    Alert,
     Container,
     CircularProgress,
     Typography,
@@ -19,6 +20,7 @@ import {
     InputLabel,
     InputAdornment,
     OutlinedInput,
+    Snackbar,
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
@@ -66,12 +68,15 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
     const { 
         state,
+        closeAlert = () => {},
         fetchUserWallets = () => {},
         sendPayment = (user:string, amount:string) => {},
      }: NnProviderValues = useContext(NnContext);
 
     const [ fetched, setFetched ] = useState(false);
     const [ loading, setLoading ] = useState(false);
+    const [ showResMsg, setShowResMsg ] = useState(false);
+    const [ resMsgObj, setResMsgObj ] = useState({error: false, message:'c±sн'});
     const [ selected, setSelected ] = useState(0);
     const [ processTypeValue, setProcessTypeValue ] = useState('pay');
     const [ transactionValue, setTransactionValue ] = useState<number | string>(0);
@@ -80,6 +85,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     const wallets = state?.user?.wallets;
     const wallet = wallets && wallets[selected];
     const balance = wallet ? wallet?.balance : null;
+    const alert = state?.network?.alert;
 
     const goFetchUserWallets = useCallback(() => {
         if (!fetched) {
@@ -114,6 +120,13 @@ export default function CashApp(props: CashAppProps):JSX.Element {
             sendPayload();
         }
     }
+
+    const handleAlertClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+        closeAlert();
+    };
 
     const scrubErr = (errStr:string) => {
         const newErrFields = errFields;
@@ -166,11 +179,33 @@ export default function CashApp(props: CashAppProps):JSX.Element {
             return () => {};
         });
 
-        const p = Promise.resolve(promises).then(()=>{
+        const p = Promise.resolve(promises).catch((err) => {
+            // log that I have an error, return the entire array;
+            console.log('err', err);
+            setLoading(false);
+            setResMsgObj({error: true, message: 'An error has occured.'});
+            setShowResMsg(true);
+            return;
+        })
+        .then((data)=>{
+            console.log('data', data);
             fetchUserWallets();
             resetCashForm();
-            setInterval(()=> setLoading(false), 250); // shows indicator
-        })
+            setTimeout(()=> {
+                setLoading(false);
+                setResMsgObj({error: false, message: `${processTypeValue === 'pay' ? 'Payment Complete.' : 'Request sent.'}`});
+                setShowResMsg(true);
+            }, 300); // shows indicator
+        },
+        (err) => {
+            // log that I have an error, return the entire array;
+            console.log('err', err);
+            setLoading(false);
+            setResMsgObj({error: true, message: 'An error has occured.'});
+            setShowResMsg(true);
+            return;
+        }
+        )
     }
 
     useEffect(() => {
@@ -317,6 +352,23 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 </Box>
             </Box>
         </div>
-        </Container>
+        {/* Refactor below into the header since it now universal */}
+        <Snackbar
+          open={alert?.show}
+          onClose={handleAlertClose}
+          autoHideDuration={2500}
+          style={{
+            bottom: '15vh',
+            filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)'
+        }}
+        >
+                <Alert 
+                    severity={alert?.severity === 'error' ? 'error' : 'success'}
+                    variant="outlined"
+                >
+                    {alert?.message}
+                </Alert>
+        </Snackbar>
+    </Container>
     )
 }

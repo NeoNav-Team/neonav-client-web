@@ -15,7 +15,14 @@ export type NnFetchDates = {
     walletHistory?: string,
 }
 
+export type NnAert = {
+    severity?: 'success' | 'error' | 'info' | 'warning',
+    message?: string,
+    show: boolean,
+}
+
 export type NnNetwork = {
+    alert: NnAert,
     location?: string,
     APILastFetch?: NnFetchDates,
 }
@@ -76,6 +83,7 @@ export type NnUser = {
 }
 
 export type NnProviderDispatch = {
+    closeAlert: () => void;
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;

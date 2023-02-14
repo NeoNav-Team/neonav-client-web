@@ -7,6 +7,7 @@ import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/c
 import executeApi from '@/utilites/executeApi';
 
 type ActionTypes = 'setNetwork' | 
+  'setAlert' |
   'setUserWallets' | 
   'setUserContacts' | 
   'initContext';
@@ -22,6 +23,10 @@ interface walletAPIResData {
 }
 
 interface netcheckAPIResData {
+  message?: String;
+}
+
+interface errorAPIResData {
   message?: String;
 }
 
@@ -43,6 +48,8 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   let newState = null;
   let clonedState = JSON.parse(JSON.stringify(state));
   switch (type) {
+    case 'setAlert':
+      clonedState.network.alert = {...clonedState.network.alert, ...payload}
     case 'initContext':
       newState = payload
       break;
@@ -95,10 +102,16 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
     dispatch({
       type: 'setUserWallets',
       payload: data,
-    })
+    });
+    return data;
   };
-  const onError = (err:object) => {
-    console.log('error', err);
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Wallets failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
   };
   executeApi('wallets', {token}, onSuccess, onError);
 }
@@ -112,21 +125,40 @@ export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
       payload: data,
     })
   };
-  const onError = (err:object) => {
-    console.log('error', err);
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Contact failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
   };
   executeApi('contacts', {token}, onSuccess, onError);
 }
 
 export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount:string) => {
-  console.log('sendPayment', recipient, amount);
   const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {};
-  const onError = (err:object) => {
-    console.log('error', err);
+  const onSuccess = (response:APIResponse) => {
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message: 'Payments Sucessful', show: true},
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Payment Failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
   };
   setTimeout(() => executeApi('pay', {token, recipient, amount}, onSuccess, onError), 2000);
 }
+
+export const closeAlert = (dispatch: DispatchFunc) => async () => {
+  dispatch({
+    type: 'setAlert',
+    payload: {show: false},
+  })
+};
 
 export const fetchNetworkStatus = (dispatch: DispatchFunc) => async () => {
   const onSuccess = (response:APIResponse) => {
@@ -147,6 +179,7 @@ export const fetchNetworkStatus = (dispatch: DispatchFunc) => async () => {
 export const { Context, Provider } = DataContextCreator(
   nnReducer,
   { 
+    closeAlert,
     fetchNetworkStatus,
     fetchUserWallets,
     fetchUserContacts,
