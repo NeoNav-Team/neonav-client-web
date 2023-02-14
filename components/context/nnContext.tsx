@@ -39,24 +39,26 @@ type DispatchFunc = (dispatch: Action) => void;
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
 export const nnReducer = (state:NnProviderValues, action: Action) => {
-  const {payload = {}, type = null} = action;
-  let newState = {};
+  const {payload, type = null} = action;
+  let newState = null;
+  let clonedState = JSON.parse(JSON.stringify(state));
   switch (type) {
     case 'initContext':
       newState = payload
       break;
     case 'setUserWallets':
-      newState = merge(state, { user: { wallets: payload } });
+      clonedState.user.wallets = payload;
       break;
     case 'setUserContacts':
-      newState = merge(state, { user: { contacts: payload } });
+      clonedState.user.contacts = payload;
       break;
     case 'setNetwork':
-      newState = merge(state,  { network: { location: payload } });
+      clonedState.network.location = payload;
       break;
   }
+  newState = {...state, ...clonedState};
   console.log(type, payload, newState);
-  setCookieContext(newState);
+  newState && setCookieContext(newState);
   return newState;
 };
 
@@ -116,19 +118,14 @@ export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
   executeApi('contacts', {token}, onSuccess, onError);
 }
 
-export const sendPayment = (dispatch: DispatchFunc) => async () => {
+export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount:string) => {
+  console.log('sendPayment', recipient, amount);
   const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {
-    const { data } = response;
-    // dispatch({
-    //   type: 'setUserContacts',
-    //   payload: data,
-    // })
-  };
+  const onSuccess = (response:APIResponse) => {};
   const onError = (err:object) => {
     console.log('error', err);
   };
-  executeApi('contacts', {token}, onSuccess, onError);
+  setTimeout(() => executeApi('pay', {token, recipient, amount}, onSuccess, onError), 2000);
 }
 
 export const fetchNetworkStatus = (dispatch: DispatchFunc) => async () => {
@@ -153,6 +150,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchNetworkStatus,
     fetchUserWallets,
     fetchUserContacts,
+    sendPayment,
     initContext,
   },
   defaultNnContext,

@@ -1,8 +1,9 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
-import { Context as NnContext } from '../components/context/nnContext';
+import { Context as NnContext, sendPayment } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import { 
@@ -66,21 +67,23 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     const { 
         state,
         fetchUserWallets = () => {},
+        sendPayment = (user:string, amount:string) => {},
      }: NnProviderValues = useContext(NnContext);
 
-    const wallets = state?.user?.wallets;
     const [ fetched, setFetched ] = useState(false);
     const [ loading, setLoading ] = useState(false);
     const [ selected, setSelected ] = useState(0);
     const [ processTypeValue, setProcessTypeValue ] = useState('pay');
     const [ transactionValue, setTransactionValue ] = useState<number | string>(0);
-    const [ recpientsValue, setRecpientsValue ] = useState<String[]>([]);
-    const [ errFields, setErrFields ] = useState<(String | Number)[]>([]);
-    const balance = wallets ? wallets[selected]?.balance : '';
+    const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]);
+    const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
+    const wallets = state?.user?.wallets;
+    const wallet = wallets && wallets[selected];
+    const balance = wallet ? wallet?.balance : null;
 
     const goFetchUserWallets = useCallback(() => {
         if (!fetched) {
-            setFetched(true)
+            setFetched(true);
             fetchUserWallets();
         }
     }, [fetchUserWallets, fetched])
@@ -99,7 +102,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     const handleBlurReZero = () => {
         transactionValue === '' && setTransactionValue(0);
     }
-    const handleRecipient = (recipientArr: Array<String>) => {
+    const handleRecipient = (recipientArr: Array<string>) => {
         setRecpientsValue(recipientArr);
         scrubErr('recipients');
     }
@@ -121,6 +124,10 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     const hasErr = (errStr:string) => {
         return errFields.indexOf(errStr) !== -1;
     }
+    const resetCashForm = () => {
+        setRecpientsValue([]);
+        setTransactionValue(0);
+    }
 
     const sendPayload = () => {
         //validate payload
@@ -138,40 +145,40 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 errFields = [...errFields, ...errObj.path]
             });
             setErrFields(errFields);
-            console.log('data.error.issues', data.error.issues);
         } else {
+            setLoading(true);
             setErrFields([]);
             processTransactionQueue();
-            setLoading(true);
         }
     }
 
     const processTransactionQueue = () => {
         const transactionQueue = recpientsValue;
-        const promises:Function[] = [];
-        const payUser = (user:string) => {
-
-        }
-        const requestPaymentFromUser = (recipient:string, amount: string) => {
-        }
-        transactionQueue.map( userObj => {
+        const limit = pLimit(1);
+        const promises:Function[] = transactionQueue.map( userId => {
             switch (processTypeValue) {
                 case 'pay':
+                    limit(() =>{ sendPayment(userId, transactionValue as string)});
                 break;
                 case 'recieve':
                 break;
             }
+            return () => {};
         });
 
-        Promise.all(promises).then(function(values) {
-            console.log(values);
-          });
+        const p = Promise.resolve(promises).then(()=>{
+            fetchUserWallets();
+            resetCashForm();
+            setInterval(()=> setLoading(false), 250); // shows indicator
+        })
     }
 
     useEffect(() => {
         const walletSize = wallets && wallets.length;
         walletSize === 0 && goFetchUserWallets();
     }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected]);
+
+
 
     return (
         <Container disableGutters style={{height: '100%'}}>
@@ -272,7 +279,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                             </FormControl>
                         </div>
                         <div style={{padding: '2vh'}}>
-                            <InputUser changeHandler={handleRecipient} error={hasErr('recipients')} />
+                            <InputUser changeHandler={handleRecipient} value={recpientsValue} error={hasErr('recipients')} />
                         </div>
                     </SimpleScrollContainer>
                 </Box>

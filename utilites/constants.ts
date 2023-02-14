@@ -33,6 +33,10 @@ export const authApiEnpoints = {
         method: "get",
         path: "/api/user/walletlist"  
     },
+    pay: {
+        method: "put",
+        path: "/api/user/wallet"  
+    },
     contacts: {
         method: "get",
         path: "/api/user/friends"       

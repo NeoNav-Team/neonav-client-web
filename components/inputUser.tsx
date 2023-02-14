@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Theme, useTheme } from '@mui/material/styles';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
@@ -31,6 +31,7 @@ import ThreePIcon from '@mui/icons-material/ThreeP';
 interface InputUserProps {
     changeHandler: Function;
     error?: boolean;
+    value: string[];
 }
 
 const ITEM_HEIGHT = 48;
@@ -55,12 +56,12 @@ function getStyles(name: string, userName: readonly string[], theme: Theme) {
 }
 
 export default function InputUser(props:InputUserProps):JSX.Element {
-  const { changeHandler, error } = props;
+  const { changeHandler, error, value } = props;
   const theme = useTheme();
-  const [userName, setUserName] = React.useState<string[]>([]);
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [userName, setUserName] = useState<string[]>(value);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(1);
   const { state }: NnProviderValues = useContext(NnContext); 
   const contacts = state.user?.contacts || []; 
 
@@ -95,6 +96,10 @@ export default function InputUser(props:InputUserProps):JSX.Element {
     }
     setOpen(false);
   };
+
+  useEffect(()=>{
+    value !== userName && setUserName(value);
+  }, [userName, value]);
 
   //JSX Elements
   const collectionIcon = (icon: string) => {
