@@ -39,7 +39,7 @@ export const authApiEnpoints = {
     },
     request: {
         method: "put",
-        path: "/api/user/_id/walletrequest"
+        path: "/api/user/$id/walletrequest"
     },
     contacts: {
         method: "get",

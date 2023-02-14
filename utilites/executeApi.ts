@@ -13,7 +13,12 @@ const executeAPI = (endpoint:string, data:any, callback: any, errBack: any):Prom
     }
     axiosDefaults.port = apiUrl.port;
     const { path, method } = (authApiEnpoints as any)[endpoint];
-    const url = `${apiUrl.protocol}://${apiUrl.hostname}${path}`;
+    let templatedPath = path;
+    data && Object.keys(data).forEach((key:string) => {
+        templatedPath = templatedPath.replace(`$${key}`, data[key])
+    });
+    const url = `${apiUrl.protocol}://${apiUrl.hostname}${templatedPath}`;
+    console.log('url', url);
     return axios({
         method,
         url,

@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
-import { Context as NnContext, sendPayment } from '../components/context/nnContext';
+import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import { 
@@ -70,13 +70,12 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         state,
         closeAlert = () => {},
         fetchUserWallets = () => {},
+        requestPayment = (user:string, amount:string) => {},
         sendPayment = (user:string, amount:string) => {},
      }: NnProviderValues = useContext(NnContext);
 
     const [ fetched, setFetched ] = useState(false);
     const [ loading, setLoading ] = useState(false);
-    const [ showResMsg, setShowResMsg ] = useState(false);
-    const [ resMsgObj, setResMsgObj ] = useState({error: false, message:'c±sн'});
     const [ selected, setSelected ] = useState(0);
     const [ processTypeValue, setProcessTypeValue ] = useState('pay');
     const [ transactionValue, setTransactionValue ] = useState<number | string>(0);
@@ -173,39 +172,19 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 case 'pay':
                     limit(() =>{ sendPayment(userId, transactionValue as string)});
                 break;
-                case 'recieve':
+                case 'request':
+                    limit(() =>{ requestPayment(userId, transactionValue as string)});
                 break;
             }
             return () => {};
         });
 
-        const p = Promise.resolve(promises).catch((err) => {
-            // log that I have an error, return the entire array;
-            console.log('err', err);
-            setLoading(false);
-            setResMsgObj({error: true, message: 'An error has occured.'});
-            setShowResMsg(true);
-            return;
-        })
+        const p = Promise.resolve(promises)
         .then((data)=>{
-            console.log('data', data);
             fetchUserWallets();
             resetCashForm();
-            setTimeout(()=> {
-                setLoading(false);
-                setResMsgObj({error: false, message: `${processTypeValue === 'pay' ? 'Payment Complete.' : 'Request sent.'}`});
-                setShowResMsg(true);
-            }, 300); // shows indicator
-        },
-        (err) => {
-            // log that I have an error, return the entire array;
-            console.log('err', err);
-            setLoading(false);
-            setResMsgObj({error: true, message: 'An error has occured.'});
-            setShowResMsg(true);
-            return;
-        }
-        )
+            setTimeout(()=> setLoading(false), 300); // shows indicator briefly for user feedback
+        });
     }
 
     useEffect(() => {

@@ -87,6 +87,7 @@ export type NnProviderDispatch = {
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;
+    requestPayment: (_user:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
     initContext: () => void;
 }

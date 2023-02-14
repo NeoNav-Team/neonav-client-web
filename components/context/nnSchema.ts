@@ -4,7 +4,7 @@ export const nnSchema:NnStore = {
     network: { 
       location: 'loading...',
       alert: {
-        severity: '',
+        severity: 'info',
         message: '',
         show: false,
       },
