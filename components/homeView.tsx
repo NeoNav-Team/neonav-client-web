@@ -12,6 +12,7 @@ import Channels from './svgr/channels';
 import TanChat from './svgr/tanchat';
 import NeoSites from './svgr/neosites';
 import Contacts from './svgr/contacts';
+import Map from './svgr/map';
 import Notes from './svgr/notes';
 import Announcements from './svgr/annoucements';
 import Notifcations from './svgr/notifications';
@@ -111,7 +112,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                     </Box>
                     </Grid>
                     <Grid item xs={4}>
-                         <Box
+                    <Box
                      display="flex"
                      justifyContent="center"
                      alignItems="center"
@@ -121,13 +122,15 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                     </Box>
                     </Grid>
                     <Grid item xs={4}>
-                         <Box
+                    <Box
                      display="flex"
                      justifyContent="center"
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<Help fontSize="inherit" />} title="Help"/>
+                        <Link href="/help">
+                            <IconFrame icon={<Help fontSize="inherit" />} title="Help"/>
+                        </Link>
                     </Box>
                 </Grid>
                 </Grid>
@@ -149,17 +152,23 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<Kitty fontSize="inherit" />} title="Kitty"/>
+                        <Link href="/map">
+                            <IconFrame icon={<Map fontSize="inherit" />} title="Map"/>
+                        </Link>
                     </Box>
                     </Grid>
                     <Grid item xs={4}>
                          <Box
-                     display="flex"
-                     justifyContent="center"
-                     alignItems="center"
-                     minHeight={fixedHeight}
-                    ></Box>
-                </Grid>
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            minHeight={fixedHeight}
+                            >
+                            <Link href="/">
+                            <IconFrame icon={<Kitty fontSize="inherit" />} title="Kitty"/>
+                        </Link>
+                        </Box>
+                    </Grid>
                 </Grid>
             </Grid>
         </Container>

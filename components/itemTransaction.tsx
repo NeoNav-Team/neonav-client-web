@@ -26,11 +26,23 @@ interface itemTransactionProps {
         if (value >= 1000 )  {
             pay = '🤑'
         }
+        if (value >= 10000 )  {
+            pay = '🤪'
+        }
+        if (value >= 100000 )  {
+            pay = '🫠'
+        }
         if (value <= -100) {
             pay = '🥹'
         }
         if (value <= -1000) {
             pay = '😭'
+        }
+        if (value <= -10000 )  {
+            pay = '🤮'
+        }
+        if (value <= -100000 )  {
+            pay = '🤯'
         }
         if (value > 0) {
             return <span>⇢ 💸{pay} ⇢</span>
@@ -59,11 +71,11 @@ interface itemTransactionProps {
                     alignItems="center"
                     spacing={0}
                 >
-                <Box sx={{minWidth:'50%'}}>
+                <Box sx={{minWidth:'45%'}}>
                     <Typography className={styles.idText}>{id}</Typography>
                     <Typography className={styles.userText}>{username}</Typography>
                 </Box>
-                <Box sx={{minWidth:'50%'}}>
+                <Box sx={{minWidth:'55%'}}>
                 <Stack
                     direction="row"
                     justifyContent="space-between"

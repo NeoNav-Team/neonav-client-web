@@ -66,6 +66,7 @@
     line-height: 2rem;
     color: var(--success-color);
     white-space: nowrap;
+    font-family: 'Jura';
     filter: drop-shadow(var(--color-2) 0 0 5px);
 }
 .loss {
@@ -73,6 +74,7 @@
     line-height: 2rem;
     color: var(--warning-color);
     white-space: nowrap;
+    font-family: 'Jura';
     filter: drop-shadow(#000 1px 1px 5px);
 }
 
