@@ -8,11 +8,12 @@ export const nnSchema:NnStore = {
         message: '',
         show: false,
       },
-      APILastFetch: {
+      apiLastFetch: {
         profile: '',
         wallets: '',
         walletHistory: '',
-      }
+      },
+      selectedAccount: '',
     },
     user: {
       profile: {

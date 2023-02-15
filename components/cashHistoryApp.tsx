@@ -5,16 +5,17 @@ import Link from 'next/link';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
+import ItemTransaction from './itemTransaction';
+import InputBalance from './inputBalance';
 import { 
     Container,
-    Typography,
     Box,
-    Grid,
     Fab,
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import { Stack } from '@mui/system';
 
 
 interface CashAppProps {};
@@ -55,29 +56,46 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
     const { 
         state,
+        fetchUserWallets = () =>{},
         fetchUserWalletHistory = (walletId:string) => {},
      }: NnProviderValues = useContext(NnContext);
 
-    const [ fetched, setFetched ] = useState(false);
+    const [ walletFetched, setWalletFetched ] = useState(false);
+    const [ transactionsFetched, setTransactionsFetched ] = useState(false);
     const [ selected, setSelected ] = useState(0);
     const wallets = state?.user?.wallets;
     const wallet = wallets && wallets[selected];
     const balance = wallet ? wallet?.balance : null;
+    const transactions = wallet ? wallet?.transactions : null;
+
+    const goFetchWallets = useCallback(() => {
+        if (!walletFetched) {
+            fetchUserWallets();
+            setWalletFetched(true);
+        }
+    }, [walletFetched, fetchUserWallets])
 
     const goFetchWalletsHistory = useCallback(() => {
-        if (!fetched) {
-            setFetched(true);
-            fetchUserWalletHistory('banana');
+        if (wallets && wallets.length !== 0 && !transactionsFetched) {
+            const walletId = wallets && wallets[selected] && wallets[selected].id || '';
+            fetchUserWalletHistory(walletId);
+            setTransactionsFetched(true);
         }
-    }, [fetchUserWalletHistory, fetched])
-
+    }, [transactionsFetched, wallets, selected, fetchUserWalletHistory])
 
     useEffect(() => {
         const walletSize = wallets && wallets.length;
-        walletSize === 0 && goFetchWalletsHistory();
-    }, [wallets, fetched, goFetchWalletsHistory, selected]);
+        if (walletSize === 0) {
+            goFetchWallets();
+        }
+    }, [wallets, goFetchWallets]);
 
-
+    useEffect(() => {
+        const walletHistorySize = wallets && typeof wallets[0]?.transactions === 'undefined';
+        if (walletHistorySize) {
+            goFetchWalletsHistory();
+        }
+    }, [wallets, goFetchWalletsHistory, selected]);
 
     return (
         <Container disableGutters style={{height: '100%'}}>
@@ -88,49 +106,25 @@ export default function CashApp(props: CashAppProps):JSX.Element {
             >
             <Box sx={flexContainer}>
                 <Box sx={flexHeader}>
-                  <Container sx={{paddingTop: '20px'}}>
-
-                        <div
-                            className={styles.presentValue}
-                            data-augmented-ui="tl-clip-x tr-rect br-clip bl-clip both"
-                            style={{padding: '2vh'}}
-                        >
-                            <Typography variant='h4' sx={{
-                                color:'var(--color-0)',
-                                filter: 'drop-shadow(var(--color-0) 0px 0px 5px)',
-                                position: 'absolute',
-                                opacity: '0.5',
-                                fontSize: { xs: '1rem', sm: '1.5rem', md: '2.125rem' }
-                            }}>
-                                BALANCE
-                            </Typography>
-                            <Grid
-                                container
-                                direction="row"
-                                justifyContent="flex-end"
-                                alignItems="baseline"
-                            >
-                                <Grid>
-                                    <Typography
-                                        variant='h2' sx={{ fontSize: { xs: '2.5rem', sm: '3rem', md: '3.75rem' }}}>
-                                        &nbsp;{balance}
-                                    </Typography>
-                                </Grid>
-                                <Grid>
-                                    <Typography variant='h4' sx={{
-                                        color:'var(--color-0)',
-                                        filter: 'drop-shadow(var(--color-0) 0px 0px 5px)',
-                                        letterSpacing: { xs: '-0.121rem', sm: '-0.25rem', md: '-0.33rem' },
-                                        fontSize: { xs: '1rem', sm: '1.5rem', md: '2.125rem' }
-                                    }}>c±sн</Typography>
-                                </Grid>
-                            </Grid>
-                        </div>
-                    </Container>
+                <Container sx={{paddingTop: '20px'}}>
+                    <InputBalance balance={balance} />
+                </Container>
                 </Box>
                 <Box sx={flexBody}>
                     <SimpleScrollContainer>
-
+                        <Stack>
+                            {transactions && transactions.map(item => {
+                               return (
+                                <ItemTransaction
+                                    key={`${item.user}_${item.ts}`}
+                                    id={item.user}
+                                    date={item.ts}
+                                    username={item.username}
+                                    amount={item.amount}
+                                />
+                               )
+                            })}
+                        </Stack>
                     </SimpleScrollContainer>
                 </Box>
                 <Box sx={flexFooter}>

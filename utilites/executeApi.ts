@@ -18,7 +18,6 @@ const executeAPI = (endpoint:string, data:any, callback: any, errBack: any):Prom
         templatedPath = templatedPath.replace(`$${key}`, data[key])
     });
     const url = `${apiUrl.protocol}://${apiUrl.hostname}${templatedPath}`;
-    console.log('url', url);
     return axios({
         method,
         url,

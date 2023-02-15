@@ -9,6 +9,7 @@ import executeApi from '@/utilites/executeApi';
 type ActionTypes = 'setNetwork' | 
   'setAlert' |
   'setUserWallets' | 
+  'setWalletTransactions' |
   'setUserContacts' | 
   'initContext';
 
@@ -57,6 +58,11 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setUserWallets':
       clonedState.user.wallets = payload;
       break;
+    case 'setWalletTransactions':
+      const walletId = clonedState.network.selectedAccount;
+      const index = clonedState.user.wallets.map((e:any) => e.id).indexOf(walletId);
+      clonedState.user.wallets[index].transactions = payload;
+      break;
     case 'setUserWallets':
       clonedState.user.wallets = payload;
       break;
@@ -69,6 +75,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   }
   newState = {...state, ...clonedState};
   newState && setCookieContext(newState);
+  console.log(type, payload);
   return newState;
 };
 
@@ -80,13 +87,18 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     const cookieJWTData = getCookieToken();
     const cookieDataArr = cookieJWTData.split('.');
     const cookieDataObj =  JSON.parse(window.atob(cookieDataArr[1]));
-    let userByJWT = {
-      auth: {
-        userid: cookieDataObj.id,
-      },
-    };
     //creates empt default context with just the userID
-    merge.all([onLoadUserContext, defaultNnContext, { user: userByJWT }]);
+    const jwtContext =  {
+        network: {
+        selectedAccount: cookieDataObj.id,
+      },
+      user: {
+        auth: {
+          userid: cookieDataObj.id,
+        }
+      }
+    };
+    onLoadUserContext = merge.all([onLoadUserContext, defaultNnContext, jwtContext]);
     setCookieContext(onLoadUserContext);
   } else {
     onLoadUserContext = cookieContextData;
@@ -118,7 +130,24 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
   };
   executeApi('wallets', {token}, onSuccess, onError);
 }
-export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async () => {
+export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async (walletId:string) => {
+  if (walletId === '' || typeof walletId === 'undefined') { return; }
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setWalletTransactions',
+      payload: data,
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Wallet History failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  executeApi('walletHistory', {token}, onSuccess, onError);
 };
 
 export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {

@@ -24,7 +24,8 @@ export type NnAert = {
 export type NnNetwork = {
     alert: NnAert,
     location?: string,
-    APILastFetch?: NnFetchDates,
+    apiLastFetch?: NnFetchDates,
+    selectedAccount?: string,
 }
 
 export type NnProfileAuth = {
