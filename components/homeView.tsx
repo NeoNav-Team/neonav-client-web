@@ -73,7 +73,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<NeoSites fontSize="inherit" />} title="NeoSites"/>
+                        <Link href="/sites">
+                            <IconFrame icon={<NeoSites fontSize="inherit" />} title="NeoSites"/>
+                        </Link>
                     </Box>
                     </Grid>
                     <Grid item xs={4}>
