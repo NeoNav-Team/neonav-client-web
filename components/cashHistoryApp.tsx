@@ -112,7 +112,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 </Box>
                 <Box sx={flexBody}>
                     <SimpleScrollContainer>
-                        <Stack>
+                        <Stack spacing={1}>
                             {transactions && transactions.map(item => {
                                return (
                                 <ItemTransaction
