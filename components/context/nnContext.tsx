@@ -50,8 +50,12 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   switch (type) {
     case 'setAlert':
       clonedState.network.alert = {...clonedState.network.alert, ...payload}
+      break;
     case 'initContext':
-      newState = payload
+      clonedState = {...clonedState, ...payload};
+      break;
+    case 'setUserWallets':
+      clonedState.user.wallets = payload;
       break;
     case 'setUserWallets':
       clonedState.user.wallets = payload;
@@ -64,7 +68,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
   }
   newState = {...state, ...clonedState};
-  console.log(type, payload, newState);
   newState && setCookieContext(newState);
   return newState;
 };
@@ -115,6 +118,8 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
   };
   executeApi('wallets', {token}, onSuccess, onError);
 }
+export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async () => {
+};
 
 export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
@@ -200,6 +205,7 @@ export const { Context, Provider } = DataContextCreator(
     closeAlert,
     fetchNetworkStatus,
     fetchUserWallets,
+    fetchUserWalletHistory,
     fetchUserContacts,
     sendPayment,
     requestPayment,

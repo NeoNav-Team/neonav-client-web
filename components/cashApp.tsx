@@ -1,5 +1,6 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import Link from 'next/link';
 import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
@@ -323,9 +324,11 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                                     <CurrencyExchangeIcon sx={{ fontSize: '70px'}} />
                                 )}
                             </Fab>
-                            <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(10deg)'}}>
-                                <QueryStatsIcon  sx={{ fontSize: '40px'}} />
-                            </Fab>
+                            <Link href={'/cash/history'}>
+                                <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(10deg)'}}>
+                                    <QueryStatsIcon  sx={{ fontSize: '40px'}} />
+                                </Fab>
+                            </Link>
                         </Box>
                     </div>
                 </Box>

@@ -3,7 +3,9 @@ import Cookies from "js-cookie";
 
 export const setCookieContext = (state:NnStore) => {
     const stringState = JSON.stringify(state);
+    console.log('new cookie context', state);
     const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
+    Cookies.remove('nnContext', { domain: '.neonav.net' }); 
     Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net' });
 };
 

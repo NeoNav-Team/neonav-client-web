@@ -21,10 +21,10 @@ export default function SitesApp(props:PageContainerProps):JSX.Element {
             display="block"
             name="neosites"
             frameBorder={0}
-            styles={{marginTop: '64px'}}
+            styles={{marginTop: '64px', maxHeight: 'calc(100% - 64px)'}}
             position="relative"
         />
-        <div style={{position: 'absolute', bottom: 10, right: 10,}}>
+        <div style={{position: 'absolute', bottom: 20, right: 10,}}>
         <Link href={NEOSITES_INDEX} target="neosites">
             <Fab color="secondary" aria-label="index">
                 <ListIcon  sx={{ fontSize: '40px'}} />
