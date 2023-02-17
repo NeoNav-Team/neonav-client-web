@@ -27,6 +27,9 @@ import { NnProviderValues } from '../components/context/nnTypes';
       const label = scopedChannels('public').length >= 2 ? tancifyName : firstChannel
       return label;
     }
+    const scopeDisable = (scope:string) => {
+      return scopedChannels(scope)[0] ? false : true;
+    }
     const getScopeChannelVars = (selectedScope: string) => {
       const scopeChannelList = scopedChannels(selectedScope);
       console.log('scopeChannelList', scopeChannelList, channels);
@@ -57,8 +60,8 @@ import { NnProviderValues } from '../components/context/nnTypes';
           allowScrollButtonsMobile
         >
           <Tab key={'chat_global'} label={`${scopeLabel('global')}`} value={'global'} />
-          <Tab key={'chat_public'} label={`${scopeLabel('public')}`} value={'public'} />
-          <Tab key={'chat_group'} label={`${scopeLabel('group')}`} value={'group'} />
+          <Tab key={'chat_public'} label={`${scopeLabel('public')}`} value={'public'} disabled={scopeDisable('public')} />
+          <Tab key={'chat_group'} label={`${scopeLabel('group')}`} value={'group'} disabled={scopeDisable('group')} />
         </Tabs>
       </Box>
         <Box sx={{ maxWidth: '100%', borderBottom: 1, borderColor: 'divider' }}>
