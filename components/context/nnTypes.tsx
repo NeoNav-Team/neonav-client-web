@@ -26,6 +26,8 @@ export type NnNetwork = {
     location?: string,
     apiLastFetch?: NnFetchDates,
     selectedAccount?: string,
+    selectedChannel?: string,
+    selectedFaction?: string,
 }
 
 export type NnProfileAuth = {
@@ -67,20 +69,27 @@ export type NnWallet = {
     transactions?: NnWalletTransaction[],
 }
 
-export type nnContact = {
+export type NnContact = {
     id: string,
     username?: string,
     status?: string,
 }
 
+export type NnChannel = {
+    id: string,
+    name: string,
+    scope: string,
+    admin: string,
+}
+
 export type NnUser = {
     profile?: NnUserProfile,
     wallets?: NnWallet[],
-    contacts?: nnContact[],
-    channels?: [],
+    contacts?: NnContact[],
+    channels?: NnChannel[],
     notifcations?: [],
     factions?: [],
-    scannedUsers?: nnContact[],
+    scannedUsers?: NnContact[],
 }
 
 export type NnProviderDispatch = {
@@ -88,6 +97,7 @@ export type NnProviderDispatch = {
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;
+    fetchUserChannels: () => void;
     fetchUserWalletHistory: (_walletId:string) => void;
     requestPayment: (_user:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;

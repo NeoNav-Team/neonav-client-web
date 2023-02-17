@@ -51,5 +51,9 @@ export const authApiEnpoints = {
     contacts: {
         method: "get",
         path: "/api/user/friends"       
+    },
+    channels: {
+        method: "get",
+        path: "/api/chat/channels"     
     }
 };

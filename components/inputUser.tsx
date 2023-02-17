@@ -12,7 +12,6 @@ import {
     FormControl,
     Chip,
     Select,
-    Grid,
     Grow,
     Paper,
     Popper,
@@ -36,14 +35,7 @@ interface InputUserProps {
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
+
 const options = ['scanned', 'contacts', 'chat', 'faction']; //TODO:  add faction to list if in factions
 
 function getStyles(name: string, userName: readonly string[], theme: Theme) {

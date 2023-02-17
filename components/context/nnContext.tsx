@@ -8,6 +8,7 @@ import executeApi from '@/utilites/executeApi';
 
 type ActionTypes = 'setNetwork' | 
   'setAlert' |
+  'setUserChannels' |
   'setUserWallets' | 
   'setWalletTransactions' |
   'setUserContacts' | 
@@ -55,6 +56,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'initContext':
       clonedState = {...clonedState, ...payload};
       break;
+    case 'setUserChannels':
+        clonedState.user.channels = payload;
+        break;
     case 'setUserWallets':
       clonedState.user.wallets = payload;
       break;
@@ -109,6 +113,28 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     payload: onLoadUserContext,
   })
 }
+
+export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setUserChannels',
+      payload: data,
+    });
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Channels failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('channels', {token}, onSuccess, onError);
+}
+
 
 export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
@@ -236,6 +262,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserWallets,
     fetchUserWalletHistory,
     fetchUserContacts,
+    fetchUserChannels,
     sendPayment,
     requestPayment,
     initContext,

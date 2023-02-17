@@ -1,5 +1,5 @@
 import SitesApp from '@/components/sitesApp';
 
 export default function Sites() {
- return (<SitesApp />);
+ return (<SitesApp indexBtn={true} />);
 }
