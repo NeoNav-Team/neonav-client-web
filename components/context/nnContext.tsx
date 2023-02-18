@@ -3,22 +3,27 @@ import merge from 'deepmerge';
 import DataContextCreator from "./dataContextCreator";
 import { 
   Action,
-  APIResponse,
   DispatchFunc,
-  netcheckAPIResData,
   NnProviderValues,
   NnStore, 
 } from "./nnTypes";
+import {
+  closeAlert,
+  fetchNetworkStatus,
+} from './nnActionsNetwork';
 import {
   fetchUserWallets,
   fetchUserWalletHistory,
   sendPayment,
   requestPayment,
 } from './nnActionsCash';
+import {
+  fetchUserContacts,
+  fetchUserChannels,
+} from './nnActionsChat';
 import { nnSchema } from "./nnSchema";
 import { getCookieContext, getCookieToken, scrubCookieData, setCookieContext } from "@/utilites/cookieContext";
 import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
-import executeApi from '@/utilites/executeApi';
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
@@ -115,69 +120,6 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
   })
 }
 
-export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
-  const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {
-    const { data } = response;
-    dispatch({
-      type: 'setUserChannels',
-      payload: data,
-    });
-    return data;
-  };
-  const onError = (err:netcheckAPIResData) => {
-    const { message = 'Channels failure' } = err;
-    dispatch({
-      type: 'setAlert',
-      payload: {severity: 'error', message, show: true},
-    })
-    return err;
-  };
-  executeApi('channels', {token}, onSuccess, onError);
-}
-
-
-export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
-  const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {
-    const { data } = response;
-    dispatch({
-      type: 'setUserContacts',
-      payload: data,
-    })
-  };
-  const onError = (err:netcheckAPIResData) => {
-    const { message = 'Contact failure' } = err;
-    dispatch({
-      type: 'setAlert',
-      payload: {severity: 'error', message, show: true},
-    })
-  };
-  executeApi('contacts', {token}, onSuccess, onError);
-}
-
-export const closeAlert = (dispatch: DispatchFunc) => async () => {
-  dispatch({
-    type: 'setAlert',
-    payload: {show: false},
-  })
-};
-
-export const fetchNetworkStatus = (dispatch: DispatchFunc) => async () => {
-  const onSuccess = (response:APIResponse) => {
-    dispatch({
-      type: 'setNetwork',
-      payload: response?.data?.message,
-    })
-  };
-  const onError = (err:object) => {
-    dispatch({
-      type: 'setNetwork',
-      payload: 'offline',
-    })
-  };
-  executeApi('netCheck', {}, onSuccess, onError);
-}
 
 export const { Context, Provider } = DataContextCreator(
   nnReducer,
