@@ -1,46 +1,22 @@
 import isBrowser from './isBrowser';
 
-interface IlocalStorage {
-    method:string;
-    key:string;
-    value?:string;
-}
-
-const localStorage = (method:string, key:string, value?:string):string => {
-
- const getStorage = (key: string) => {
-    const payload = isBrowser && 
-        typeof window.localStorage.getItem(key) !== null &&
-        window.localStorage.getItem(key);
-    return payload ? payload : '';
+export const getLocalStorage = (key: string) => {
+    const payload = localStorage.getItem(key) || '{}';
+    const decodedPayload =  JSON.parse(payload);
+    return decodedPayload;
  }
- const setStorage = (key:string, value:string) => {
-    isBrowser && window.localStorage.setItem(key, JSON.stringify(value));
-    return '';
+
+export const setLocalStorage = (key:string, payload:string) => {
+    const encodedValue = JSON.stringify(payload);
+    console.log('encodedValue', encodedValue);
+    localStorage.setItem(key, encodedValue);
  }
- const clearStorage = (key:string) => {
-    isBrowser && window.localStorage.setItem(key, '');
+
+export const clearLocalStorage = (key:string) => {
+    isBrowser && localStorage.setItem(key, '');
  };
- const storageExists = (key:string) => {
-    const storage = getStorage(key);
-    return storage !== '';
+
+ export const localStorageExists = (key:string) => {
+    const storage = getLocalStorage(key);
+    return Object.keys(storage).length >= 1;
  }
-
-    switch (method) {
-        case 'set':
-            value && setStorage(key, value);
-        break;
-        case 'get':
-            getStorage(key);
-        break;
-        case 'check':
-            storageExists(key);
-        case 'clear':
-            clearStorage(key);
-        break;
-        default:
-    }
-    return '';
-}
-
-export default localStorage;

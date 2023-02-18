@@ -1,5 +1,5 @@
 import ChatApp from '@/components/chatApp';
 
 export default function Sites() {
- return (<ChatApp />);
+ return (<ChatApp msgBtn={true} />);
 }

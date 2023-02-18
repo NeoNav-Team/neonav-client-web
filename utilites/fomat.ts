@@ -1,3 +1,5 @@
+import { NnIndexCollection } from '../components/context/nnTypes';
+
 const LANDFALL = 2021;
 
 export const isoDateToDaily = (isoDate:string) => {

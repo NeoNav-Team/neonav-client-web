@@ -38,7 +38,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
+                        <Link href="/chat">
                         <IconFrame icon={<TanChat fontSize="inherit" />} title="Tan / Chat"/>
+                        </Link>
                     </Box>
                     </Grid>
                     <Grid item xs={4}>
@@ -48,7 +50,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <Link href="/">
+                        <Link href="/channels">
                             <IconFrame icon={<Channels fontSize="inherit" />} title="Channels"/>
                         </Link>
                     </Box>
@@ -96,7 +98,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<Notes fontSize="inherit" />} title="Notes"/>
+                        <Link href="/notes">
+                            <IconFrame icon={<Notes fontSize="inherit" />} title="Notes"/>
+                        </Link>
                     </Box>
                 </Grid>
                 </Grid>
@@ -108,7 +112,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<Announcements fontSize="inherit" />} title="Annoucements"/>
+                        <Link href="/announce">
+                            <IconFrame icon={<Announcements fontSize="inherit" />} title="Annoucements"/>
+                        </Link>
                     </Box>
                     </Grid>
                     <Grid item xs={4}>
@@ -118,7 +124,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                      alignItems="center"
                      minHeight={fixedHeight}
                     >
-                        <IconFrame icon={<Notifcations fontSize="inherit" />} title="Notifcations"/>
+                        <Link href="/notify">
+                            <IconFrame icon={<Notifcations fontSize="inherit" />} title="Notifcations"/>
+                        </Link>
                     </Box>
                     </Grid>
                     <Grid item xs={4}>

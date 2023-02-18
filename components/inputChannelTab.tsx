@@ -32,7 +32,6 @@ import { NnProviderValues } from '../components/context/nnTypes';
     }
     const getScopeChannelVars = (selectedScope: string) => {
       const scopeChannelList = scopedChannels(selectedScope);
-      console.log('scopeChannelList', scopeChannelList, channels);
       const showChannelList =  scopeChannelList ? scopeChannelList.length >= 2 : false;
       const defaultChannelListIndex = scopeChannelList.length >= 1 ? scopeChannelList[0].id : null;
       return { scopeChannelList, showChannelList, defaultChannelListIndex };

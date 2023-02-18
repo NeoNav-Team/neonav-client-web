@@ -13,7 +13,24 @@ export const nnSchema:NnStore = {
         wallets: '',
         walletHistory: '',
       },
-      selectedAccount: '',
+      selected: {
+        account: '',
+        channel: '',
+      },
+      collections: {
+        chats: [],
+        transactions: [],
+        users: [
+          {
+            id: 'contacts',
+            collection: [],
+          },
+          {
+            id: 'scannedUsers',
+            collection: [],
+          }
+        ],
+      }
     },
     user: {
       profile: {
@@ -35,11 +52,9 @@ export const nnSchema:NnStore = {
           bio: '',
         }
       },
-      contacts: [],
       channels: [],
       wallets: [],
       notifcations: [],
       factions: [],
-      scannedUsers: [],
     },
   };

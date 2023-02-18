@@ -21,14 +21,6 @@ export type NnAert = {
     show: boolean,
 }
 
-export type NnNetwork = {
-    alert: NnAert,
-    location?: string,
-    apiLastFetch?: NnFetchDates,
-    selectedAccount?: string,
-    selectedChannel?: string,
-    selectedFaction?: string,
-}
 
 export type NnProfileAuth = {
     userid: string,
@@ -55,22 +47,23 @@ export type NnUserProfile = {
 }
 
 export type NnWalletTransaction = {
-    ts: string,
-    amount: number | string,
-    user: string,
-    username: string,
+    id: any;
+    ts?: string,
+    amount?: number | string,
+    user?: string,
+    username?: string,
 }
 
 export type NnWallet = {
+    type?: string;
     id?: string,
     owner?: string,
     name?: string,
-    balance: number,
-    transactions?: NnWalletTransaction[],
+    balance?: number,
 }
 
 export type NnContact = {
-    id: string,
+    id?: string,
     username?: string,
     status?: string,
 }
@@ -82,14 +75,78 @@ export type NnChannel = {
     admin: string,
 }
 
+export type NnChatMessages = {
+    id?: string,
+    ts?: string,
+    channel?: string,
+    fromid?: string,
+    from?: string,
+    text?: string,
+}
+
+export type NnIndexCollection = {
+    id: string,
+    collection: NnWalletTransaction[] & NnChatMessages[] & NnContact[];
+}
+
+export type NnNetwork = {
+    alert: NnAert,
+    location?: string,
+    apiLastFetch?: NnFetchDates,
+    selected: {
+        account?: string,
+        channel?: string,
+    },
+    collections: {
+        chats?: NnIndexCollection[],
+        transactions?: NnIndexCollection[],
+        users?: NnIndexCollection[],
+    }
+}
+
 export type NnUser = {
     profile?: NnUserProfile,
     wallets?: NnWallet[],
-    contacts?: NnContact[],
     channels?: NnChannel[],
     notifcations?: [],
     factions?: [],
-    scannedUsers?: NnContact[],
+}
+
+export type ActionTypes = 'setNetwork' | 
+  'setAlert' |
+  'setUserChannels' |
+  'setUserWallets' | 
+  'setWalletTransactions' |
+  'setUserContacts' | 
+  'initContext';
+
+export interface Action {
+    type: ActionTypes,
+    payload?: Object,
+  }
+
+export type DispatchFunc = (dispatch: Action) => void;
+  
+export type errorAPIResData = {
+    message?: String;
+}
+
+export interface walletAPIResData {
+    balance?: Number;
+    owner?: String;
+  }
+  
+export interface netcheckAPIResData {
+    message?: String;
+  }
+  
+export interface APIResData extends walletAPIResData, netcheckAPIResData {
+    _id: String;
+    _rev: String;
+  }
+  
+export interface APIResponse {
+    data: APIResData;
 }
 
 export type NnProviderDispatch = {

@@ -55,7 +55,11 @@ export default function InputUser(props:InputUserProps):JSX.Element {
   const anchorRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(1);
   const { state }: NnProviderValues = useContext(NnContext); 
-  const contacts = state.user?.contacts || []; 
+  const filteredUsergroups = state.network?.collections?.users?.
+    filter(arrItem => arrItem.id == 'contacts')[0]; 
+  const contacts = filteredUsergroups?.collection || []
+
+  console.log('contacts', state.network?.collections?.users);
 
   const handleChange = (event: SelectChangeEvent<typeof userName>) => {
     const {
@@ -110,9 +114,11 @@ export default function InputUser(props:InputUserProps):JSX.Element {
   }
   
   const nameById = (id:string) => {
-    const constacts = state.user?.contacts || [];
-    const scannedUsers = state.user?.scannedUsers || [];
-    const allKnownUsers = [...constacts, ...scannedUsers] || [];
+    const contacts = state.network?.collections?.users?.
+      filter(arrItem => arrItem.id == 'contacts')[0].collection || [];
+    const scannedUsers = state.network?.collections?.users?.
+      filter(arrItem => arrItem.id == 'scannedUsers')[0].collection || [];  
+    const allKnownUsers = [...contacts, ...scannedUsers] || [];
     if(allKnownUsers.length !== 0) {
         const user = allKnownUsers.find(user => user.id === id);
         return user ? user.username : id;
