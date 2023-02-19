@@ -4,8 +4,10 @@ import DataContextCreator from "./dataContextCreator";
 import { 
   Action,
   DispatchFunc,
+  NnIndexCollection,
   NnProviderValues,
-  NnStore, 
+  NnStore,
+  NnCollectionKeys,
 } from "./nnTypes";
 import {
   closeAlert,
@@ -20,6 +22,7 @@ import {
 import {
   fetchUserContacts,
   fetchUserChannels,
+  fetchChannelHistory,
 } from './nnActionsChat';
 import { nnSchema } from "./nnSchema";
 import { getCookieContext, getCookieToken, scrubCookieData, setCookieContext } from "@/utilites/cookieContext";
@@ -27,10 +30,25 @@ import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
+const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection) => {
+  const collection = state.network?.collections[collectionName];
+  let index = -1;
+  if (collection) {
+    index = collection && collection.map(function(x) {return x.id; }).indexOf(id);
+    if (index === -1) {
+      const newCollection:NnIndexCollection = {id: id, collection: payload};
+      collection.push(newCollection);
+    } else {
+      const collectionItem = collection[index];
+      collectionItem.collection = payload;
+    }
+  }
+  return state;
+}
+
 export const nnReducer = (state:NnProviderValues, action: Action) => {
   const {payload, type = null} = action;
   let newState = null;
-  let index = 0;
   let clonedState = JSON.parse(JSON.stringify(state));
   switch (type) {
     case 'setAlert':
@@ -47,19 +65,17 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setWalletTransactions':
       const walletId = clonedState.network.selected.account;
-      index = clonedState.network.collections.transactions.map((e:any) => e.id).indexOf(walletId);
-      if (index !== -1) {
-        clonedState.network.collections.transactions[index].collection = payload;
-      }
+      clonedState = setCollectionByIndex(clonedState, 'transactions', walletId, payload as NnIndexCollection);
       break;
     case 'setUserWallets':
       clonedState.user.wallets = payload;
       break;
     case 'setUserContacts':
-      index = clonedState.network.collections.users.map((e:any) => e.id).indexOf('contacts');
-      if (index !== -1) {
-        clonedState.network.collections.users[index].collection = payload;
-      }
+      clonedState = setCollectionByIndex(clonedState, 'users', 'contacts', payload as NnIndexCollection);
+      break;
+    case 'setMessageHistory':
+      const channelId = clonedState.network.selected.channel;
+      clonedState = setCollectionByIndex(clonedState, 'chats', channelId, payload as NnIndexCollection);
       break;
     case 'setNetwork':
       clonedState.network.location = payload;
@@ -130,6 +146,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserWalletHistory,
     fetchUserContacts,
     fetchUserChannels,
+    fetchChannelHistory,
     initContext,
     sendPayment,
     requestPayment,

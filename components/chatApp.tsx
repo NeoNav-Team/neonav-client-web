@@ -21,6 +21,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   const { 
     state,
     fetchUserChannels = () => {},
+    fetchChatHistory= () => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel = state.network?.selected?.channel || GLOBAL_CHAT; 
 
@@ -31,11 +32,11 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     }
   }, [channelsFetched, fetchUserChannels])
 
-    useEffect(() => {
-      const channels = state.user?.channels || []; 
-      if (channels.length === 0) {
-          goFetchChannels();
-      }
+  useEffect(() => {
+    const channels = state.user?.channels || []; 
+    if (channels.length === 0) {
+        goFetchChannels();
+    }
   }, [state, goFetchChannels]);
 
     return (

@@ -86,7 +86,7 @@ export type NnChatMessages = {
 
 export type NnIndexCollection = {
     id: string,
-    collection: NnWalletTransaction[] & NnChatMessages[] & NnContact[];
+    collection?: NnWalletTransaction & NnChatMessages & NnContact;
 }
 
 export type NnNetwork = {
@@ -112,12 +112,16 @@ export type NnUser = {
     factions?: [],
 }
 
+export type NnCollectionKeys = 'chats' | 'transactions' | 'users';
+
 export type ActionTypes = 'setNetwork' | 
   'setAlert' |
   'setUserChannels' |
   'setUserWallets' | 
   'setWalletTransactions' |
   'setUserContacts' | 
+  'setChatMessages' |
+  'setMessageHistory' |
   'initContext';
 
 export interface Action {

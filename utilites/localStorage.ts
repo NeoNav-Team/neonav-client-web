@@ -8,7 +8,6 @@ export const getLocalStorage = (key: string) => {
 
 export const setLocalStorage = (key:string, payload:string) => {
     const encodedValue = JSON.stringify(payload);
-    console.log('encodedValue', encodedValue);
     localStorage.setItem(key, encodedValue);
  }
 

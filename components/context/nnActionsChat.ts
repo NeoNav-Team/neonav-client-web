@@ -46,3 +46,22 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
     };
     executeApi('contacts', {token}, onSuccess, onError);
   }
+
+  export const fetchChannelHistory = (dispatch: DispatchFunc) => async () => {
+    const token = getCookieToken();
+    const onSuccess = (response:APIResponse) => {
+      const { data } = response;
+      dispatch({
+        type: 'setChatMessages',
+        payload: data,
+      })
+    };
+    const onError = (err:netcheckAPIResData) => {
+      const { message = 'Chat History failure' } = err;
+      dispatch({
+        type: 'setAlert',
+        payload: {severity: 'error', message, show: true},
+      })
+    };
+    executeApi('chatHistory', {token}, onSuccess, onError);
+  }
