@@ -8,23 +8,24 @@ import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth, isoDateToOrbit } from '@/utilites/fomat';
 
 interface itemTransactionProps {
-    date: string;
-    id: string;
-    username: string;
-    text: string;
+    date?: string;
+    id?: string;
+    username?: string;
+    text?: string;
   }
   
   export default function ItemTransaction(props:itemTransactionProps):JSX.Element {
     const { date, id, username, text } = props;
-
+    const safeDate = date || '';
+    console.log('date', date);
   
     return (
         <Box>
             <div className={styles.dateLine} data-augmented-ui="tr-clip both">
                 <Stack direction="row" spacing={1}>
-                <Typography className={styles.dateText}>{isoDateToDaily(date)}</Typography>
-                <Typography className={styles.dateText}><span>✦ {isoDateToMonth(date)}</span></Typography>
-                <Typography className={styles.dateText}><span>❂ {isoDateToOrbit(date)}</span></Typography>
+                <Typography className={styles.dateText}>{isoDateToDaily(safeDate)}</Typography>
+                <Typography className={styles.dateText}><span>✦ {isoDateToMonth(safeDate)}</span></Typography>
+                <Typography className={styles.dateText}><span>❂ {isoDateToOrbit(safeDate)}</span></Typography>
                 </Stack>
             </div>
             <div className={styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">

@@ -75,7 +75,7 @@ export type NnChannel = {
     admin: string,
 }
 
-export type NnChatMessages = {
+export type NnChatMessage = {
     id?: string,
     ts?: string,
     channel?: string,
@@ -86,7 +86,7 @@ export type NnChatMessages = {
 
 export type NnIndexCollection = {
     id: string,
-    collection?: NnWalletTransaction[] & NnChatMessages[] & NnContact[];
+    collection?: NnWalletTransaction[] & NnChatMessage[] & NnContact[];
 }
 
 export type NnNetwork = {

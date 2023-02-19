@@ -15,13 +15,13 @@ export const isoDateToDaily = (isoDate:string) => {
 }
 
 export const isoDateToOrbit = (isoDate:string) => {
-    const year =  new Date().toLocaleDateString('en-gb',{year: 'numeric'});
+    const year =  new Date(isoDate).toLocaleDateString('en-gb',{year: 'numeric'});
     const differnce = (parseInt(year, 10) - LANDFALL);
     return `${ordinal(differnce)}`;
 }
 
 export const isoDateToMonth = (isoDate:string) => {
-    const month =  new Date().toLocaleDateString('en-gb',{month: '2-digit'});
+    const month =  new Date(isoDate).toLocaleDateString('en-gb',{month: '2-digit'});
     return `${ordinal(parseInt(month, 10))}`;
 }
 
