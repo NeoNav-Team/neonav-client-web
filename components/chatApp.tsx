@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { restrictedChannels } from '../utilites/constants';
 import styles from '../styles/generic.module.css';
-import { Container, Fab } from '@mui/material';
+import { Container, Fab, Stack } from '@mui/material';
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
@@ -103,9 +103,11 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                     loader={<h4>Loading...</h4>}
                     scrollableTarget="scrollableDiv"
                   >
+                    <Stack spacing={1}>
                     {messages.map((item, index) => (
                       <ItemMessage key={item.ts} date={item.ts || ''} text={item.text} username={item.from} id={item.fromid} />
                     ))}
+                    </Stack>
                   </InfiniteScroll>
                 </div>
 

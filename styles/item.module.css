@@ -101,4 +101,11 @@
         font-size: 1.5rem;
         line-height: 1.5rem;
     }
+    .dateText {
+        font-size: 12px;
+        line-height: 12px;
+    }
+    .dateText span {
+        opacity: 0.75;
+    }
 }
