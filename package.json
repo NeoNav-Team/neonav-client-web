@@ -7,7 +7,7 @@
     "sdev": "node server/development-index.js",
     "build": "next build",
     "start": "next start",
-    "deploy": "pm2 start npm --name nn-client-web -- run start -- -p 3000",
+    "deploy": "pm2 start npm --name nn-client-web -- run start -- -p 3001",
     "lint": "next lint"
   },
   "dependencies": {
