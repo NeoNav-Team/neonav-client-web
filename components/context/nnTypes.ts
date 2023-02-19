@@ -86,7 +86,7 @@ export type NnChatMessages = {
 
 export type NnIndexCollection = {
     id: string,
-    collection?: NnWalletTransaction & NnChatMessages & NnContact;
+    collection?: NnWalletTransaction[] & NnChatMessages[] & NnContact[];
 }
 
 export type NnNetwork = {
@@ -122,6 +122,7 @@ export type ActionTypes = 'setNetwork' |
   'setUserContacts' | 
   'setChatMessages' |
   'setMessageHistory' |
+  'setSelected' |
   'initContext';
 
 export interface Action {
@@ -159,9 +160,11 @@ export type NnProviderDispatch = {
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;
     fetchUserChannels: () => void;
+    fetchChannelHistory: (_channelId:string) => void;
     fetchUserWalletHistory: (_walletId:string) => void;
     requestPayment: (_user:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
+    setSelected: (_indexType:string, _index:string) => void;
     initContext: () => void;
 }
 

@@ -12,6 +12,7 @@ import {
 import {
   closeAlert,
   fetchNetworkStatus,
+  setSelected,
 } from './nnActionsNetwork';
 import {
   fetchUserWallets,
@@ -30,7 +31,7 @@ import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
-const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection) => {
+const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection[]) => {
   const collection = state.network?.collections[collectionName];
   let index = -1;
   if (collection) {
@@ -40,7 +41,7 @@ const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id
       collection.push(newCollection);
     } else {
       const collectionItem = collection[index];
-      collectionItem.collection = payload;
+      collectionItem.collection = payload
     }
   }
   return state;
@@ -65,20 +66,22 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setWalletTransactions':
       const walletId = clonedState.network.selected.account;
-      clonedState = setCollectionByIndex(clonedState, 'transactions', walletId, payload as NnIndexCollection);
+      clonedState = setCollectionByIndex(clonedState, 'transactions', walletId, payload as NnIndexCollection[]);
       break;
     case 'setUserWallets':
       clonedState.user.wallets = payload;
       break;
     case 'setUserContacts':
-      clonedState = setCollectionByIndex(clonedState, 'users', 'contacts', payload as NnIndexCollection);
+      clonedState = setCollectionByIndex(clonedState, 'users', 'contacts', payload as NnIndexCollection[]);
       break;
     case 'setMessageHistory':
       const channelId = clonedState.network.selected.channel;
-      clonedState = setCollectionByIndex(clonedState, 'chats', channelId, payload as NnIndexCollection);
+      clonedState = setCollectionByIndex(clonedState, 'chats', channelId, payload as NnIndexCollection[]);
       break;
     case 'setNetwork':
       clonedState.network.location = payload;
+    case 'setSelected':
+        clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
       break;
   }
   newState = {...state, ...clonedState};
@@ -148,8 +151,9 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserChannels,
     fetchChannelHistory,
     initContext,
-    sendPayment,
     requestPayment,
+    sendPayment,
+    setSelected,
   },
   defaultNnContext,
 );

@@ -46,6 +46,7 @@ import { NnProviderValues } from '../components/context/nnTypes';
       setScope(newValue);
       const { showChannelList, defaultChannelListIndex } = getScopeChannelVars(newValue);
       const defaultSelected = showChannelList ? defaultChannelListIndex : null;
+      changeHandler && changeHandler(defaultChannelListIndex);
       setSelected(defaultSelected);
     };
   

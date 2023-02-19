@@ -11,6 +11,14 @@ import {
     })
   };
   
+  export const setSelected = (dispatch: DispatchFunc) => async (indexType:string, index:string) => {
+    dispatch({
+      type: 'setSelected',
+      payload: {[indexType]: index},
+    })
+  };
+
+  
   export const fetchNetworkStatus = (dispatch: DispatchFunc) => async () => {
     const onSuccess = (response:APIResponse) => {
       dispatch({

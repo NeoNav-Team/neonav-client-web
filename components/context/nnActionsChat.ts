@@ -27,7 +27,6 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
     executeApi('channels', {token}, onSuccess, onError);
   }
   
-  
   export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
@@ -47,12 +46,12 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
     executeApi('contacts', {token}, onSuccess, onError);
   }
 
-  export const fetchChannelHistory = (dispatch: DispatchFunc) => async () => {
+  export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string) => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
       dispatch({
-        type: 'setChatMessages',
+        type: 'setMessageHistory',
         payload: data,
       })
     };
@@ -63,5 +62,5 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
         payload: {severity: 'error', message, show: true},
       })
     };
-    executeApi('chatHistory', {token}, onSuccess, onError);
+    executeApi('chatHistory', {token, id}, onSuccess, onError);
   }
