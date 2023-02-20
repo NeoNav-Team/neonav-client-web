@@ -4,13 +4,10 @@ body {
   margin: 0;
   font-family: Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   height: 100%;
-  height: -moz-available;
-  height: -webkit-fill-available;
-  height: fill-available;
   height: stretch;
   overflow: hidden;
-  min-height: 100vh;
   max-height: 100vh;
+  min-height: -webkit-fill-available;
   min-width: 100vw;
   color: #fff;
   background-color: #120458;

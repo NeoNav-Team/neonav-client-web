@@ -41,17 +41,17 @@ function ButtonIcon(props:ButtonIconProps):JSX.Element {
         top:0,
         width: {
             xs: 64,
-            sm: 72,
+            sm: 64,
             md: 96,
             lg: 108,
-            xl: '120px',
+            xl: 120,
         },
         height: {
             xs: 64,
-            sm: 72,
+            sm: 64,
             md: 96,
             lg: 108,
-            xl: '120px',
+            xl: 120,
         },
         fontSize: {
             xs: 48,
@@ -69,12 +69,14 @@ function ButtonIcon(props:ButtonIconProps):JSX.Element {
             <div className={evenClass && styles.even}>
                 <div className={styles.abg} data-augmented-ui="all-hexangle-down inlay" />
                 <div className={styles.augment} data-augmented-ui="all-hexangle-up border" />
-                    <IconButton 
-                        className={styles.iconButton} 
-                        sx={boxSizing}
-                    >
-                        {icon}
-                    </IconButton>
+                    <div style={{position: 'relative', border: '1px'}}>
+                        <IconButton 
+                            className={styles.iconButton} 
+                            sx={boxSizing}
+                        >
+                            {icon}
+                        </IconButton>
+                    </div>
             </div>
         </Box>
         {title &&
