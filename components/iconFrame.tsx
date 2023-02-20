@@ -38,19 +38,20 @@ function ButtonIcon(props:ButtonIconProps):JSX.Element {
     const evenClass = isEven ? 'even' : '';
 
     const boxSizing = {
+        top:0,
         width: {
             xs: 64,
             sm: 72,
             md: 96,
             lg: 108,
-            xl: 120,
+            xl: '120px',
         },
         height: {
             xs: 64,
             sm: 72,
             md: 96,
             lg: 108,
-            xl: 120,
+            xl: '120px',
         },
         fontSize: {
             xs: 48,
