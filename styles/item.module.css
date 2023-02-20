@@ -1,6 +1,5 @@
 .dateLine {
-    width: 275px;
-    padding: 2px 10px;
+    padding: 2px 20px 2px 5px;
     --aug-inlay-all: 4px;
     --aug-inlay-bg: radial-gradient(ellipse at top, var(--color-2), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
     --aug-border-all: 1px;
@@ -12,6 +11,20 @@
     --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-3), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
     --aug-border-all: 1px;
     --aug-border-bg: radial-gradient(var(--color-3), var(--color-4)) 100% 100% / 100% 100%;
+}
+.systemLine {
+    padding: 10px;
+    color: var(--color-3);
+    --aug-inlay-all: 4px;
+    --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-1), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
+}
+.nameLine {
+    padding: 6px;
+    --aug-tr: 5px;
+    --aug-inlay-all: 4px;
+    --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-0), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
+    --aug-border-all: 1px;
+    --aug-border-bg: radial-gradient(var(--color-1), var(--color-2)) 100% 100% / 100% 100%;
 }
 
 .dateText {
@@ -81,13 +94,16 @@
 @media screen and (max-width: 600px) {
     .idText {
         font-size: 0.75rem;
-        line-height: 0.75rem;
+        line-height: 0;
     }
     .userText {
-        line-height: 0.5rem;
-        font-size: 1.125rem;
-        text-indent: 1vh;
+        line-height: 1.25rem;
+        font-size: 1rem;
+        text-indent: 0.5vh;
         letter-spacing: -0.125rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
     .directionText {
         font-size: 1.5rem;

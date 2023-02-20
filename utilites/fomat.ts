@@ -22,7 +22,8 @@ export const isoDateToOrbit = (isoDate:string) => {
 
 export const isoDateToMonth = (isoDate:string) => {
     const month =  new Date(isoDate).toLocaleDateString('en-gb',{month: '2-digit'});
-    return `${ordinal(parseInt(month, 10))}`;
+    const day = new Date(isoDate).toLocaleDateString('en-gb',{day: '2-digit'});
+    return `${month}.${day}`;
 }
 
 const ordinal = (i:number) => {

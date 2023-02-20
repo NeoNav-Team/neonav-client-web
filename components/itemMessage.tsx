@@ -15,34 +15,34 @@ interface itemTransactionProps {
   }
   
   export default function ItemTransaction(props:itemTransactionProps):JSX.Element {
-    const { date, id, username, text } = props;
-    const safeDate = date || '';
-    console.log('date', date);
+    const { date = '', id = '', username = '', text = '' } = props;
+    const isSystemMsg = (id:string, username:string) => {
+        return id === '0000000000' && username === 'tan/chat';
+    }
   
     return (
-        <Box>
-            <div className={styles.dateLine} data-augmented-ui="tr-clip both">
-                <Stack direction="row" spacing={1}>
-                <Typography className={styles.dateText}>{isoDateToDaily(safeDate)}</Typography>
-                <Typography className={styles.dateText}><span>✦ {isoDateToMonth(safeDate)}</span></Typography>
-                <Typography className={styles.dateText}><span>❂ {isoDateToOrbit(safeDate)}</span></Typography>
-                </Stack>
-            </div>
-            <div className={styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
-                <Stack
-                    direction="row"
-                    justifyContent="space-around"
-                    alignItems="center"
-                    spacing={0}
-                >
-                <Box sx={{minWidth:'45%'}}>
+        <Box style={{padding: '1vh 0'}}>
+                <Stack direction="row" spacing={1} alignItems="flex-end">
+                <Box sx={{minWidth:'40%', maxWidth: '40%'}}>
+                <div className={styles.nameLine} data-augmented-ui="tr-clip tr-rect both">
                     <Typography className={styles.idText}>{id}</Typography>
                     <Typography className={styles.userText}>{username}</Typography>
+                </div>
                 </Box>
-                <Box sx={{minWidth:'55%'}}>
-                    <Typography>{text}</Typography>
+                <Box sx={{minWidth:'40%', maxWiddth: '55%'}}>
+                <div className={styles.dateLine} data-augmented-ui="tr-clip both">
+                    <Stack direction="row" spacing={1}>
+                        <Typography className={styles.dateText}>{isoDateToDaily(date)}</Typography>
+                        <Typography className={styles.dateText}><span>✦ {isoDateToMonth(date)}</span></Typography>
+                        <Typography className={styles.dateText}><span>❂ {isoDateToOrbit(date)}</span></Typography>
+                    </Stack>
+                </div>
                 </Box>
-                </Stack>
+            </Stack>
+            <div className={isSystemMsg(id, username) ? styles.systemLine : styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
+                <Box>
+                    <Typography> 》 {text}</Typography>
+                </Box>
             </div>
         </Box>
     )

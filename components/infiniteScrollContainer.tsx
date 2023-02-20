@@ -1,12 +1,19 @@
 
 import { Container } from '@mui/material';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface ContainerProps {
   children?: React.ReactNode;
+  nextHandler?: Function;
 }
 
 export default function InfiniteScrollContainer(props:ContainerProps):JSX.Element {
-  const { children } = props;
+  const { children, nextHandler } = props;
+
+  const handleNext = ()=> {
+    console.log('handling next...');
+    nextHandler && nextHandler();
+  }
 
   return (
     <>
@@ -16,6 +23,9 @@ export default function InfiniteScrollContainer(props:ContainerProps):JSX.Elemen
                 overflow: 'auto',
                 padding: '2vh',
                 height: '100%',
+                maxHeight: 'calc(100% - 200px)',
+                display: 'flex',
+                flexDirection: 'column-reverse',
                 '&::-webkit-scrollbar': {
                     width: '0.69em'
                   },
@@ -28,9 +38,18 @@ export default function InfiniteScrollContainer(props:ContainerProps):JSX.Elemen
                     outline: '1px solid var(--color-1)'
                   }
             }}
-        ><div>
-            {children}
-            </div>
+        >
+            <InfiniteScroll
+              dataLength={30}
+              next={handleNext}
+              style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
+              inverse={true}
+              hasMore={true}
+              loader={<h4>Loading...</h4>}
+              scrollableTarget="scrollableDiv"
+            >
+              {children}
+            </InfiniteScroll>
         </Container>
     </>
   )

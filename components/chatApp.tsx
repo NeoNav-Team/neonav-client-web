@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { restrictedChannels } from '../utilites/constants';
+import { globalChannel } from '../utilites/constants';
 import styles from '../styles/generic.module.css';
 import { Container, Fab, Stack } from '@mui/material';
 import AddCommentIcon from '@mui/icons-material/AddComment';
@@ -8,13 +8,13 @@ import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
-import InfiniteScroll from 'react-infinite-scroll-component';
+import InfiniteScrollContainer from './infiniteScrollContainer';
 
 interface ChatAppProps {
   msgBtn?: boolean;
 }
 
-const GLOBAL_CHAT = restrictedChannels[1];
+const GLOBAL_CHAT = globalChannel;
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
   const { msgBtn } = props;
@@ -83,33 +83,18 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                 data-augmented-ui="tl-clip-x tr-clip-x br-clip bl-clip both"
             >
                 <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
-                <div
-                  id="scrollableDiv"
-                  style={{
-                    height: '100%',
-                    maxHeight: 'calc(100% - 200px)',
-                    overflow: 'auto',
-                    display: 'flex',
-                    flexDirection: 'column-reverse',
-                  }}
-                >
-                  {/*Put the scroll bar always on the bottom*/}
-                  <InfiniteScroll
-                    dataLength={30}
-                    next={handleNext}
-                    style={{ display: 'flex', flexDirection: 'column-reverse' }} //To put endMessage and loader to the top.
-                    inverse={true}
-                    hasMore={true}
-                    loader={<h4>Loading...</h4>}
-                    scrollableTarget="scrollableDiv"
-                  >
-                    <Stack spacing={1}>
-                    {messages.map((item, index) => (
-                      <ItemMessage key={item.ts} date={item.ts || ''} text={item.text} username={item.from} id={item.fromid} />
+                <InfiniteScrollContainer>
+                    <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
+                    {messages.map(item => (
+                      <ItemMessage
+                        key={item.ts}
+                        date={item.ts}
+                        text={item.text}
+                        username={item.from}
+                        id={item.fromid} />
                     ))}
                     </Stack>
-                  </InfiniteScroll>
-                </div>
+                </InfiniteScrollContainer>
 
                 {msgBtn && (
                     <div style={{position: 'absolute', bottom: 20, right: 10,}}>
