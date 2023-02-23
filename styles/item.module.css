@@ -16,7 +16,7 @@
     padding: 10px;
     color: var(--color-3);
     --aug-inlay-all: 4px;
-    --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-1), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
+    --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-2), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
 }
 .nameLine {
     padding: 6px;
@@ -30,7 +30,7 @@
 .dateText {
     font-family: 'Jura';
     opacity: 0.8;
-    font-size: '10px';
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.1rem;
     font-weight: 700;
@@ -46,7 +46,7 @@
 .idText {
     font-family: 'Jura';
     opacity: 0.6;
-    font-size: 1rem;
+    font-size: 16px;
     line-height: 0.5rem;
     letter-spacing: 0.1rem;
     font-weight: 300;
@@ -58,7 +58,7 @@
     font-family: 'Jura';
     text-indent: 2vh;
     opacity: 0.8;
-    font-size: 2rem;
+    font-size: 30px;
     letter-spacing: 0.1rem;
     font-weight: 700;
     line-height: 1.5rem;
@@ -91,7 +91,7 @@
     filter: drop-shadow(#000 1px 1px 5px);
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
     .idText {
         font-size: 0.75rem;
         line-height: 0;
@@ -118,8 +118,7 @@
         line-height: 1.5rem;
     }
     .dateText {
-        font-size: 12px;
-        line-height: 12px;
+        line-height: 14px;
     }
     .dateText span {
         opacity: 0.75;

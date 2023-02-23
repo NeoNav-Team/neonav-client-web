@@ -22,10 +22,30 @@
     --aug-tr: 10px;
     --aug-b-extend1: 50%;
     --aug-border-all: 2px;
-    --aug-border-bg: radial-gradient(var(--background-color), var(--color-3)) 100% 100% / 100% 100%;
+    --aug-border-bg: radial-gradient(var(--background-color), var(--color-2)) 100% 100% / 100% 100%;
     --aug-inlay-all: 4px;
-    --aug-inlay-bg: radial-gradient(ellipse at top, #fff, transparent)  50% 50% / 100% 100%;
+    --aug-inlay-bg: radial-gradient(ellipse at top, var(--background-color), transparent)  50% 50% / 100% 100%;
     --aug-inlay-opacity: 0.5;
+}
+
+.gridBackground { width: 100%; position: absolute; bottom: 0; left: 0; }
+
+.gridBackground:after {
+    -webkit-mask-image: -webkit-gradient(linear, left 90%, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+    mask-image: gradient(linear, left 90%, left top, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)));
+        transform: perspective(200px) rotateX(40deg) scale(2,1) translateZ(0);
+    content: ""; display: block; position: absolute; bottom: 0; left: 0; right: 0; width: 100%; height: 30vh;
+    padding: 1px; 
+    background-clip: content-box; 
+    backface-visibility: hidden;
+    outline: 1px solid transparent;
+    transform-origin: bottom center;
+    will-change: transform; 
+    background-position: center bottom;
+    background-size: 40px 40px;
+    background-image: 
+    linear-gradient(to right, #7a04eb 2px, transparent 2px), 
+    linear-gradient(to bottom, #7a04eb 1px, transparent 2px);
 }
 
 .presentValue {

@@ -2,8 +2,8 @@ import { createTheme, ThemeOptions } from '@mui/material/styles';
 
 interface ExtendedThemeOptions extends ThemeOptions {
     palette?: {},
+    fab?: {},
 }
-
   
 const defaultTheme = createTheme();
 
@@ -72,6 +72,18 @@ export const themeOptions: ExtendedThemeOptions = {
     },
     shape: {
         borderRadius: 4,
+    },
+    components: {
+        MuiFab: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 0,
+                    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+                    background: 'radial-gradient(var(--background-color), var(--color-0)) 100% 100% / 100% 100%',
+                    border: '2px solid var(--background-color)',
+                },
+            },
+        },
     },
     spacing: 8,
 };

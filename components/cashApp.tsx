@@ -1,6 +1,5 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import Link from 'next/link';
 import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
@@ -8,13 +7,12 @@ import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputBalance from './inputBalance';
+import FooterNav from './footerNav';
 import { 
     Alert,
     Container,
-    CircularProgress,
     Typography,
     Box,
-    Fab,
     ToggleButton,
     ToggleButtonGroup,
     FormControl,
@@ -60,7 +58,7 @@ const flexBody = {
 
 const flexFooter = {
     order: 0,
-    flex: '0 1 24px',
+    flex: '0 1 50px',
     alignSelf: 'flex-end',
     width: '100%',
 };
@@ -263,38 +261,22 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                     </SimpleScrollContainer>
                 </Box>
                 <Box sx={flexFooter}>
-                    <div
-                        className={styles.lightPane}
-                        style={{
-                            height: '24px',
+                    <FooterNav
+                        bigHexProps={{
+                            icon: <CurrencyExchangeIcon />,
+                            handleAction: handleSubmit,
+                            loading: loading,
+                            disabled: loading,
                         }}
-                        data-augmented-ui="t-clip-x br-clip bl-clip both"
-                    >
-                    </div>
-                    <div style={{ height: 0, marginTop: '-135px', textAlign: 'center' }}>
-                        <Box sx={{ '& > :not(style)': { m: 2 } }}>
-                            <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(-10deg)'}}>
-                                <QrCodeScannerIcon  sx={{ fontSize: '40px'}} />
-                            </Fab>
-                            <Fab color="secondary"
-                                aria-label="send"
-                                disabled={loading}
-                                sx={{ height: '100px', width: '100px'}}
-                                onClick={handleSubmit}
-                            >
-                                {loading ? (
-                                    <CircularProgress sx={{ fontSize: '70px'}} />
-                                ) : (
-                                    <CurrencyExchangeIcon sx={{ fontSize: '70px'}} />
-                                )}
-                            </Fab>
-                            <Link href={'/cash/history'}>
-                                <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(10deg)'}}>
-                                    <QueryStatsIcon  sx={{ fontSize: '40px'}} />
-                                </Fab>
-                            </Link>
-                        </Box>
-                    </div>
+                        thirdHexProps={{
+                            icon: <QueryStatsIcon />,
+                            link: "/cash/history",
+                        }}
+                        secondHexProps={{
+                            icon: <QrCodeScannerIcon />,
+                            disabled: true,
+                        }}
+                    />
                 </Box>
             </Box>
         </div>

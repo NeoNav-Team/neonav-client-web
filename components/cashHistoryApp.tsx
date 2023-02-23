@@ -1,18 +1,16 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styles from '../styles/generic.module.css';
-import Link from 'next/link';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemTransaction from './itemTransaction';
 import InputBalance from './inputBalance';
+import FooterNav from './footerNav';
 import { 
     Container,
     Box,
-    Fab,
 } from '@mui/material';
-import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { Stack } from '@mui/system';
@@ -129,33 +127,19 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                     </SimpleScrollContainer>
                 </Box>
                 <Box sx={flexFooter}>
-                    <div
-                        className={styles.lightPane}
-                        style={{
-                            height: '24px',
+                    <FooterNav
+                        secondHexProps={{
+                            disabled: true,
                         }}
-                        data-augmented-ui="t-clip-x br-clip bl-clip both"
-                    >
-                    </div>
-                    <div style={{ height: 0, marginTop: '-135px', textAlign: 'center' }}>
-                        <Box sx={{ '& > :not(style)': { m: 2 } }}>
-                            <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(-10deg)'}}>
-                                <QrCodeScannerIcon  sx={{ fontSize: '40px'}} />
-                            </Fab>
-                            <Fab color="secondary"
-                                aria-label="send"
-                                disabled
-                                sx={{ height: '100px', width: '100px'}}
-                            >
-                                <QueryStatsIcon sx={{ fontSize: '70px'}} />
-                            </Fab>
-                            <Link href={'/cash'}>
-                                <Fab color="secondary" aria-label="scan" sx={{ transform: 'rotate(10deg)'}}>
-                                    <CurrencyExchangeIcon  sx={{ fontSize: '40px'}} />
-                                </Fab>
-                            </Link>
-                        </Box>
-                    </div>
+                        bigHexProps={{
+                            icon: <QueryStatsIcon />,
+                            disabled: true,
+                        }}
+                        thirdHexProps={{
+                            icon: <CurrencyExchangeIcon />,
+                            link: "/cash",
+                        }}
+                    />
                 </Box>
             </Box>
         </div>

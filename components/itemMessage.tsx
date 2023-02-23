@@ -29,7 +29,7 @@ interface itemTransactionProps {
                     <Typography className={styles.userText}>{username}</Typography>
                 </div>
                 </Box>
-                <Box sx={{minWidth:'40%', maxWiddth: '55%'}}>
+                <Box sx={{minWidth:'45%', maxWidth: '59%'}}>
                 <div className={styles.dateLine} data-augmented-ui="tr-clip both">
                     <Stack direction="row" spacing={1}>
                         <Typography className={styles.dateText}>{isoDateToDaily(date)}</Typography>

@@ -1,0 +1,7 @@
+.footerItem {
+    filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)';
+}
+
+.footerItem[data-visible="false"] {
+    opacity:0;
+}

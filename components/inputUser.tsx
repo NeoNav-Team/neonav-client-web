@@ -59,8 +59,6 @@ export default function InputUser(props:InputUserProps):JSX.Element {
     filter(arrItem => arrItem.id == 'contacts')[0]; 
   const contacts = filteredUsergroups?.collection || []
 
-  console.log('contacts', state.network?.collections?.users);
-
   const handleChange = (event: SelectChangeEvent<typeof userName>) => {
     const {
       target: { value },
