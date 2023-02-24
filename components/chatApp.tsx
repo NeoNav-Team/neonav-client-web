@@ -7,7 +7,7 @@ import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
-import InfiniteScrollContainer from './infiniteScrollContainer';
+import SimpleScrollContainer from './simpleScrollContainer';
 import InputMessage from './inputMessage';
 
 interface ChatAppProps {
@@ -37,7 +37,7 @@ const flexBody = {
   order: 0,
   flex: '1',
   alignSelf: 'auto',
-  width: '100%',
+  maxWidth: '100%',
   overflow: 'hidden',
 };
 
@@ -127,7 +127,8 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                     <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
                   </Box>
                   <Box sx={flexBody}>
-                    <InfiniteScrollContainer>
+                    <SimpleScrollContainer>
+                      <Box sx={{maxWidth: '100vw'}}>
                       <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
                       {messages.map(item => (
                         <ItemMessage
@@ -138,7 +139,8 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                           id={item.fromid} />
                       ))}
                       </Stack>
-                    </InfiniteScrollContainer>
+                      </Box>
+                    </SimpleScrollContainer>
                 </Box>
                   <Box sx={flexFooter}>
                   <InputMessage value={msg} clickHandler={() => setShowMsgDrawer(true)} />
