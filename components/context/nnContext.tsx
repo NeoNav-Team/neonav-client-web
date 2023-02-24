@@ -32,6 +32,7 @@ import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
 const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection[]) => {
+  console.log('setCollectionByIndex',collectionName, id, state, payload);
   const collection = state.network?.collections[collectionName];
   let index = -1;
   if (collection) {
@@ -50,6 +51,7 @@ const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id
 
 export const nnReducer = (state:NnProviderValues, action: Action) => {
   const {payload, type = null} = action;
+  console.log('init new action', type, payload)
   let newState = null;
   let clonedState = JSON.parse(JSON.stringify(state));
   switch (type) {
