@@ -23,7 +23,7 @@ export default function InfiniteScrollContainer(props:ContainerProps):JSX.Elemen
                 overflow: 'auto',
                 padding: '2vh',
                 height: '100%',
-                maxHeight: 'calc(100% - 200px)',
+                maxHeight: '100%',
                 display: 'flex',
                 flexDirection: 'column-reverse',
                 '&::-webkit-scrollbar': {

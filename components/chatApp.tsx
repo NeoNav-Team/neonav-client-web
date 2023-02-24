@@ -2,19 +2,51 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { globalChannel } from '../utilites/constants';
 import styles from '../styles/generic.module.css';
-import { Container, Fab, Stack } from '@mui/material';
-import AddCommentIcon from '@mui/icons-material/AddComment';
+import { Container, Box, Stack } from '@mui/material';
 import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
 import InfiniteScrollContainer from './infiniteScrollContainer';
+import InputMessage from './inputMessage';
 
 interface ChatAppProps {
   msgBtn?: boolean;
 }
 
 const GLOBAL_CHAT = globalChannel;
+
+const flexContainer = {
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+  alignContent: 'space-around',
+  alignItems: 'stretch',
+};
+
+const flexHeader = {
+  order: 0,
+  flex: '0 1 64px',
+  alignSelf: 'flex-start',
+  width: '100%',
+};
+
+const flexBody = {
+  order: 0,
+  flex: '1',
+  alignSelf: 'auto',
+  width: '100%',
+  overflow: 'hidden',
+};
+
+const flexFooter = {
+  order: 0,
+  flex: '0 1 50px',
+  alignSelf: 'flex-end',
+  width: '100%',
+};
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
   const { msgBtn } = props;
@@ -30,12 +62,19 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   const [channelsFetched, setChannelsFetched] = useState<boolean>(false);
   const [chatsFetcedList, setChatsFetcedList] = useState<string[]>([]);
   const [ messages, setMessages ] = useState<NnChatMessage[]>([]);
+  const [ showMsgDrawer, setShowMsgDrawer ] = useState<boolean>(false);
+  const [ msg, setMsg ] = useState<string>('');
 
   const channelSelection = (selectedChannel:string) => {
     setSelected('channel', selectedChannel);
   }
 
   const handleNext = () => {};
+
+  const goSendMessage = () => {
+    console.log('sending message');
+    setMsg('');
+  }
   
   const goFetchChannels = useCallback(() => {
     if (!channelsFetched) {
@@ -82,27 +121,29 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                 style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
                 data-augmented-ui="tl-clip-x tr-clip-x br-clip bl-clip both"
             >
-                <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
-                <InfiniteScrollContainer>
-                    <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
-                    {messages.map(item => (
-                      <ItemMessage
-                        key={item.ts}
-                        date={item.ts}
-                        text={item.text}
-                        username={item.from}
-                        id={item.fromid} />
-                    ))}
-                    </Stack>
-                </InfiniteScrollContainer>
 
-                {msgBtn && (
-                    <div style={{position: 'absolute', bottom: 20, right: 10,}}>
-                          <Fab color="secondary" aria-label="index">
-                              <AddCommentIcon  sx={{ fontSize: '40px'}} />
-                          </Fab>
-                    </div>
-                )}
+                <Box sx={flexContainer}>
+                  <Box sx={flexHeader}>
+                    <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
+                  </Box>
+                  <Box sx={flexBody}>
+                    <InfiniteScrollContainer>
+                      <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
+                      {messages.map(item => (
+                        <ItemMessage
+                          key={item.ts}
+                          date={item.ts}
+                          text={item.text}
+                          username={item.from}
+                          id={item.fromid} />
+                      ))}
+                      </Stack>
+                    </InfiniteScrollContainer>
+                </Box>
+                  <Box sx={flexFooter}>
+                  <InputMessage value={msg} clickHandler={() => setShowMsgDrawer(true)} />
+                </Box>
+                </Box>
             </div>
         </Container>
     )
