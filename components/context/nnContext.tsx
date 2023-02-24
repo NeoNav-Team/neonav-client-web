@@ -88,9 +88,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
   }
   newState = {...state, ...clonedState};
-  const { cookieData, localStorageData  } = scrubCookieData(newState);
-  cookieData && setCookieContext(cookieData);
-  setLocalStorage('nnCollection', localStorageData);
+  // const { cookieData, localStorageData  } = scrubCookieData(newState);
+  // cookieData && setCookieContext(cookieData);
+  // setLocalStorage('nnCollection', localStorageData);
   console.log(type, payload);
   console.log('returning new State');
   return newState;
