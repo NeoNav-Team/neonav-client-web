@@ -44,6 +44,7 @@ const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id
       collectionItem.collection = payload
     }
   }
+  console.log('collection', collection);
   return state;
 }
 
@@ -89,6 +90,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   cookieData && setCookieContext(cookieData);
   setLocalStorage('nnCollection', localStorageData);
   console.log(type, payload);
+  console.log('returning new State');
   return newState;
 };
 
