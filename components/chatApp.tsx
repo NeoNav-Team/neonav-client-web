@@ -90,29 +90,29 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     }
   }, [state, goFetchChannels]);
 
-  useEffect(() => {
-    if (chatHistories && selectedChannel) {
-      if (chatsFetcedList.indexOf(selectedChannel) === -1) {
-        const chat = chatHistories[chatHistoriesIndex] || {collection: []};
-        const chatHistory = chat ? chat.collection : [];
-        if (chatHistory && chatHistory.length === 0) {
-          fetchChannelHistory(selectedChannel);
-          const newChatsFetchedList = [...chatsFetcedList, selectedChannel];
-          setChatsFetcedList(newChatsFetchedList);
-        }
-      }
-    }
-  }, [chatHistories, chatHistoriesIndex, chatsFetcedList, fetchChannelHistory, selectedChannel]);
+  // useEffect(() => {
+  //   if (chatHistories && selectedChannel) {
+  //     if (chatsFetcedList.indexOf(selectedChannel) === -1) {
+  //       const chat = chatHistories[chatHistoriesIndex] || {collection: []};
+  //       const chatHistory = chat ? chat.collection : [];
+  //       if (chatHistory && chatHistory.length === 0) {
+  //         fetchChannelHistory(selectedChannel);
+  //         const newChatsFetchedList = [...chatsFetcedList, selectedChannel];
+  //         setChatsFetcedList(newChatsFetchedList);
+  //       }
+  //     }
+  //   }
+  // }, [chatHistories, chatHistoriesIndex, chatsFetcedList, fetchChannelHistory, selectedChannel]);
 
 
-  useEffect(() => {
-    if (chatHistories ) {
-      const chat:NnIndexCollection = chatHistories[chatHistoriesIndex];
-      console.log('chat', chat);
-      const selectedChatMessages = chat?.collection || [];
-      setMessages(selectedChatMessages);
-    }
-  }, [chatHistories, chatHistoriesIndex, selectedChannel]);
+  // useEffect(() => {
+  //   if (chatHistories ) {
+  //     const chat:NnIndexCollection = chatHistories[chatHistoriesIndex];
+  //     console.log('chat', chat);
+  //     const selectedChatMessages = chat?.collection || [];
+  //     setMessages(selectedChatMessages);
+  //   }
+  // }, [chatHistories, chatHistoriesIndex, selectedChannel]);
 
 
     return (
