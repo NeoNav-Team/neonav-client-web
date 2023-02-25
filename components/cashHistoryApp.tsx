@@ -56,7 +56,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     const { 
         state,
         fetchUserWallets = () =>{},
-        fetchUserWalletHistory = (walletId:string) => {},
+        fetchUserWalletHistory = () => {},
      }: NnProviderValues = useContext(NnContext);
 
     const getFilteredCollection = (collection:NnIndexCollection[], selectedId?:string) => {
@@ -101,12 +101,10 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
     const goFetchWalletsHistory = useCallback(() => {
         if (!transactionsFetched) {
-            const walletId = wallet?.id;
-            const hasId = typeof walletId !== 'undefined' && walletId !== '';
-            hasId && fetchUserWalletHistory(walletId);
-            setTransactionsFetched(hasId);
+            fetchUserWalletHistory();
+            setTransactionsFetched(true);
         }
-    }, [transactionsFetched, fetchUserWalletHistory, wallet])
+    }, [transactionsFetched, fetchUserWalletHistory])
 
     useEffect(() => {
         if (!wallets.length) {

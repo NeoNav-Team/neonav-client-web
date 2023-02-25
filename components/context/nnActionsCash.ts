@@ -63,14 +63,7 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
     executeApi('wallets', {token}, onSuccess, onError);
   }
   
- export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async (walletId:string) => {
-    if (walletId === '' || typeof walletId === 'undefined') { 
-      dispatch({
-        type: 'setAlert',
-        payload: {severity: 'error', message:'No Wallet Id', show: true},
-      });
-      return;
-    }
+ export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
