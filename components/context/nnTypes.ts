@@ -96,6 +96,7 @@ export type NnNetwork = {
     location?: string,
     apiLastFetch?: NnFetchDates,
     selected: {
+        transactions?: string,
         account?: string,
         channel?: string,
     },

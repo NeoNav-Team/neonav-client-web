@@ -1,4 +1,7 @@
 import { NnStore } from "./nnTypes";
+import { globalChannel } from "@/utilites/constants";
+
+const GLOBAL_CHANNEL = globalChannel;
 
 export const nnSchema:NnStore = {
     network: { 
@@ -14,8 +17,9 @@ export const nnSchema:NnStore = {
         walletHistory: '',
       },
       selected: {
+        transactions: '',
         account: '',
-        channel: '',
+        channel: GLOBAL_CHANNEL,
       },
       collections: {
         chats: [],

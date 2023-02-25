@@ -6,7 +6,7 @@ import { Container, Box, Stack } from '@mui/material';
 import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
+import { NnChatMessage, NnProviderValues, NnIndexCollection } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputMessage from './inputMessage';
 
@@ -58,9 +58,9 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = state.network?.selected?.channel || GLOBAL_CHAT;
   const chatHistories = state.network?.collections?.chats;
-  const chatHistoriesIndex = chatHistories && chatHistories.map(function(x) {return x.id; }).indexOf(selectedChannel) || -1;
-  const [channelsFetched, setChannelsFetched] = useState<boolean>(false);
-  const [chatsFetcedList, setChatsFetcedList] = useState<string[]>([]);
+  const chatHistoriesIndex = chatHistories && chatHistories.map(function(x) {return x.id; }).indexOf(selectedChannel) || 0;
+  const [ channelsFetched, setChannelsFetched ] = useState<boolean>(false);
+  const [ chatsFetcedList, setChatsFetcedList ] = useState<string[]>([]);
   const [ messages, setMessages ] = useState<NnChatMessage[]>([]);
   const [ showMsgDrawer, setShowMsgDrawer ] = useState<boolean>(false);
   const [ msg, setMsg ] = useState<string>('');
@@ -106,9 +106,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
 
   useEffect(() => {
-    if (chatHistories) {
-      const chat = chatHistories[chatHistoriesIndex] || {collection: []};
-      const selectedChatMessages = chat.collection || [];
+    if (chatHistories ) {
+      const chat:NnIndexCollection = chatHistories[chatHistoriesIndex];
+      console.log('chat', chat);
+      const selectedChatMessages = chat?.collection || [];
       setMessages(selectedChatMessages);
     }
   }, [chatHistories, chatHistoriesIndex, selectedChannel]);

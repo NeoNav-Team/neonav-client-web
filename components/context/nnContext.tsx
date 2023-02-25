@@ -44,13 +44,11 @@ const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id
       collectionItem.collection = payload
     }
   }
-  console.log('setCollectionByIndex return state', state);
   return state;
 }
 
 export const nnReducer = (state:NnProviderValues, action: Action) => {
   const {payload, type = null} = action;
-  console.log('init new action', type, payload)
   let newState = null;
   let clonedState = JSON.parse(JSON.stringify(state));
   switch (type) {
@@ -82,6 +80,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setNetwork':
       clonedState.network.location = payload;
+      break;
     case 'setSelected':
         clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
       break;
