@@ -1,5 +1,6 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
+import { get } from 'lodash';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues, NnIndexCollection, NnCollection, NnWallet } from '../components/context/nnTypes';
@@ -40,6 +41,7 @@ const flexBody = {
     flex: '1',
     alignSelf: 'auto',
     width: '100%',
+    minHeight: '30vh',
     overflow: 'hidden',
 };
 
@@ -64,7 +66,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         const filteredList = collection.filter(arrItem => arrItem.id == selectedId);
         if (filteredList.length) {
             filteredItem = filteredList[0];
-            filteredCollection = filteredItem?.collection || [];
+            filteredCollection = get(filteredItem, 'collection', []);
         }
         return filteredCollection;
     }
@@ -83,12 +85,12 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
     const [ walletFetched, setWalletFetched ] = useState(false);
     const [ transactionsFetched, setTransactionsFetched ] = useState(false);
-    const wallets = useMemo(() => {return state?.user?.wallets || [{}] }, [state]);
+    const wallets = get(state, 'user.wallets', []);
     const personalWallet = getFilteredItemValue(wallets, 'personal', 'id');
-    const selectedAccount = state?.network?.selected.account || personalWallet;
+    const selectedAccount = get(state, 'network.selected.account', personalWallet);
     const wallet = wallets && wallets.filter(arrItem => arrItem.id == selectedAccount)[0];
-    const balance = wallet ? wallet?.balance : null;
-    const transactionCollections =  state?.network?.collections?.transactions || [];
+    const balance = get(wallet, 'balance', null);
+    const transactionCollections =  get(state, 'network.collections.transactions', []);
     const transactions = getFilteredCollection(transactionCollections, selectedAccount); 
 
     const goFetchWallets = useCallback(() => {
@@ -100,11 +102,11 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
     const goFetchWalletsHistory = useCallback(() => {
         if (wallets && wallets.length !== 0 && !transactionsFetched) {
-            const walletId = wallet?.id || '';
+            const walletId = get(wallet, 'id', '');
             fetchUserWalletHistory(walletId);
             setTransactionsFetched(true);
         }
-    }, [wallets, transactionsFetched, fetchUserWalletHistory, wallet?.id])
+    }, [wallets, transactionsFetched, fetchUserWalletHistory, wallet])
 
     useEffect(() => {
         const walletSize = wallets && wallets.length;
