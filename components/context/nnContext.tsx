@@ -32,19 +32,21 @@ import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
 const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection[]) => {
-  const collection = state.network?.collections[collectionName];
+  let clonedState = JSON.parse(JSON.stringify(state));
+  const collection = clonedState.network?.collections[collectionName];
   let index = -1;
-  // if (collection) {
-  //   index = collection && collection.map(function(x) {return x.id; }).indexOf(id);
-  //   if (index === -1) {
-  //     const newCollection:NnIndexCollection = {id: id, collection: payload};
-  //     collection.push(newCollection);
-  //   } else {
-  //     const collectionItem = collection[index];
-  //     collectionItem.collection = payload
-  //   }
-  // }
-  return state;
+  if (collection) {
+    const indexes = collection && collection.map(function(x:Record<string, any>) { return x.id; });
+    index = indexes.length ? indexes.indexOf(id) : index;
+    if (index === -1) {
+      const newCollection:NnIndexCollection = {id: id, collection: payload};
+      collection.push(newCollection);
+    } else {
+      const collectionItem = collection[index];
+      collectionItem.collection = payload
+    }
+  }
+  return clonedState;
 }
 
 export const nnReducer = (state:NnProviderValues, action: Action) => {
