@@ -67,11 +67,10 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
-      console.log('wallet history data', data);
-      // dispatch({
-      //   type: 'setWalletTransactions',
-      //   payload: data,
-      // })
+      dispatch({
+        type: 'setWalletTransactions',
+        payload: data,
+      })
     };
     const onError = (err:netcheckAPIResData) => {
       const { message = 'Wallet History failure' } = err;

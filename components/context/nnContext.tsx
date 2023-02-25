@@ -65,8 +65,8 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       clonedState.user.wallets = payload;
       break;
     case 'setWalletTransactions':
-      const walletId = clonedState.network.selected.account;
-      clonedState = setCollectionByIndex(clonedState, 'transactions', walletId, payload as NnIndexCollection[]);
+      // const walletId = clonedState.network.selected.account;
+      // clonedState = setCollectionByIndex(clonedState, 'transactions', walletId, payload as NnIndexCollection[]);
       break;
     case 'setUserWallets':
       clonedState.user.wallets = payload;
