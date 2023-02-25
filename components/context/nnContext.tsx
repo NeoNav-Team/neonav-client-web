@@ -32,12 +32,17 @@ import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
 const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection[]) => {
+  console.log('==== setCollectionByIndex ====');
   let clonedState = JSON.parse(JSON.stringify(state));
   const collection:NnIndexCollection[] = clonedState.network?.collections[collectionName];
   let index = -1;
+  console.log('collection', collection);
+  console.log('Object.keys(collection).length', Object.keys(collection).length);
   if (Object.keys(collection).length >= 1) {
     const indexes = collection.map(item => item.id);
+    console.log('indexes', indexes);
     index = indexes.length ? indexes.indexOf(id) : index;
+    console.log('index pos', index);
   }
   if (index !== -1) {
     const collectionItem = collection[index];
@@ -47,6 +52,7 @@ const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id
     const newCollection:NnIndexCollection = {id: id, collection: payload};
     collection.push(newCollection);
   } 
+  console.log('return clonedState', clonedState);
   return clonedState;
 }
 
