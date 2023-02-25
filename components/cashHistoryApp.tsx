@@ -100,26 +100,25 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     }, [walletFetched, fetchUserWallets])
 
     const goFetchWalletsHistory = useCallback(() => {
-        if (wallets && wallets.length !== 0 && !transactionsFetched) {
-            const walletId = wallet?.id || '';
-            fetchUserWalletHistory(walletId);
-            setTransactionsFetched(true);
+        if (!transactionsFetched) {
+            const walletId = wallet?.id;
+            const hasId = typeof walletId !== 'undefined';
+            hasId && fetchUserWalletHistory(walletId);
+            setTransactionsFetched(hasId);
         }
-    }, [wallets, transactionsFetched, fetchUserWalletHistory, wallet?.id])
+    }, [transactionsFetched, fetchUserWalletHistory, wallet])
 
     useEffect(() => {
-        const walletSize = wallets && wallets.length;
-        if (walletSize === 0) {
+        if (!wallets.length) {
             goFetchWallets();
         }
     }, [wallets, goFetchWallets]);
 
-    // useEffect(() => {
-    //     const walletHistorySize = transactions.length === 0;
-    //     if (walletHistorySize) {
-    //         goFetchWalletsHistory();
-    //     }
-    // }, [wallets, goFetchWalletsHistory, transactions]);
+    useEffect(() => {
+        if (!transactions.length) {
+            goFetchWalletsHistory();
+        }
+    }, [transactions, goFetchWalletsHistory]);
 
     return (
         <Container disableGutters style={{height: '100%'}}>
