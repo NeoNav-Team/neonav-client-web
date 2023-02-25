@@ -33,10 +33,10 @@ const defaultNnContext:NnStore = merge({}, nnSchema);
 
 const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection[]) => {
   let clonedState = JSON.parse(JSON.stringify(state));
-  const collection = clonedState.network?.collections[collectionName];
+  const collection:NnIndexCollection[] = clonedState.network?.collections[collectionName];
   let index = -1;
   if (Object.keys(collection).length >= 1) {
-    const indexes = collection.map((x:Record<string, any>) => { return x.id; });
+    const indexes = collection.map(item => item.id);
     index = indexes.length ? indexes.indexOf(id) : index;
   }
   if (index !== -1) {
