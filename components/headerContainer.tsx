@@ -36,8 +36,8 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     //get inital values on page load
     if(!initialized) { 
       initContext();
-      fetchNetworkStatus();
-      fetchUserContacts();
+      // fetchNetworkStatus();
+      // fetchUserContacts();
       setInitialized(true);
     }
   }, [fetchNetworkStatus, fetchUserContacts, initContext, initialized]);
