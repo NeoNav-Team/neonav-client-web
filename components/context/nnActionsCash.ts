@@ -24,7 +24,7 @@ export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount
     setTimeout(() => executeApi('pay', {token, recipient, amount}, onSuccess, onError), 2000);
   }
   
-  export const requestPayment = (dispatch: DispatchFunc) => (id:string, amount:string) => {
+export const requestPayment = (dispatch: DispatchFunc) => (id:string, amount:string) => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       dispatch({
@@ -42,7 +42,7 @@ export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount
     setTimeout(() => executeApi('request', {token, id, amount}, onSuccess, onError), 2000);
   }
 
-  export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
+export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
@@ -63,8 +63,14 @@ export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount
     executeApi('wallets', {token}, onSuccess, onError);
   }
   
-  export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async (walletId:string) => {
-    if (walletId === '' || typeof walletId === 'undefined') { return; }
+ export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async (walletId:string) => {
+    if (walletId === '' || typeof walletId === 'undefined') { 
+      dispatch({
+        type: 'setAlert',
+        payload: {severity: 'error', message:'No Wallet Id', show: true},
+      });
+      return;
+    }
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;

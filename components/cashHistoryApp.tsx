@@ -102,7 +102,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     const goFetchWalletsHistory = useCallback(() => {
         if (!transactionsFetched) {
             const walletId = wallet?.id;
-            const hasId = typeof walletId !== 'undefined';
+            const hasId = typeof walletId !== 'undefined' && walletId !== '';
             hasId && fetchUserWalletHistory(walletId);
             setTransactionsFetched(hasId);
         }
