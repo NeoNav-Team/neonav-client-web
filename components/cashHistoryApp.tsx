@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues } from '../components/context/nnTypes';
+import { NnProviderValues, NnIndexCollection, NnCollection } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemTransaction from './itemTransaction';
 import InputBalance from './inputBalance';
@@ -58,6 +58,17 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         fetchUserWalletHistory = (walletId:string) => {},
      }: NnProviderValues = useContext(NnContext);
 
+    const getFilteredCollection = (collection:NnIndexCollection[], selectedId?:string) => {
+        let filteredItem = null;
+        let filteredCollection:NnCollection = []
+        const filteredList = collection.filter(arrItem => arrItem.id == selectedId);
+        if (filteredList.length) {
+            filteredItem = filteredList[0];
+            filteredCollection = filteredItem?.collection || [];
+        }
+        return filteredCollection;
+    }
+
     const [ walletFetched, setWalletFetched ] = useState(false);
     const [ transactionsFetched, setTransactionsFetched ] = useState(false);
     const wallets = state?.user?.wallets;
@@ -65,8 +76,8 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     const selectedAccount = state?.network?.selected.account || personalWallet?.id;
     const wallet = wallets && wallets.filter(arrItem => arrItem.id == selectedAccount)[0];
     const balance = wallet ? wallet?.balance : null;
-    const transactionCollections = wallet ? state?.network?.collections?.transactions : null;
-    const transactions = transactionCollections && transactionCollections.length >= 1 && transactionCollections.filter(arrItem => arrItem.id == selectedAccount)[0].collection || []; 
+    const transactionCollections =  state?.network?.collections?.transactions || [];
+    const transactions = getFilteredCollection(transactionCollections, selectedAccount); 
 
     const goFetchWallets = useCallback(() => {
         if (!walletFetched) {
@@ -77,7 +88,8 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
     const goFetchWalletsHistory = useCallback(() => {
         if (wallets && wallets.length !== 0 && !transactionsFetched) {
-            fetchUserWalletHistory(wallet?.id || '');
+            const walletId = wallet?.id || '';
+            fetchUserWalletHistory(walletId);
             setTransactionsFetched(true);
         }
     }, [wallets, transactionsFetched, fetchUserWalletHistory, wallet?.id])

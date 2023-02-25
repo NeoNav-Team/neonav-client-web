@@ -84,9 +84,11 @@ export type NnChatMessage = {
     text?: string,
 }
 
+export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];
+
 export type NnIndexCollection = {
     id: string,
-    collection?: NnWalletTransaction[] & NnChatMessage[] & NnContact[];
+    collection?: NnCollection;
 }
 
 export type NnNetwork = {
