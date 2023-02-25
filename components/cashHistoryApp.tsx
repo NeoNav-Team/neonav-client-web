@@ -66,6 +66,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
             filteredItem = filteredList[0];
             filteredCollection = filteredItem?.collection || [];
         }
+        console.log('filtered transactions', filteredCollection);
         return filteredCollection;
     }
 

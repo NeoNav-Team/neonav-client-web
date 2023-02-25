@@ -32,7 +32,6 @@ import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
 const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection[]) => {
-  console.log('setCollectionByIndex',collectionName, id, state, payload);
   const collection = state.network?.collections[collectionName];
   let index = -1;
   if (collection) {
@@ -45,7 +44,7 @@ const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id
       collectionItem.collection = payload
     }
   }
-  console.log('collection', collection);
+  console.log('setCollectionByIndex return state', state);
   return state;
 }
 
@@ -88,11 +87,10 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
   }
   newState = {...state, ...clonedState};
-  // const { cookieData, localStorageData  } = scrubCookieData(newState);
-  // cookieData && setCookieContext(cookieData);
-  // setLocalStorage('nnCollection', localStorageData);
-  console.log(type, payload);
-  console.log('returning new State');
+  const { cookieData, localStorageData  } = scrubCookieData(newState);
+  cookieData && setCookieContext(cookieData);
+  setLocalStorage('nnCollection', localStorageData);
+  console.log('nnReducer', type, payload, newState);
   return newState;
 };
 
