@@ -35,17 +35,18 @@ const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id
   let clonedState = JSON.parse(JSON.stringify(state));
   const collection = clonedState.network?.collections[collectionName];
   let index = -1;
-  if (collection) {
-    const indexes = collection && collection.map(function(x:Record<string, any>) { return x.id; });
+  if (collection.length) {
+    const indexes = collection.map((x:Record<string, any>) => { return x.id; });
     index = indexes.length ? indexes.indexOf(id) : index;
-    if (index === -1) {
-      const newCollection:NnIndexCollection = {id: id, collection: payload};
-      collection.push(newCollection);
-    } else {
-      const collectionItem = collection[index];
-      collectionItem.collection = payload
-    }
   }
+  if (index !== -1) {
+    const collectionItem = collection[index];
+    collectionItem.collection = payload
+  }
+  if (!collection.length || index === -1) {
+    const newCollection:NnIndexCollection = {id: id, collection: payload};
+    collection.push(newCollection);
+  } 
   return clonedState;
 }
 
