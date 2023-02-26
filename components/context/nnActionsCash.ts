@@ -68,7 +68,7 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
-      storeFetched('userWallet', JSON.stringify(data));
+      storeFetched('userWallet', data);
       dispatch({
         type: 'setWalletTransactions',
         payload: data,

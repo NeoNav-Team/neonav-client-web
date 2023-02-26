@@ -6,7 +6,7 @@ import { Container, Box, Stack } from '@mui/material';
 import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnChatMessage, NnProviderValues, NnIndexCollection } from '../components/context/nnTypes';
+import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputMessage from './inputMessage';
 
