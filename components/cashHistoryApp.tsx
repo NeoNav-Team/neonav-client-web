@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues, NnIndexCollection, NnCollection, NnWallet } from '../components/context/nnTypes';
+import { NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemTransaction from './itemTransaction';
 import InputBalance from './inputBalance';
@@ -59,17 +59,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         fetchUserWalletHistory = () => {},
      }: NnProviderValues = useContext(NnContext);
 
-    const getFilteredCollection = (collection:NnIndexCollection[], selectedId?:string) => {
-        let filteredItem:Record<string, any> = {};
-        let filteredCollection:NnCollection = []
-        const filteredList = collection.filter(arrItem => arrItem.id == selectedId);
-        if (filteredList.length) {
-            filteredItem = filteredList[0];
-            filteredCollection = filteredItem?.collection || [];
-        }
-        return filteredCollection;
-    }
-
     const getFilteredItemValue = (collection:Record<string, any>[], selectedId:string, returnKey:string) => {
         let filteredItem:Record<string, any> = {};
         let filteredValue:string = '';
@@ -84,13 +73,15 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
     const [ walletFetched, setWalletFetched ] = useState(false);
     const [ transactionsFetched, setTransactionsFetched ] = useState(false);
-    const wallets = useMemo(() => {return state?.user?.wallets || [{}] }, [state]);
+    const wallets = useMemo(() => { return state?.user?.wallets || [{}] }, [state]);
     const personalWallet = getFilteredItemValue(wallets, 'personal', 'id');
     const selectedAccount = state?.network?.selected.account || personalWallet;
     const wallet = wallets && wallets.filter(arrItem => arrItem.id == selectedAccount)[0];
     const balance = wallet ? wallet?.balance : null;
-    const transactionCollections =  state?.network?.collections?.transactions || [];
-    const transactions = getFilteredCollection(transactionCollections, selectedAccount); 
+    const transactions = useMemo(() => { 
+        const transArr = state?.network?.collections?.transactions || [];
+        return transArr.length > 30 ? transArr.slice(0, 30) : transArr;
+    }, [state]);
 
     const goFetchWallets = useCallback(() => {
         if (!walletFetched) {

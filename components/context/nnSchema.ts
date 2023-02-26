@@ -2,6 +2,7 @@ import { NnStore } from "./nnTypes";
 import { globalChannel } from "@/utilites/constants";
 
 const GLOBAL_CHANNEL = globalChannel;
+const NOW = new Date().toISOString();
 
 export const nnSchema:NnStore = {
     network: { 
@@ -11,29 +12,21 @@ export const nnSchema:NnStore = {
         message: '',
         show: false,
       },
-      apiLastFetch: {
-        profile: '',
-        wallets: '',
-        walletHistory: '',
-      },
       selected: {
         transactions: '',
         account: '',
         channel: GLOBAL_CHANNEL,
       },
+      localStorage: {
+        transactions: [],
+        chats: [],
+        channels: [],
+      },
       collections: {
         chats: [],
         transactions: [],
-        users: [
-          {
-            id: 'contacts',
-            collection: [],
-          },
-          {
-            id: 'scannedUsers',
-            collection: [],
-          }
-        ],
+        contacts: [],
+        scannedUsers: [],
       }
     },
     user: {

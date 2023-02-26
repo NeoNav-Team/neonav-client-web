@@ -4,10 +4,8 @@ import DataContextCreator from "./dataContextCreator";
 import { 
   Action,
   DispatchFunc,
-  NnIndexCollection,
   NnProviderValues,
   NnStore,
-  NnCollectionKeys,
 } from "./nnTypes";
 import {
   closeAlert,
@@ -26,35 +24,9 @@ import {
   fetchChannelHistory,
 } from './nnActionsChat';
 import { nnSchema } from "./nnSchema";
-import { getCookieContext, getCookieToken, scrubCookieData, setCookieContext } from "@/utilites/cookieContext";
-import { getLocalStorage, setLocalStorage } from '@/utilites/localStorage';
+import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/cookieContext";
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
-
-const setCollectionByIndex = (state:NnStore, collectionName:NnCollectionKeys, id:string, payload:NnIndexCollection[]) => {
-  console.log('==== setCollectionByIndex ====');
-  let clonedState = JSON.parse(JSON.stringify(state));
-  const collection:NnIndexCollection[] = clonedState.network?.collections[collectionName];
-  let index = -1;
-  console.log('collection', collection);
-  console.log('Object.keys(collection).length', Object.keys(collection).length);
-  if (Object.keys(collection).length >= 1) {
-    const indexes = collection.map(item => item.id);
-    console.log('indexes', indexes);
-    index = indexes.length ? indexes.indexOf(id) : index;
-    console.log('index pos', index);
-  }
-  if (index !== -1) {
-    const collectionItem = collection[index];
-    collectionItem.collection = payload
-  }
-  if (!Object.keys(collection).length || index === -1) {
-    const newCollection:NnIndexCollection = {id: id, collection: payload};
-    collection.push(newCollection);
-  } 
-  console.log('return clonedState', clonedState);
-  return clonedState;
-}
 
 export const nnReducer = (state:NnProviderValues, action: Action) => {
   const {payload, type = null} = action;
@@ -74,15 +46,13 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       clonedState.user.wallets = payload;
       break;
     case 'setWalletTransactions':
-      const walletId = clonedState.network.selected.account;
-      clonedState = setCollectionByIndex(clonedState, 'transactions', walletId, payload as NnIndexCollection[]);
+      clonedState.network.collections.transactions = payload;
       break;
     case 'setUserContacts':
-      clonedState = setCollectionByIndex(clonedState, 'users', 'contacts', payload as NnIndexCollection[]);
+      clonedState.network.collections.contacts = payload;
       break;
     case 'setMessageHistory':
-      const channelId = clonedState.network.selected.channel;
-      clonedState = setCollectionByIndex(clonedState, 'chats', channelId, payload as NnIndexCollection[]);
+      clonedState.network.collections.chat = payload;
       break;
     case 'setNetwork':
       clonedState.network.location = payload;
@@ -92,17 +62,13 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
   }
   newState = {...state, ...clonedState};
-  const { cookieData, localStorageData  } = scrubCookieData(newState);
-  cookieData && setCookieContext(cookieData);
-  setLocalStorage('nnCollection', localStorageData);
-  console.log('nnReducer', type, payload, newState);
+  setCookieContext(newState);
   return newState;
 };
 
 export const initContext = (dispatch: DispatchFunc) => async () => {
   let onLoadUserContext = {};
   const cookieContextData = getCookieContext();
-  const storedCollections = getLocalStorage('nnCollection')
   if (Object.keys(cookieContextData).length === 0) {
     // creates nnContext cookie if one does not exist
     const cookieJWTData = getCookieToken();
@@ -132,12 +98,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     onLoadUserContext = merge.all([onLoadUserContext, defaultNnContext, jwtContext]);
     setCookieContext(onLoadUserContext);
   } else {
-    const collectionContext =  {
-      network: {
-        collections: storedCollections
-      }
-    };
-    onLoadUserContext = merge.all([onLoadUserContext, cookieContextData, collectionContext]);
+    onLoadUserContext = cookieContextData;
   }
   //dispatches context to state
   dispatch({

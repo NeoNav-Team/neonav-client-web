@@ -5,6 +5,7 @@ import {
     netcheckAPIResData,
 } from "./nnTypes";
 import { getCookieToken } from "@/utilites/cookieContext";
+import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
 
 export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount:string) => {
     const token = getCookieToken();
@@ -67,6 +68,7 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
+      storeFetched('userWallet', JSON.stringify(data));
       dispatch({
         type: 'setWalletTransactions',
         payload: data,
@@ -79,5 +81,13 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
         payload: {severity: 'error', message, show: true},
       })
     };
-    executeApi('walletHistory', {token}, onSuccess, onError);
+    if (storedRecently('userWallet')) {
+      const data = JSON.parse(getLocalStorage('userWallet'));
+      dispatch({
+        type: 'setWalletTransactions',
+        payload: data,
+      })
+    } else {
+      executeApi('walletHistory', {token}, onSuccess, onError); 
+    }
   };

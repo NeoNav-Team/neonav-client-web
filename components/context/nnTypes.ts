@@ -9,12 +9,6 @@ export type NnStore = {
     user?: NnUser,
 }
 
-export type NnFetchDates = {
-    profile?: string,
-    wallets?: string,
-    walletHistory?: string,
-}
-
 export type NnAert = {
     severity?: 'success' | 'error' | 'info' | 'warning',
     message?: string,
@@ -86,24 +80,25 @@ export type NnChatMessage = {
 
 export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];
 
-export type NnIndexCollection = {
-    id: string,
-    collection?: NnCollection;
-}
-
 export type NnNetwork = {
     alert: NnAert,
     location?: string,
-    apiLastFetch?: NnFetchDates,
+    lastFetched?: string,
     selected: {
         transactions?: string,
         account?: string,
         channel?: string,
     },
+    localStorage: {
+        chats?: String[],
+        transactions?: String[],
+        channels?: String[],
+    },
     collections: {
-        chats?: NnIndexCollection[],
-        transactions?: NnIndexCollection[],
-        users?: NnIndexCollection[],
+        chats?: NnChatMessage[],
+        transactions?: NnWalletTransaction[],
+        contacts?: NnContact[],
+        scannedUsers?: NnContact[],
     }
 }
 
