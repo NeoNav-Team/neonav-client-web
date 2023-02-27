@@ -14,6 +14,7 @@ import {
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { Stack } from '@mui/system';
+import { use100vh } from 'react-div-100vh';
 
 
 interface CashAppProps {};
@@ -40,6 +41,7 @@ const flexBody = {
     flex: '1',
     alignSelf: 'auto',
     width: '100%',
+    minWidth: '100%',
     minHeight: '50vh',
     overflow: 'hidden',
 };
@@ -52,7 +54,9 @@ const flexFooter = {
 };
 
 export default function CashApp(props: CashAppProps):JSX.Element {
-
+    const FULL_HEIGHT = use100vh() || 600;
+    const FLEX_HEIGHT = FULL_HEIGHT - 75;
+    const SCROLL_HEIGHT = FULL_HEIGHT - 114;
     const { 
         state,
         fetchUserWallets = () =>{},
@@ -116,15 +120,16 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
                 data-augmented-ui="tl-clip-x tr-rect br-clip bl-clip both"
             >
-            <Box sx={flexContainer}>
+            <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
                 <Box sx={flexHeader}>
-                <Container sx={{paddingTop: '20px'}}>
-                    <InputBalance balance={balance} />
-                </Container>
+                    <Container sx={{paddingTop: '20px'}}>
+                        <InputBalance balance={balance} />
+                    </Container>
                 </Box>
-                <Box sx={flexBody}>
+                <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
                     <SimpleScrollContainer>
-                        <Stack spacing={1}>
+                        <Box sx={{minWidth: '100%', minHeight: '100%'}}>
+                        <Stack spacing={0} sx={{ display: 'flex' }}>
                             {transactions && transactions.map(item => {
                                return (
                                 <ItemTransaction
@@ -137,6 +142,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                                )
                             })}
                         </Stack>
+                        </Box>
                     </SimpleScrollContainer>
                 </Box>
                 <Box sx={flexFooter}>

@@ -56,9 +56,10 @@ interface itemTransactionProps {
     }
   
     return (
-        <Box>
+        <Box style={{minWidth: '100%'}}>
             <div className={styles.dateLine} data-augmented-ui="tr-clip both">
                 <Stack direction="row" spacing={1}>
+                <Typography className={styles.idSmallText}>{id}</Typography>
                 <Typography className={styles.dateText}>{isoDateToDaily(date)}</Typography>
                 <Typography className={styles.dateText}><span>{isoDateToMonth(date)}</span></Typography>
                 </Stack>
@@ -71,7 +72,6 @@ interface itemTransactionProps {
                     spacing={0}
                 >
                 <Box sx={{minWidth:'45%'}}>
-                    <Typography className={styles.idText}>{id}</Typography>
                     <Typography className={styles.userText}>{username}</Typography>
                 </Box>
                 <Box sx={{minWidth:'55%'}}>

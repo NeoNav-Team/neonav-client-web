@@ -9,7 +9,7 @@ import { Context as NnContext } from '../components/context/nnContext';
 import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputMessage from './inputMessage';
-import { use100vh } from 'react-div-100vh'
+import { use100vh } from 'react-div-100vh';
 
 interface ChatAppProps {
   msgBtn?: boolean;
@@ -111,14 +111,14 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                     <SimpleScrollContainer>
                       <Box sx={{maxWidth: '100%'}}>
                       <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
-                      {messages.map(item => (
-                        <ItemMessage
-                          key={item.ts}
-                          date={item.ts}
-                          text={item.text}
-                          username={item.from}
-                          id={item.fromid} />
-                      ))}
+                        {messages.map(item => (
+                          <ItemMessage
+                            key={item.ts}
+                            date={item.ts}
+                            text={item.text}
+                            username={item.from}
+                            id={item.fromid} />
+                        ))}
                       </Stack>
                       </Box>
                     </SimpleScrollContainer>

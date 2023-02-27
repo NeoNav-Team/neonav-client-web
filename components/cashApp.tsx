@@ -20,6 +20,7 @@ import {
     InputAdornment,
     OutlinedInput,
     Snackbar,
+    Stack
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
@@ -27,6 +28,7 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import InputUser from './inputUser';
+import { use100vh } from 'react-div-100vh';
 
 
 interface CashAppProps {};
@@ -64,7 +66,9 @@ const flexFooter = {
 };
 
 export default function CashApp(props: CashAppProps):JSX.Element {
-
+    const FULL_HEIGHT = use100vh() || 600;
+    const FLEX_HEIGHT = FULL_HEIGHT - 75;
+    const SCROLL_HEIGHT = FULL_HEIGHT - 114;
     const { 
         state,
         closeAlert = () => {},
@@ -72,7 +76,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         requestPayment = (user:string, amount:string) => {},
         sendPayment = (user:string, amount:string) => {},
      }: NnProviderValues = useContext(NnContext);
-
     const [ fetched, setFetched ] = useState(false);
     const [ loading, setLoading ] = useState(false);
     const [ selected, setSelected ] = useState(0);
@@ -200,14 +203,15 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
                 data-augmented-ui="tl-clip-x tr-rect br-clip bl-clip both"
             >
-            <Box sx={flexContainer}>
+            <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
                 <Box sx={flexHeader}>
                     <Container sx={{paddingTop: '20px'}}>
                         <InputBalance balance={balance} />
                     </Container>
                 </Box>
-                <Box sx={flexBody}>
+                <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
                     <SimpleScrollContainer>
+                        <Stack>
                         <div
                         className={styles.togglePanel}
                         data-augmented-ui="inlay"
@@ -258,6 +262,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                         <div style={{padding: '2vh'}}>
                             <InputUser changeHandler={handleRecipient} value={recpientsValue} error={hasErr('recipients')} />
                         </div>
+                        </Stack>
                     </SimpleScrollContainer>
                 </Box>
                 <Box sx={flexFooter}>

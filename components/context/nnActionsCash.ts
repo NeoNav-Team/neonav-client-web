@@ -82,7 +82,7 @@ export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
       })
     };
     if (storedRecently('userWallet')) {
-      const data = JSON.parse(getLocalStorage('userWallet'));
+      const data = getLocalStorage('userWallet');
       dispatch({
         type: 'setWalletTransactions',
         payload: data,

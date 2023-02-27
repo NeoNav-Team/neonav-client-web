@@ -4,7 +4,6 @@ body {
   margin: 0;
   font-family: Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   height: 100%;
-  height: stretch;
   overflow: hidden;
   max-height: 100vh;
   max-height: -webkit-fill-available;
