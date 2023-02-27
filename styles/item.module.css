@@ -62,7 +62,7 @@
     font-size: 16px;
     letter-spacing: 0.1rem;
     font-weight: 700;
-    line-height: 1.5rem;
+    line-height: 16px;
     white-space: nowrap;
     filter: drop-shadow(#fff 0 0 5px);
 }
@@ -107,8 +107,6 @@
         font-size: 16px;
         text-indent: 4px;
         width: 100%;
-        letter-spacing: -0.125rem;
-        overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
     }

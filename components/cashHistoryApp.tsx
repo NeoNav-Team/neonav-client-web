@@ -23,7 +23,7 @@ const flexContainer = {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     justifyContent: 'center',
     alignContent: 'space-around',
     alignItems: 'stretch',

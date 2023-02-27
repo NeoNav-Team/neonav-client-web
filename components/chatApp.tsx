@@ -37,10 +37,10 @@ const flexHeader = {
 
 const flexBody = {
   order: 0,
-  display: 'flex',
   flex: '1',
   alignSelf: 'auto',
   maxWidth: '100vw',
+  minHeight: '50vh',
   overflow: 'hidden',
 };
 
