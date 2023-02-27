@@ -18,9 +18,11 @@ const GLOBAL_CHAT = globalChannel;
 
 const flexContainer = {
   height: '100%',
+  minHeight: 'calc(100vh - 75px)',
+  maxHeight: 'calc(100vh - 75px)',
   display: 'flex',
   flexDirection: 'column',
-  flexWrap: 'wrap',
+  flexWrap: 'nowrap',
   justifyContent: 'center',
   alignContent: 'space-around',
   alignItems: 'stretch',
@@ -35,9 +37,11 @@ const flexHeader = {
 
 const flexBody = {
   order: 0,
+  display: 'flex',
   flex: '1',
   alignSelf: 'auto',
   maxWidth: '100%',
+  maxHeight: 'calc(100% - 114px)',
   overflow: 'hidden',
 };
 
@@ -87,7 +91,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [initChat]);
 
   useEffect(() => {
-    console.log(messages);
+    console.log(messages)
   }, [messages]);
 
     return (

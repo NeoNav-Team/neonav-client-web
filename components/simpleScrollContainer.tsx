@@ -14,10 +14,10 @@ export default function SimpleScrollContainer(props:ContainerProps):JSX.Element 
             disableGutters
             sx={{
                 overflow: 'auto',
+                display: 'flex',
                 padding: '2vh',
-                maxWidth: '100vw',
                 overflowX: 'hidden',
-                height: '100%',
+                overflowY: 'auto',
                 '&::-webkit-scrollbar': {
                     width: '0.69em'
                   },
@@ -30,9 +30,8 @@ export default function SimpleScrollContainer(props:ContainerProps):JSX.Element 
                     outline: '1px solid var(--color-1)'
                   }
             }}
-        ><div>
+        >
             {children}
-            </div>
         </Container>
     </>
   )
