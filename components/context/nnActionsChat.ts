@@ -5,6 +5,7 @@ import {
     netcheckAPIResData,
 } from "./nnTypes";
 import { getCookieToken } from "@/utilites/cookieContext";
+import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
 
 export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
@@ -47,9 +48,11 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   }
 
   export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string) => {
+    console.log('fetchChannelHistory');
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
+      storeFetched(id, data);
       dispatch({
         type: 'setMessageHistory',
         payload: data,
@@ -62,5 +65,14 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
         payload: {severity: 'error', message, show: true},
       })
     };
-    executeApi('chatHistory', {token, id}, onSuccess, onError);
+
+    if (storedRecently(id)) {
+      const data = getLocalStorage(id);
+      dispatch({
+        type: 'setMessageHistory',
+        payload: data,
+      })
+    } else {
+      executeApi('chatHistory', {token, id}, onSuccess, onError);
+    }
   }

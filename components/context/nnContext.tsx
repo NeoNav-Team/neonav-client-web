@@ -52,7 +52,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       clonedState.network.collections.contacts = payload;
       break;
     case 'setMessageHistory':
-      clonedState.network.collections.chat = payload;
+      clonedState.network.collections.messages = payload;
       break;
     case 'setNetwork':
       clonedState.network.location = payload;
@@ -63,6 +63,8 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   }
   newState = {...state, ...clonedState};
   setCookieContext(newState);
+  console.log(action, payload, newState);
+
   return newState;
 };
 

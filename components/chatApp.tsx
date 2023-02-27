@@ -1,20 +1,14 @@
 'use client';
-import React, { 
-  // useCallback, useContext, useEffect, useState 
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
 import { globalChannel } from '../utilites/constants';
-// import styles from '../styles/generic.module.css';
-import { 
-  Container, 
-  // Box, 
-  // Stack,
-} from '@mui/material';
-// import InputChannelTab from './inputChannelTab';
-// import ItemMessage from './itemMessage';
-// import { Context as NnContext } from '../components/context/nnContext';
-// import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
-// import SimpleScrollContainer from './simpleScrollContainer';
-// import InputMessage from './inputMessage';
+import styles from '../styles/generic.module.css';
+import { Container, Box, Stack } from '@mui/material';
+import InputChannelTab from './inputChannelTab';
+import ItemMessage from './itemMessage';
+import { Context as NnContext } from '../components/context/nnContext';
+import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
+import SimpleScrollContainer from './simpleScrollContainer';
+import InputMessage from './inputMessage';
 
 interface ChatAppProps {
   msgBtn?: boolean;
@@ -55,80 +49,54 @@ const flexFooter = {
 };
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
-  // const { msgBtn } = props;
-  // const { 
-  //   state,
-  //   fetchUserChannels = () => {},
-  //   fetchChannelHistory = (channelId:string) => {},
-  //   setSelected = (indexType:string, channelId:string) => {},
-  // }: NnProviderValues = useContext(NnContext);
-  // const selectedChannel:string = state.network?.selected?.channel || GLOBAL_CHAT;
-  // const chatHistories = state.network?.collections?.chats;
-  // const chatHistoriesIndex = chatHistories && chatHistories.map(function(x) {return x.id; }).indexOf(selectedChannel) || 0;
-  // const [ channelsFetched, setChannelsFetched ] = useState<boolean>(false);
-  // const [ chatsFetcedList, setChatsFetcedList ] = useState<string[]>([]);
-  // const [ messages, setMessages ] = useState<NnChatMessage[]>([]);
-  // const [ showMsgDrawer, setShowMsgDrawer ] = useState<boolean>(false);
-  // const [ msg, setMsg ] = useState<string>('');
+  const { msgBtn } = props;
+  const { 
+    state,
+    fetchUserChannels = () => {},
+    fetchChannelHistory = (channelId:string) => {},
+    setSelected = (indexType:string, channelId:string) => {},
+  }: NnProviderValues = useContext(NnContext);
+  const selectedChannel:string = state.network?.selected?.channel || GLOBAL_CHAT;
+  const messages:NnChatMessage[] = useMemo(() => { 
+    const chatArr = state?.network?.collections?.messages || [];
+    return chatArr.length > 30 ? chatArr.slice(0, 30) : chatArr;
+  }, [state]);
+  const [ initFetched, setInitFetched ] = useState<boolean>(false);
+  const [ msg, setMsg ] = useState<string>('');
 
-  // const channelSelection = (selectedChannel:string) => {
-  //   setSelected('channel', selectedChannel);
-  // }
+  const initChat = useCallback(() => {
+    if (!initFetched) {
+      fetchUserChannels();
+      fetchChannelHistory(selectedChannel);
+      setInitFetched(true);
+    }
+  }, [fetchChannelHistory, fetchUserChannels, initFetched, selectedChannel])
 
-  // const handleNext = () => {};
+  const channelSelection = (selectedChannel:string) => {
+    fetchChannelHistory(selectedChannel);
+    setSelected('channel', selectedChannel);
+  }
 
-  // const goSendMessage = () => {
-  //   console.log('sending message');
-  //   setMsg('');
-  // }
+  const goSendMessage = () => {
+    console.log('sending message');
+    setMsg('');
+  }
   
-  // const goFetchChannels = useCallback(() => {
-  //   if (!channelsFetched) {
-  //     fetchUserChannels();
-  //     setChannelsFetched(true);
-  //   }
-  // }, [channelsFetched, fetchUserChannels])
+  useEffect(() => {
+    initChat();
+  }, [initChat]);
 
-  // useEffect(() => {
-  //   const channels = state.user?.channels || []; 
-  //   if (channels.length === 0) {
-  //       goFetchChannels();
-  //   }
-  // }, [state, goFetchChannels]);
-
-  // useEffect(() => {
-  //   if (chatHistories && selectedChannel) {
-  //     if (chatsFetcedList.indexOf(selectedChannel) === -1) {
-  //       const chat = chatHistories[chatHistoriesIndex] || {collection: []};
-  //       const chatHistory = chat ? chat.collection : [];
-  //       if (chatHistory && chatHistory.length === 0) {
-  //         fetchChannelHistory(selectedChannel);
-  //         const newChatsFetchedList = [...chatsFetcedList, selectedChannel];
-  //         setChatsFetcedList(newChatsFetchedList);
-  //       }
-  //     }
-  //   }
-  // }, [chatHistories, chatHistoriesIndex, chatsFetcedList, fetchChannelHistory, selectedChannel]);
-
-
-  // useEffect(() => {
-  //   if (chatHistories ) {
-  //     const chat:NnIndexCollection = chatHistories[chatHistoriesIndex];
-  //     console.log('chat', chat);
-  //     const selectedChatMessages = chat?.collection || [];
-  //     setMessages(selectedChatMessages);
-  //   }
-  // }, [chatHistories, chatHistoriesIndex, selectedChannel]);
-
+  useEffect(() => {
+    console.log(messages);
+  }, [messages]);
 
     return (
         <Container disableGutters style={{height: '100%'}}>
-             {/* <div
+             <div
                 className={styles.darkPane}
                 style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
                 data-augmented-ui="tl-clip-x tr-clip-x br-clip bl-clip both"
             >
-
                 <Box sx={flexContainer}>
                   <Box sx={flexHeader}>
                     <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
@@ -150,10 +118,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                     </SimpleScrollContainer>
                 </Box>
                   <Box sx={flexFooter}>
-                  <InputMessage value={msg} clickHandler={() => setShowMsgDrawer(true)} />
+                  <InputMessage value={msg} clickHandler={() => {}} />
                 </Box>
                 </Box>
-            </div> */}
+            </div>
         </Container>
     )
 }

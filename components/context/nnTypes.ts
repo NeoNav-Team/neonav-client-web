@@ -95,7 +95,7 @@ export type NnNetwork = {
         channels?: String[],
     },
     collections: {
-        chats?: NnChatMessage[],
+        messages?: NnChatMessage[],
         transactions?: NnWalletTransaction[],
         contacts?: NnContact[],
         scannedUsers?: NnContact[],

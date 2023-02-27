@@ -23,7 +23,7 @@ export const nnSchema:NnStore = {
         channels: [],
       },
       collections: {
-        chats: [],
+        messages: [],
         transactions: [],
         contacts: [],
         scannedUsers: [],
