@@ -93,7 +93,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [initChat]);
 
   useEffect(() => {
-    console.log(messages)
+    const scoller = document.getElementById('simpleScoll');
+    if (scoller){
+      scoller.scrollTop = scoller.scrollHeight;
+    }
   }, [messages]);
 
     return (
