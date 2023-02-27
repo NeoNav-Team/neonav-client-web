@@ -106,12 +106,15 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                       <Box sx={{maxWidth: '100vw'}}>
                       <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
                       {messages.map(item => (
-                        <ItemMessage
-                          key={item.ts}
-                          date={item.ts}
-                          text={item.text}
-                          username={item.from}
-                          id={item.fromid} />
+                        // <ItemMessage
+                        //   key={item.ts}
+                        //   date={item.ts}
+                        //   text={item.text}
+                        //   username={item.from}
+                        //   id={item.fromid} />
+                        <div key={item.ts}>
+                          {JSON.stringify(item)}
+                        </div>
                       ))}
                       </Stack>
                       </Box>
