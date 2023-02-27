@@ -3,7 +3,7 @@ body {
   padding: 0;
   margin: 0;
   font-family: Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  height: 100%;
+  height: 100vh;
   height: stretch;
   overflow: hidden;
   max-height: 100vh;

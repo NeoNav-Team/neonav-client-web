@@ -16,6 +16,7 @@ export default function SimpleScrollContainer(props:ContainerProps):JSX.Element 
                 overflow: 'auto',
                 display: 'flex',
                 padding: '2vh',
+                maxWidth: '100vw',
                 overflowX: 'hidden',
                 overflowY: 'auto',
                 '&::-webkit-scrollbar': {
