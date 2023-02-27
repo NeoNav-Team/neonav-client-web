@@ -25,15 +25,15 @@ interface itemTransactionProps {
             <Stack direction="row" spacing={1} alignItems="flex-end">
                 <Box sx={{minWidth:'40%', maxWidth: '40%'}}>
                 <div className={styles.nameLine} data-augmented-ui="tr-clip tr-rect both">
-                    <Typography className={styles.idText}>{id}</Typography>
-                    <Typography className={styles.userText}>{username}</Typography>
+                    <div className={styles.idText}>{id}</div>
+                    <div className={styles.userText}>{username}</div>
                 </div>
                 </Box>
                 <Box sx={{minWidth:'45%', maxWidth: '59%'}}>
                 <div className={styles.dateLine} data-augmented-ui="tr-clip both">
                     <Stack direction="row" spacing={1}>
-                        <Typography className={styles.dateText}>{isoDateToDaily(date)}</Typography>
-                        <Typography className={styles.dateText}><span>{isoDateToMonth(date)}</span></Typography>
+                        <div className={styles.dateText}>{isoDateToDaily(date)}</div>
+                        <div className={styles.dateText}><span>{isoDateToMonth(date)}</span></div>
                     </Stack>
                 </div>
                 </Box>
