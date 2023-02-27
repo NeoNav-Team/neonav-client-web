@@ -9,12 +9,14 @@ import { Context as NnContext } from '../components/context/nnContext';
 import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputMessage from './inputMessage';
+import { use100vh } from 'react-div-100vh'
 
 interface ChatAppProps {
   msgBtn?: boolean;
 }
 
 const GLOBAL_CHAT = globalChannel;
+
 
 const flexContainer = {
   height: '100%',
@@ -41,7 +43,6 @@ const flexBody = {
   flex: '1',
   alignSelf: 'auto',
   maxWidth: '100%',
-  maxHeight: 'calc(100% - 114px)',
   overflow: 'hidden',
 };
 
@@ -54,6 +55,7 @@ const flexFooter = {
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
   const { msgBtn } = props;
+  const FULL_HEIGHT = use100vh();
   const { 
     state,
     fetchUserChannels = () => {},
@@ -105,7 +107,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                   <Box sx={flexHeader}>
                     <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
                   </Box>
-                  <Box sx={flexBody}>
+                  <Box sx={{...flexBody, maxHeight: `calc(${FULL_HEIGHT} - 114px)` }}>
                     <SimpleScrollContainer>
                       <Box sx={{maxWidth: '100vw'}}>
                       <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
