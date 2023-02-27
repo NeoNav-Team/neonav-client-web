@@ -20,8 +20,6 @@ const GLOBAL_CHAT = globalChannel;
 
 const flexContainer = {
   height: '100%',
-  minHeight: 'calc(100vh - 75px)',
-  maxHeight: 'calc(100vh - 75px)',
   display: 'flex',
   flexDirection: 'column',
   flexWrap: 'nowrap',
@@ -42,7 +40,7 @@ const flexBody = {
   display: 'flex',
   flex: '1',
   alignSelf: 'auto',
-  maxWidth: '100%',
+  maxWidth: '100vh',
   overflow: 'hidden',
 };
 
@@ -56,6 +54,7 @@ const flexFooter = {
 export default function ChatApp(props:ChatAppProps):JSX.Element {
   const { msgBtn } = props;
   const FULL_HEIGHT = use100vh() || 600;
+  const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
@@ -104,7 +103,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                 style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
                 data-augmented-ui="tl-clip-x tr-clip-x br-clip bl-clip both"
             >
-                <Box sx={flexContainer}>
+                <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
                   <Box sx={flexHeader}>
                     <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
                   </Box>
