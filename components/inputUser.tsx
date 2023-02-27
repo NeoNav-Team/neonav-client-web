@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
 import { Theme, useTheme } from '@mui/material/styles';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues } from '../components/context/nnTypes';
+import { NnContact, NnProviderValues } from '../components/context/nnTypes';
 import styles from '../styles/generic.module.css';
 import {
     Box,
@@ -55,9 +55,12 @@ export default function InputUser(props:InputUserProps):JSX.Element {
   const anchorRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(1);
   const { state }: NnProviderValues = useContext(NnContext); 
-  const filteredUsergroups = state.network?.collections?.users?.
-    filter(arrItem => arrItem.id == 'contacts')[0]; 
-  const contacts = filteredUsergroups?.collection || []
+  const contacts:NnContact[] = useMemo(() => { 
+    return state?.network?.collections?.contacts || [];
+  }, [state]);
+  const scannedUsers:NnContact[] = useMemo(() => { 
+    return state?.network?.collections?.scannedUsers || [];
+  }, [state]);
 
   const handleChange = (event: SelectChangeEvent<typeof userName>) => {
     const {
@@ -111,11 +114,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
     }
   }
   
-  const nameById = (id:string) => {
-    const contacts = state.network?.collections?.users?.
-      filter(arrItem => arrItem.id == 'contacts')[0].collection || [];
-    const scannedUsers = state.network?.collections?.users?.
-      filter(arrItem => arrItem.id == 'scannedUsers')[0].collection || [];  
+  const nameById = (id:string) => {  
     const allKnownUsers = [...contacts, ...scannedUsers] || [];
     if(allKnownUsers.length !== 0) {
         const user = allKnownUsers.find(user => user.id === id);
@@ -198,11 +197,11 @@ export default function InputUser(props:InputUserProps):JSX.Element {
 
                 </InputAdornment>}
                 >
-                {contacts.map((user, index) => (
+                {contacts && contacts.map((user, index) => (
                     <MenuItem
                         key={`${user.id}_${index}`}
                         value={user.id}
-                        style={getStyles(user.id, (user.username as unknown as string[] || user.id), theme)}
+                        style={getStyles((user.id || ''), (user.username as unknown as string[] || user.id), theme)}
                     >
                     {(user.username as unknown as string[] || user.id)}
                     </MenuItem>

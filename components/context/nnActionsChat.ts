@@ -32,6 +32,7 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
+      storeFetched('contacts', data);
       dispatch({
         type: 'setUserContacts',
         payload: data,
@@ -44,11 +45,19 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
         payload: {severity: 'error', message, show: true},
       })
     };
-    executeApi('contacts', {token}, onSuccess, onError);
+
+    if (storedRecently('contacts')) {
+      const data = getLocalStorage('contacts');
+      dispatch({
+        type: 'setUserContacts',
+        payload: data,
+      })
+    } else {
+      executeApi('contacts', {token}, onSuccess, onError);
+    }
   }
 
   export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string) => {
-    console.log('fetchChannelHistory');
     const token = getCookieToken();
     const onSuccess = (response:APIResponse) => {
       const { data } = response;
