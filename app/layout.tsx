@@ -14,6 +14,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../utilites/theme';
 import { Provider  as NnPoivder } from '../components/context/nnContext';
 import HeaderContainer from '@/components/headerContainer';
+import Div100vh from 'react-div-100vh';
 
 
 export default function RootLayout({
@@ -31,8 +32,10 @@ export default function RootLayout({
       <body>
         <ThemeProvider theme={theme} >
           <NnPoivder>
-            <HeaderContainer />
-            {children}
+            <Div100vh>
+              <HeaderContainer />
+              {children}
+            </Div100vh>
           </NnPoivder>
         </ThemeProvider>
       </body>
