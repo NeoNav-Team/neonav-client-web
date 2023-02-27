@@ -40,7 +40,7 @@ const flexBody = {
   display: 'flex',
   flex: '1',
   alignSelf: 'auto',
-  maxWidth: '100vh',
+  maxWidth: '100vw',
   overflow: 'hidden',
 };
 
@@ -109,7 +109,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                   </Box>
                   <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
                     <SimpleScrollContainer>
-                      <Box sx={{maxWidth: '100vw'}}>
+                      <Box sx={{maxWidth: '100%'}}>
                       <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
                       {messages.map(item => (
                         <ItemMessage

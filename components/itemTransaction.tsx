@@ -5,7 +5,7 @@ import {
     Typography
 } from '@mui/material';
 import styles from '../styles/item.module.css';
-import { isoDateToDaily, isoDateToMonth, isoDateToOrbit } from '@/utilites/fomat';
+import { isoDateToDaily, isoDateToMonth } from '@/utilites/fomat';
 
 interface itemTransactionProps {
     date: string;
@@ -60,8 +60,7 @@ interface itemTransactionProps {
             <div className={styles.dateLine} data-augmented-ui="tr-clip both">
                 <Stack direction="row" spacing={1}>
                 <Typography className={styles.dateText}>{isoDateToDaily(date)}</Typography>
-                <Typography className={styles.dateText}><span>✦ {isoDateToMonth(date)}</span></Typography>
-                <Typography className={styles.dateText}><span>❂ {isoDateToOrbit(date)}</span></Typography>
+                <Typography className={styles.dateText}><span>{isoDateToMonth(date)}</span></Typography>
                 </Stack>
             </div>
             <div className={styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">

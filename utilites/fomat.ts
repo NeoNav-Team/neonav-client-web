@@ -12,16 +12,11 @@ export const isoDateToDaily = (isoDate:string) => {
       );
 }
 
-export const isoDateToOrbit = (isoDate:string) => {
-    const year =  new Date(isoDate).toLocaleDateString('en-gb',{year: 'numeric'});
-    const differnce = (parseInt(year, 10) - LANDFALL);
-    return `${ordinal(differnce)}`;
-}
-
 export const isoDateToMonth = (isoDate:string) => {
-    const month =  new Date(isoDate).toLocaleDateString('en-gb',{month: '2-digit'});
-    const day = new Date(isoDate).toLocaleDateString('en-gb',{day: '2-digit'});
-    return `${month}.${day}`;
+    const calendarDate = isoDate.split('T')[0];
+    const calArr = calendarDate.split('-');
+    const differnce = (parseInt(calArr[0], 10) - LANDFALL);
+    return `✦ ${calArr[1]}-${calArr[2]}  |  ❂ ${ordinal(differnce)}`;
 }
 
 const ordinal = (i:number) => {
