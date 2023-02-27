@@ -22,7 +22,7 @@ interface itemTransactionProps {
   
     return (
         <Box style={{padding: '1vh 0'}}>
-            {/* <Stack direction="row" spacing={1} alignItems="flex-end">
+            <Stack direction="row" spacing={1} alignItems="flex-end">
                 <Box sx={{minWidth:'40%', maxWidth: '40%'}}>
                 <div className={styles.nameLine} data-augmented-ui="tr-clip tr-rect both">
                     <Typography className={styles.idText}>{id}</Typography>
@@ -38,7 +38,7 @@ interface itemTransactionProps {
                     </Stack>
                 </div>
                 </Box>
-            </Stack> */}
+            </Stack>
             <div className={isSystemMsg(id, username) ? styles.systemLine : styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
                 <Box>
                     <Typography> 》 {text}</Typography>
