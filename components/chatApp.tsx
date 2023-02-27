@@ -107,7 +107,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                   <Box sx={flexHeader}>
                     <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
                   </Box>
-                  <Box sx={{...flexBody, maxHeight: `calc(${FULL_HEIGHT} - 114px)` }}>
+                  <Box sx={{...flexBody, maxHeight: `calc(${FULL_HEIGHT}px - 114px)` }}>
                     <SimpleScrollContainer>
                       <Box sx={{maxWidth: '100vw'}}>
                       <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
