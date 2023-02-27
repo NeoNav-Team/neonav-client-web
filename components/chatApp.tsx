@@ -55,7 +55,8 @@ const flexFooter = {
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
   const { msgBtn } = props;
-  const FULL_HEIGHT = use100vh();
+  const FULL_HEIGHT = use100vh() || 600;
+  const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
     fetchUserChannels = () => {},
@@ -107,7 +108,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                   <Box sx={flexHeader}>
                     <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
                   </Box>
-                  <Box sx={{...flexBody, maxHeight: `calc(${FULL_HEIGHT}px - 114px)` }}>
+                  <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
                     <SimpleScrollContainer>
                       <Box sx={{maxWidth: '100vw'}}>
                       <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
