@@ -23,15 +23,10 @@ interface itemTransactionProps {
     return (
         <Box style={{padding: '1vh 0', width: '100%'}}>
             <Stack direction="row" spacing={1} alignItems="flex-end">
-                <Box sx={{minWidth:'40%', maxWidth: '40%'}}>
-                <div className={styles.nameLine} data-augmented-ui="tr-clip tr-rect both">
-                    <div className={styles.idText}>{id}</div>
-                    <div className={styles.userText}>{username}</div>
-                </div>
-                </Box>
-                <Box sx={{minWidth:'45%', maxWidth: '59%'}}>
+                <Box sx={{minWidth:'60%', maxWidth: '80%'}}>
                 <div className={styles.dateLine} data-augmented-ui="tr-clip both">
                     <Stack direction="row" spacing={1}>
+                        <div className={styles.idSmallText}>{id}</div>
                         <div className={styles.dateText}>{isoDateToDaily(date)}</div>
                         <div className={styles.dateText}><span>{isoDateToMonth(date)}</span></div>
                     </Stack>
@@ -40,7 +35,7 @@ interface itemTransactionProps {
             </Stack>
             <div className={isSystemMsg(id, username) ? styles.systemLine : styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
                 <Box>
-                    <Typography> 》 {text}</Typography>
+                    <Typography><span className={styles.name}>{username}</span> 》 {text}</Typography>
                 </Box>
             </div>
         </Box>

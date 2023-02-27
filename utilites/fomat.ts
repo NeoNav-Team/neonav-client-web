@@ -16,7 +16,7 @@ export const isoDateToMonth = (isoDate:string) => {
     const calendarDate = isoDate.split('T')[0];
     const calArr = calendarDate.split('-');
     const differnce = (parseInt(calArr[0], 10) - LANDFALL);
-    return `✦ ${calArr[1]}-${calArr[2]}  |  ❂ ${ordinal(differnce)}`;
+    return `✦ ${calArr[1]}-${calArr[2]}  ❂ ${ordinal(differnce)}`;
 }
 
 const ordinal = (i:number) => {
