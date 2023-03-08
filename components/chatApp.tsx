@@ -61,6 +61,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     fetchUserChannels = () => {},
     fetchChannelHistory = (channelId:string) => {},
     setSelected = (indexType:string, channelId:string) => {},
+    sendChannelMessage = (channelId:string, text: string) => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = state.network?.selected?.channel || GLOBAL_CHAT;
   const messages:NnChatMessage[] = useMemo(() => { 
@@ -83,8 +84,14 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     setSelected('channel', selectedChannel);
   }
 
-  const goSendMessage = () => {
-    console.log('sending message');
+  const updateMessage = (event: React.ChangeEvent<HTMLInputElement>)  => {
+    setMsg( event?.target?.value);
+  }
+
+  const goSendMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    console.log('goSendMessage', msg);
+    sendChannelMessage(selectedChannel, msg);
     setMsg('');
   }
   
@@ -127,7 +134,11 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                     </SimpleScrollContainer>
                 </Box>
                   <Box sx={flexFooter}>
-                  <InputMessage value={msg} clickHandler={() => {}} />
+                  <InputMessage 
+                    value={msg} 
+                    changeHandler={(event: React.ChangeEvent<HTMLInputElement>) => updateMessage(event)}
+                    submitHandler={(event: React.ChangeEvent<HTMLInputElement>) => goSendMessage(event)}
+                    />
                 </Box>
                 </Box>
             </div>

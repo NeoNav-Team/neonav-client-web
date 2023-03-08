@@ -15,9 +15,12 @@ const executeAPI = (endpoint:string, data:any, callback: any, errBack: any):Prom
     const { path, method } = (authApiEnpoints as any)[endpoint];
     let templatedPath = path;
     data && Object.keys(data).forEach((key:string) => {
+        const inTemplate = templatedPath.indexOf(`$${key}`) !== -1;
         templatedPath = templatedPath.replace(`$${key}`, data[key])
+        inTemplate && delete data[key];
     });
     const url = `${apiUrl.protocol}://${apiUrl.hostname}${templatedPath}`;
+    console.log('data', data);
     return axios({
         method,
         url,

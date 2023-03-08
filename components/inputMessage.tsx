@@ -1,4 +1,3 @@
-
 import { 
     Typography,
     Box,
@@ -9,18 +8,18 @@ import styles from '../styles/generic.module.css';
 
 interface InputMessageProps {
   value?: string | null;
-  clickHandler: Function;
+  changeHandler: Function;
+  submitHandler: Function;
 }
 
 export default function InputMessage(props:InputMessageProps):JSX.Element {
-  const { value, clickHandler } = props;
+  const { value, changeHandler, submitHandler } = props;
 
   return (
     <div
         className={styles.presentValue}
         data-augmented-ui="tl-clip-x tr-rect br-clip bl-clip both"
         style={{padding: '1vh', minWidth: '100%'}}
-        onClick={()=> clickHandler}
     >
         <Stack
             direction="row"
@@ -31,11 +30,25 @@ export default function InputMessage(props:InputMessageProps):JSX.Element {
             <Box>
             <Typography
                 variant='h2' sx={{ fontSize: { xs: '2.5rem', sm: '3rem', md: '3.75rem' }}}>
-                ⇴&nbsp;{value}
+                ⇴&nbsp;
             </Typography>
             </Box>
             <Box  sx={{minWidth: '100%'}}>
-                <TextField sx={{minWidth: '85%'}}/>
+                <form
+                    onSubmit={event => submitHandler(event)}
+                    autoComplete="off"
+                >
+                    <TextField
+                        onChange={event => changeHandler(event)}
+                        value={value}
+                        sx={{minWidth: '85%'}}
+                        placeholder="type message here"
+                        inputProps={{
+                            autoComplete: "chrome-off",
+                        }}
+                    />
+                    <input type="submit" style={{'visibility':'hidden', 'position':'absolute'}}/>
+                </form>
             </Box>
         </Stack>
     </div>

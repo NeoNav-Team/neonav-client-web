@@ -22,6 +22,7 @@ import {
   fetchUserContacts,
   fetchUserChannels,
   fetchChannelHistory,
+  sendChannelMessage,
 } from './nnActionsChat';
 import { nnSchema } from "./nnSchema";
 import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/cookieContext";
@@ -122,6 +123,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelHistory,
     initContext,
     requestPayment,
+    sendChannelMessage,
     sendPayment,
     setSelected,
   },
