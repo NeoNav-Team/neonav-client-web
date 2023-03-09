@@ -1,4 +1,5 @@
 import executeApi from '@/utilites/executeApi';
+import longPollApi from '@/utilites/longPollApi';
 import { 
     APIResponse,
     DispatchFunc,
@@ -27,74 +28,89 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
     };
     executeApi('channels', {token}, onSuccess, onError);
   }
-  
-  export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
-    const token = getCookieToken();
-    const onSuccess = (response:APIResponse) => {
-      const { data } = response;
-      storeFetched('contacts', data);
-      dispatch({
-        type: 'setUserContacts',
-        payload: data,
-      })
-    };
-    const onError = (err:netcheckAPIResData) => {
-      const { message = 'Contact failure' } = err;
-      dispatch({
-        type: 'setAlert',
-        payload: {severity: 'error', message, show: true},
-      })
-    };
 
-    if (storedRecently('contacts')) {
-      const data = getLocalStorage('contacts');
-      dispatch({
-        type: 'setUserContacts',
-        payload: data,
-      })
-    } else {
-      executeApi('contacts', {token}, onSuccess, onError);
-    }
+export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    storeFetched('contacts', data);
+    dispatch({
+      type: 'setUserContacts',
+      payload: data,
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Contact failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+
+  if (storedRecently('contacts')) {
+    const data = getLocalStorage('contacts');
+    dispatch({
+      type: 'setUserContacts',
+      payload: data,
+    })
+  } else {
+    executeApi('contacts', {token}, onSuccess, onError);
   }
+}
 
-  export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string) => {
-    const token = getCookieToken();
-    const onSuccess = (response:APIResponse) => {
-      const { data } = response;
-      storeFetched(id, data);
-      dispatch({
-        type: 'setMessageHistory',
-        payload: data,
-      })
-    };
-    const onError = (err:netcheckAPIResData) => {
-      const { message = 'Chat History failure' } = err;
-      dispatch({
-        type: 'setAlert',
-        payload: {severity: 'error', message, show: true},
-      })
-    };
+export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    storeFetched(id, data);
+    dispatch({
+      type: 'setMessageHistory',
+      payload: data,
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Chat History failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
 
-    if (storedRecently(id)) {
-      const data = getLocalStorage(id);
-      dispatch({
-        type: 'setMessageHistory',
-        payload: data,
-      })
-    } else {
-      executeApi('chatHistory', {token, id}, onSuccess, onError);
-    }
+  if (storedRecently(id)) {
+    const data = getLocalStorage(id);
+    dispatch({
+      type: 'setMessageHistory',
+      payload: data,
+    })
+  } else {
+    executeApi('chatHistory', {token, id}, onSuccess, onError);
   }
+}
 
-  export const sendChannelMessage = (dispatch: DispatchFunc) => async (id:string, text: string) => {
-    const token = getCookieToken();
-    const onSuccess = (response:APIResponse) => {};
-    const onError = (err:netcheckAPIResData) => {
-      const { message = 'Chat Message failure' } = err;
-      dispatch({
-        type: 'setAlert',
-        payload: {severity: 'error', message, show: true},
-      })
-    };
-    executeApi('message', {token, text, id}, onSuccess, onError);
-  }
+export const sendChannelMessage = (dispatch: DispatchFunc) => async (id:string, text: string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {};
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Chat Message failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  executeApi('message', {token, text, id}, onSuccess, onError);
+}
+
+export const longPollMessages = (dispatch: DispatchFunc) => async (since:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    console.log('longPollMessages response', response);
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Chat Message failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  longPollApi('pollMessages', {token, since}, onSuccess, onError);
+}

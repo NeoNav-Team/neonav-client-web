@@ -64,5 +64,9 @@ export const authApiEnpoints = {
     message: {
         method: "post",
         path: "/api/chat/channels/$id"   
+    },
+    pollMessages: {
+        method: "get",
+        path: "/api/chat/channels/all/?since=$since"   
     }
 };

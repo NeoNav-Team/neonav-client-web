@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { apiUrl, authApiEnpoints } from '../utilites/constants';
 
 const executeAPI = (endpoint:string, data:any, callback: any, errBack: any):Promise<any> => {
@@ -20,17 +20,16 @@ const executeAPI = (endpoint:string, data:any, callback: any, errBack: any):Prom
         inTemplate && delete data[key];
     });
     const url = `${apiUrl.protocol}://${apiUrl.hostname}${templatedPath}`;
-    console.log('data', data);
     return axios({
         method,
         url,
         data,
         headers
     }).then(
-        function (response:any) {
+        function (response:AxiosResponse) {
             callback && callback(response)
         }
-    ).catch(function (error:any) {
+    ).catch(function (error:AxiosError) {
         if (error.response) {
             console.log('Error', error.response.data)
             errBack && errBack(error.response.data);

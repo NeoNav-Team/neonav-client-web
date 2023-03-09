@@ -160,11 +160,12 @@ export type NnProviderDispatch = {
     fetchUserChannels: () => void;
     fetchChannelHistory: (_channelId:string) => void;
     fetchUserWalletHistory: () => void;
+    initContext: () => void;
+    longPollMessages: (_since:string) => void;
     requestPayment: (_user:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
     sendChannelMessage: (_channelId:string, _text:string) => void;
     setSelected: (_indexType:string, _index:string) => void;
-    initContext: () => void;
 }
 
 export type NnProviderValues = ProviderValues & Partial<NnProviderDispatch>;

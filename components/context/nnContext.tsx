@@ -22,6 +22,7 @@ import {
   fetchUserContacts,
   fetchUserChannels,
   fetchChannelHistory,
+  longPollMessages,
   sendChannelMessage,
 } from './nnActionsChat';
 import { nnSchema } from "./nnSchema";
@@ -122,6 +123,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserChannels,
     fetchChannelHistory,
     initContext,
+    longPollMessages,
     requestPayment,
     sendChannelMessage,
     sendPayment,
