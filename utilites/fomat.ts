@@ -33,3 +33,9 @@ const ordinal = (i:number) => {
     }
     return i + "th";
 }
+
+export const orderbyDate = (arrayObject:Record<string, string>[], dateKey:string) => {
+    return arrayObject.sort(function(a, b){
+        return new Date(b[dateKey]).valueOf() - new Date(a[dateKey]).valueOf();
+    });   
+}

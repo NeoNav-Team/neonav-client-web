@@ -5,6 +5,7 @@ import styles from '../styles/generic.module.css';
 import { Container, Box, Stack } from '@mui/material';
 import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
+import { orderbyDate } from '@/utilites/fomat';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
@@ -66,8 +67,11 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   const selectedChannel:string = state.network?.selected?.channel || GLOBAL_CHAT;
   const messages:NnChatMessage[] = useMemo(() => { 
     const chatArr = state?.network?.collections?.messages || [];
-    return chatArr.length > 30 ? chatArr.slice(0, 30) : chatArr;
-  }, [state]);
+    const orderChatArr = orderbyDate(chatArr, 'ts');
+    const chatLength = orderChatArr.length;
+    const last30 = chatLength > 30 ? orderChatArr.slice(0, 30) : orderChatArr;
+    return last30;
+  }, [state?.network?.collections?.messages]);
   const [ initFetched, setInitFetched ] = useState<boolean>(false);
   const [ msg, setMsg ] = useState<string>('');
 
@@ -90,7 +94,6 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   const goSendMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
-    console.log('goSendMessage', msg);
     sendChannelMessage(selectedChannel, msg);
     setMsg('');
   }

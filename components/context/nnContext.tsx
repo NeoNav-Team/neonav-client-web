@@ -35,6 +35,8 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   let newState = null;
   let clonedState = JSON.parse(JSON.stringify(state));
   switch (type) {
+    case 'addMessage': 
+      break;
     case 'setAlert':
       clonedState.network.alert = {...clonedState.network.alert, ...payload}
       break;
@@ -55,6 +57,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setMessageHistory':
       clonedState.network.collections.messages = payload;
+      break;
+    case 'updateMessageHistory':
+      clonedState.network.collections.messages.unshift(payload);
       break;
     case 'setNetwork':
       clonedState.network.location = payload;

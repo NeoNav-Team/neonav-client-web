@@ -112,7 +112,9 @@ export type NnUser = {
 
 export type NnCollectionKeys = 'chats' | 'transactions' | 'users';
 
-export type ActionTypes = 'setNetwork' | 
+export type ActionTypes =
+  'addMessage' | 
+  'setNetwork' | 
   'setAlert' |
   'setUserChannels' |
   'setUserWallets' | 
@@ -121,6 +123,7 @@ export type ActionTypes = 'setNetwork' |
   'setChatMessages' |
   'setMessageHistory' |
   'setSelected' |
+  'updateMessageHistory' |
   'initContext';
 
 export interface Action {

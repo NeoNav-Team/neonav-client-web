@@ -4,6 +4,9 @@ import { apiUrl, authApiEnpoints } from '../utilites/constants';
 const WAIT_TIME = 3000;
 
 const longPollApi = async (endpoint:string, data:any, callback: any, errBack: any):Promise<any> => {
+    if (typeof data === 'undefined') {
+        return;
+    }
     const axiosDefaults:any = axios.defaults;
     let headers = {};
     const token = data?.token;
@@ -38,15 +41,22 @@ const longPollApi = async (endpoint:string, data:any, callback: any, errBack: an
             return error;
         }
     });
-    console.log(longPollResponse.status);
-    if (typeof longPollResponse !== 'undefined' && (
-        longPollResponse.status === 403 ||
-        longPollResponse.status === 401
+    if (
+        typeof longPollResponse !== 'undefined' && 
+        typeof longPollResponse.status !== 'undefined' &&(
+        longPollResponse?.status === 403 ||
+        longPollResponse?.status === 401
     )) {
         errBack ? errBack(longPollResponse) : null;
-    } else if (typeof longPollResponse !== 'undefined' && longPollResponse.status === 502) {
+    } else if (
+        typeof longPollResponse !== 'undefined' && 
+        typeof longPollResponse.status !== 'undefined' &&
+        longPollResponse?.status === 502) {
        // await longPollApi(endpoint, data, callback, errBack);
-    } else if (typeof longPollResponse !== 'undefined' && longPollResponse.status !== 200) {
+    } else if (
+        typeof longPollResponse !== 'undefined' &&
+        typeof longPollResponse.status !== 'undefined' &&
+        longPollResponse?.status !== 200) {
         // An error - let's show it
         errBack ? errBack(longPollResponse) : null;
         // Reconnect
@@ -54,7 +64,7 @@ const longPollApi = async (endpoint:string, data:any, callback: any, errBack: an
        // await longPollApi(endpoint, data, callback, errBack);
     } else {
         // Get and show the message
-        callback(longPollResponse);
+        callback(longPollResponse.data[1]);
         // Call longPollResponseMessages() again to get the next message
         const since = longPollResponse?.data[0];
         let newData = {since, token};

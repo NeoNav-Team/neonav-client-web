@@ -4,6 +4,7 @@ import {
     APIResponse,
     DispatchFunc,
     netcheckAPIResData,
+    NnChatMessage,
 } from "./nnTypes";
 import { getCookieToken } from "@/utilites/cookieContext";
 import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
@@ -102,8 +103,23 @@ export const sendChannelMessage = (dispatch: DispatchFunc) => async (id:string, 
 
 export const longPollMessages = (dispatch: DispatchFunc) => async (since:string) => {
   const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {
-    console.log('longPollMessages response', response);
+  const onSuccess = (message:NnChatMessage) => {
+    const { channel = 'noChannelID', id } = message;
+    const cookieContext = getCookieToken();
+  
+    // add the message to the local storage 
+    const messages = getLocalStorage(channel);
+    const selectedChannel = messages[0].channel;
+    if (!messages.some((item:NnChatMessage) => item.id === id)) {
+      messages.push(message);
+      storeFetched(channel, messages);
+      if(channel == selectedChannel) {
+        dispatch({
+          type: 'updateMessageHistory',
+          payload: message,
+        })
+      }
+    }
   };
   const onError = (err:netcheckAPIResData) => {
     const { message = 'Chat Message failure' } = err;
