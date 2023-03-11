@@ -43,28 +43,31 @@ const longPollApi = async (endpoint:string, data:any, callback: any, errBack: an
     });
     if (
         typeof longPollResponse !== 'undefined' && 
-        typeof longPollResponse.status !== 'undefined' &&(
+        typeof longPollResponse?.status !== 'undefined' &&(
         longPollResponse?.status === 403 ||
         longPollResponse?.status === 401
     )) {
         errBack ? errBack(longPollResponse) : null;
     } else if (
         typeof longPollResponse !== 'undefined' && 
-        typeof longPollResponse.status !== 'undefined' &&
+        typeof longPollResponse?.status !== 'undefined' &&
         longPollResponse?.status === 502) {
-       // await longPollApi(endpoint, data, callback, errBack);
+        let newData = {since:'now', token};
+        await longPollApi(endpoint, newData, callback, errBack);
     } else if (
         typeof longPollResponse !== 'undefined' &&
-        typeof longPollResponse.status !== 'undefined' &&
+        typeof longPollResponse?.status !== 'undefined' &&
         longPollResponse?.status !== 200) {
         // An error - let's show it
         errBack ? errBack(longPollResponse) : null;
         // Reconnect
         await new Promise(resolve => setTimeout(resolve, WAIT_TIME));
-       // await longPollApi(endpoint, data, callback, errBack);
+        let newData = {since:'now', token};
+        await longPollApi(endpoint, newData, callback, errBack);
     } else {
         // Get and show the message
-        callback(longPollResponse.data[1]);
+
+        callback(longPollResponse?.data[1]);
         // Call longPollResponseMessages() again to get the next message
         const since = longPollResponse?.data[0];
         let newData = {since, token};
