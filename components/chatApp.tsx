@@ -65,7 +65,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     sendChannelMessage = (channelId:string, text: string) => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = state.network?.selected?.channel || GLOBAL_CHAT;
-  const messages:NnChatMessage[] = useMemo(() => { 
+  const messages:NnChatMessage[] = useMemo(() => {
     const chatArr = state?.network?.collections?.messages || [];
     const orderChatArr = orderbyDate(chatArr, 'ts');
     const chatLength = orderChatArr.length;

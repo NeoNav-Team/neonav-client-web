@@ -104,20 +104,21 @@ export const sendChannelMessage = (dispatch: DispatchFunc) => async (id:string, 
 export const longPollMessages = (dispatch: DispatchFunc) => async (since:string) => {
   const token = getCookieToken();
   const onSuccess = (message:NnChatMessage) => {
-    const { channel = 'noChannelID', id } = message;
-    const cookieContext = getCookieToken();
-  
+    const id = message?.id || null;
+    const channel = message?.channel || null;
     // add the message to the local storage 
-    const messages = getLocalStorage(channel);
-    const selectedChannel = messages[0].channel;
-    if (!messages.some((item:NnChatMessage) => item.id === id)) {
-      messages.push(message);
-      storeFetched(channel, messages);
-      if(channel == selectedChannel) {
-        dispatch({
-          type: 'updateMessageHistory',
-          payload: message,
-        })
+    if (id !== null && channel !== null) {
+      const messages = getLocalStorage(channel);
+      const selectedChannel = messages[0].channel;
+      if (!messages.some((item:NnChatMessage) => item.id === id)) {
+        messages.push(message);
+        storeFetched(channel, messages);
+        if(channel == selectedChannel) {
+          dispatch({
+            type: 'updateMessageHistory',
+            payload: message,
+          })
+        }
       }
     }
   };

@@ -25,6 +25,9 @@ import {
   longPollMessages,
   sendChannelMessage,
 } from './nnActionsChat';
+import {
+  fetchUserFactions,
+} from './nnActionsFaction';
 import { nnSchema } from "./nnSchema";
 import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/cookieContext";
 
@@ -45,6 +48,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setUserChannels':
         clonedState.user.channels = payload;
+        break;
+    case 'setUserFactions':
+        clonedState.user.factions = payload;
         break;
     case 'setUserWallets':
       clonedState.user.wallets = payload;
@@ -126,6 +132,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserWalletHistory,
     fetchUserContacts,
     fetchUserChannels,
+    fetchUserFactions,
     fetchChannelHistory,
     initContext,
     longPollMessages,

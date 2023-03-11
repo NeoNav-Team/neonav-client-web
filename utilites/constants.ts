@@ -29,6 +29,10 @@ export const authApiEnpoints = {
         method: "get",
         path: "/api/user"       
     },
+    factions: {
+        method: "get",
+        path: "/api/factions"       
+    },
     wallet: {
         method: "get",
         path: "/api/user/wallet"  

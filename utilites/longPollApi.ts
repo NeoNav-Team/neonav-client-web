@@ -10,7 +10,9 @@ const longPollApi = async (endpoint:string, data:any, callback: any, errBack: an
     const axiosDefaults:any = axios.defaults;
     let headers = {};
     const token = data?.token;
-    data.since ? data.since : 'now';
+    if (typeof data.since === 'undefined') {
+        data.since = 'now';
+    }
     if(data?.token) {
         headers = {
             'content-type': 'application/json',
@@ -71,6 +73,7 @@ const longPollApi = async (endpoint:string, data:any, callback: any, errBack: an
         // Call longPollResponseMessages() again to get the next message
         const since = longPollResponse?.data[0];
         let newData = {since, token};
+        console.log('since', since);
         await longPollApi(endpoint, newData, callback, errBack);
     }
 }

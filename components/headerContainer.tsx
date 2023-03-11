@@ -15,10 +15,10 @@ import {
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import AppsIcon from '@mui/icons-material/Apps';
 import styles from '../styles/generic.module.css';
 import Logo from './svgr/logo';
+import SelectFaction from './selectFaction';
 
 interface PageContainerProps {}
 
@@ -29,6 +29,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     initContext = () => {},
     fetchNetworkStatus = () => {},
     fetchUserContacts = () => {},
+    fetchUserFactions = () => {},
     longPollMessages = (since:string) => {},
   }: NnProviderValues = useContext(NnContext);  
   const [ initialized, setInitialized ] = useState(false)
@@ -39,10 +40,11 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
       initContext();
       fetchNetworkStatus();
       fetchUserContacts();
+      fetchUserFactions();
       setInitialized(true);
       longPollMessages('now');
     }
-  }, [fetchNetworkStatus, fetchUserContacts, initContext, longPollMessages, initialized]);
+  }, [fetchNetworkStatus, fetchUserContacts, fetchUserFactions,  initContext, longPollMessages, initialized]);
 
   return (
 
@@ -86,11 +88,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
                 <NotificationsIcon fill="#fff" />
               </Badge>
             </IconButton>
-            <IconButton
-              size="large"
-            >
-              <AccountCircle />
-            </IconButton>
+           <SelectFaction />
           </Box>
           <Box>
             <Grid container spacing={1} minHeight={64}>

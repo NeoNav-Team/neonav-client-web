@@ -19,7 +19,7 @@ export const themeOptions: ExtendedThemeOptions = {
         },
         background: {
             default: '#120458',
-            paper: 'rgba(0,0,0,0)',
+            paper: 'rgba(18,4,88,0.90)',
         },
         text: {
             primary: '#ffffff',

@@ -78,6 +78,12 @@ export type NnChatMessage = {
     text?: string,
 }
 
+export type NnFaction = {
+    id: string,
+    admin?: string,
+    name?: string,
+}
+
 export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];
 
 export type NnNetwork = {
@@ -106,8 +112,8 @@ export type NnUser = {
     profile?: NnUserProfile,
     wallets?: NnWallet[],
     channels?: NnChannel[],
-    notifcations?: [],
-    factions?: [],
+    notifcations?: NnChatMessage[],
+    factions?: NnFaction[],
 }
 
 export type NnCollectionKeys = 'chats' | 'transactions' | 'users';
@@ -117,6 +123,7 @@ export type ActionTypes =
   'setNetwork' | 
   'setAlert' |
   'setUserChannels' |
+  'setUserFactions' |
   'setUserWallets' | 
   'setWalletTransactions' |
   'setUserContacts' | 
@@ -161,6 +168,7 @@ export type NnProviderDispatch = {
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;
     fetchUserChannels: () => void;
+    fetchUserFactions: () => void;
     fetchChannelHistory: (_channelId:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
