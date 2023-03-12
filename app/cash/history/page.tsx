@@ -1,5 +1,5 @@
 import CashHistoryApp from '@/components/cashHistoryApp';
 
-export default function Cash() {
- return (<CashHistoryApp />);
+export default function CashHistory() {
+  return (<CashHistoryApp />);
 }

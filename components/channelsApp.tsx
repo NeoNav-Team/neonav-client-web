@@ -1,16 +1,16 @@
 'use client';
 import React, { useCallback, useContext, useState } from 'react';
 import styles from '../styles/generic.module.css';
-import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues } from '../components/context/nnTypes';
+import { Context as NnContext } from './context/nnContext';
+import { NnProviderValues } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import FooterNav from './footerNav';
 import { 
   Container,
   Box,
 } from '@mui/material';
-import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -69,7 +69,11 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
       fetchUserContacts();
       setContactsFetched(true);
     }
-  }, [contactsFetched, fetchUserContacts])
+  }, [contactsFetched, fetchUserContacts]);
+
+  const scanForContact = () =>  {
+    console.log('scanning');
+  }
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -101,12 +105,13 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                 disabled: true,
               }}
               bigHexProps={{
-                icon: <QueryStatsIcon />,
+                icon: <PersonSearchIcon />,
                 disabled: true,
               }}
               thirdHexProps={{
-                icon: <CurrencyExchangeIcon />,
-                link: "/cash",
+                icon: <QrCodeScannerIcon />,
+                disabled: true,
+                handleAction: () => scanForContact,
               }}
             />
           </Box>

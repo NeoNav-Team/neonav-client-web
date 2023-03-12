@@ -7,14 +7,14 @@ import {
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilites/fomat';
 
-interface itemTransactionProps {
+interface itemMessageProps {
     date?: string;
     id?: string;
     username?: string;
     text?: string;
   }
   
-export default function ItemTransaction(props:itemTransactionProps):JSX.Element {
+export default function ItemMessage(props:itemMessageProps):JSX.Element {
   const { date = '', id = '', username = '', text = '' } = props;
   const isSystemMsg = (id:string, username:string) => {
     return id === '0000000000' && username === 'tan/chat';

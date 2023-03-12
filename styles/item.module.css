@@ -5,6 +5,14 @@
     --aug-border-all: 1px;
     --aug-border-bg: radial-gradient(var(--color-2), var(--color-2)) 100% 100% / 100% 100%;
 }
+.subtitleLine {
+    padding: 2px 20px 2px 5px;
+    --aug-inlay-all: 4px;
+    --aug-inlay-bg: radial-gradient(ellipse at top, var(--color-2), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
+    --aug-border-all: 1px;
+    --aug-border-bg: radial-gradient(var(--color-2), var(--color-2)) 100% 100% / 100% 100%;
+    text-indent: 20px;
+}
 .transactionLine {
     padding: 10px;
     --aug-inlay-all: 4px;
@@ -94,6 +102,10 @@
 
 .name {
     font-weight: 700;
+}
+.id {
+    font-weight: 100;
+    opacity: 0.5;
 }
 
 @media screen and (max-width: 800px) {
