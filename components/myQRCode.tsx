@@ -19,7 +19,7 @@ export default function MyQRCode(props:MyQRCodeProps):JSX.Element {
 
   return (
     <>
-      <QRCodeSVG size={size} value={value} width={!size && '100%'} />
+      <QRCodeSVG size={size} value={value} width={!size ? '100%' : ''} />
     </>
   )
 }
