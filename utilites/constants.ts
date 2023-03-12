@@ -49,6 +49,10 @@ export const authApiEnpoints = {
         method: "put",
         path: "/api/user/wallet"  
     },
+    factionPay: {
+        method: "put",
+        path: "/api/factions/$faction/wallet"  
+    },
     request: {
         method: "put",
         path: "/api/user/$id/walletrequest"

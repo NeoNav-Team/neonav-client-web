@@ -29,11 +29,17 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
   const { children } = props;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { state }: NnProviderValues = useContext(NnContext); 
+  const { 
+    state,
+    setSelected = (indexType:string, channelId:string) => {},
+  }: NnProviderValues = useContext(NnContext); 
   const factions:NnFaction[] = useMemo(() => { return state?.user?.factions || [] }, [state]);
+  const defaultSelected =  useMemo(() => { return state?.network?.selected?.account as unknown as number || -1 }, [state]);
   const user:string = useMemo(() => { return state?.user?.profile?.meta?.firstname || 'Personal' }, [state]);
-  const [selected, setSelected] = useState<number>(-1);
+  const userId:string = useMemo(() => { return state?.user?.profile?.auth?.userid || '' }, [state]);
+  const [selected, setSelectedFaction] = useState<number>(defaultSelected);
 
+  console.log('USER ID', userId);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -42,7 +48,10 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     setAnchorEl(null);
   };
   const handleMenuItemClick = (event: MouseEvent<HTMLButtonElement>, index: number) => {
-    setSelected(index);
+    setSelectedFaction(index);
+    const factionId = factions[index]?.id || userId;
+    setSelected('account', factionId);
+    handleClose();
   }
 
   return (
@@ -77,7 +86,7 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
           selected={selected === index}
         >
         <ListItemIcon>
-          <SupervisedUserCircleIcon fontSize="small" sx={{color:colors[index]}} />
+          <SupervisedUserCircleIcon sx={{color:colors[index]}} />
         </ListItemIcon>
         <div style={{overflow:'hidden', textOverflow: 'ellipsis'}}>{faction.name}</div>
       </MenuItem>

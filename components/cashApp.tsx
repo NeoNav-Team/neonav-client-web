@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
@@ -75,16 +75,20 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         fetchUserWallets = () => {},
         requestPayment = (user:string, amount:string) => {},
         sendPayment = (user:string, amount:string) => {},
+        sendFactionPayment = (faction: string, user:string, amount:string) => {},
      }: NnProviderValues = useContext(NnContext);
     const [ fetched, setFetched ] = useState(false);
     const [ loading, setLoading ] = useState(false);
-    const [ selected, setSelected ] = useState(0);
     const [ processTypeValue, setProcessTypeValue ] = useState('pay');
     const [ transactionValue, setTransactionValue ] = useState<number | string>(0);
     const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]);
     const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
-    const wallets = state?.user?.wallets;
-    const wallet = wallets && wallets[selected];
+    const wallets = useMemo(() => { 
+        return state?.user?.wallets || [];
+    }, [state]);
+    const accountId = state?.network?.selected?.account || '';
+    const selected = wallets?.map(function(x) {return x.id; }).indexOf(accountId) || 0;
+    const wallet = wallets[selected];
     const balance = wallet ? wallet?.balance : null;
     const alert = state?.network?.alert;
 
@@ -172,7 +176,12 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         const promises:Function[] = transactionQueue.map( userId => {
             switch (processTypeValue) {
                 case 'pay':
-                    limit(() =>{ sendPayment(userId, transactionValue as string)});
+                    if(selected === 0) {
+                        limit(() =>{ sendPayment(userId, transactionValue as string)});
+                    } else {
+                        console.log('pay with sendFactionPayment');
+                        limit(() =>{ sendFactionPayment(accountId, userId, transactionValue as string)});
+                    }
                 break;
                 case 'request':
                     limit(() =>{ requestPayment(userId, transactionValue as string)});
@@ -192,6 +201,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     useEffect(() => {
         const walletSize = wallets && wallets.length;
         walletSize === 0 && goFetchUserWallets();
+        
     }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected]);
 
 

@@ -16,6 +16,7 @@ import {
   fetchUserWallets,
   fetchUserWalletHistory,
   sendPayment,
+  sendFactionPayment,
   requestPayment,
 } from './nnActionsCash';
 import {
@@ -105,8 +106,10 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
         }
       },
       user: {
-        auth: {
-          userid: cookieDataObj.id,
+        profile: {
+          auth: {
+            userid: cookieDataObj.id,
+          }
         }
       }
     };
@@ -139,6 +142,7 @@ export const { Context, Provider } = DataContextCreator(
     requestPayment,
     sendChannelMessage,
     sendPayment,
+    sendFactionPayment,
     setSelected,
   },
   defaultNnContext,
