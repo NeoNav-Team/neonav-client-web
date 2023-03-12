@@ -28,6 +28,32 @@
     --aug-inlay-opacity: 0.5;
 }
 
+.submenuPane {
+    --aug-tr: 10px;
+    --aug-b-extend1: 50%;
+    --aug-border-all: 2px;
+    --aug-border-bg: radial-gradient(var(--background-color), var(--color-2)) 100% 100% / 100% 100%;
+    --aug-inlay-all: 2px;
+    --aug-inlay-bg: radial-gradient(ellipse at top, var(--color-0),  var(--background-color))  50% 50% / 100% 100%;
+    --aug-inlay-opacity: 1;
+}
+
+.qrcodePane {
+    --aug-tr: 25px;
+    --aug-b-extend1: 50%;
+    --aug-border-all: 0.5vh;
+    --aug-border-bg: #fff;
+    --aug-inlay-all: 0;
+    --aug-inlay-bg: #fff;
+    --aug-inlay-opacity: 1;
+    margin: 1vh;
+    text-align: center;
+}
+.qrcodePane svg {
+    max-width: 90vw;
+    margin: 1vh;
+}
+
 .gridBackground { width: 100%; position: absolute; bottom: 0; left: 0; }
 
 .gridBackground:after {

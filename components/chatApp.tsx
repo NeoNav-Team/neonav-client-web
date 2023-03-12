@@ -109,42 +109,42 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     }
   }, [messages]);
 
-    return (
-        <Container disableGutters style={{height: '100%'}}>
-             <div
-                className={styles.darkPane}
-                style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
-                data-augmented-ui="tl-clip-x tr-clip-x br-clip bl-clip both"
-            >
-                <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
-                  <Box sx={flexHeader}>
-                    <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
-                  </Box>
-                  <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
-                    <SimpleScrollContainer>
-                      <Box sx={{maxWidth: '100%'}}>
-                      <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
-                        {messages.map(item => (
-                          <ItemMessage
-                            key={item.ts}
-                            date={item.ts}
-                            text={item.text}
-                            username={item.from}
-                            id={item.fromid} />
-                        ))}
-                      </Stack>
-                      </Box>
-                    </SimpleScrollContainer>
-                </Box>
-                  <Box sx={flexFooter}>
-                  <InputMessage 
-                    value={msg} 
-                    changeHandler={(event: React.ChangeEvent<HTMLInputElement>) => updateMessage(event)}
-                    submitHandler={(event: React.ChangeEvent<HTMLInputElement>) => goSendMessage(event)}
-                    />
-                </Box>
-                </Box>
-            </div>
-        </Container>
-    )
+  return (
+    <Container disableGutters style={{height: '100%'}}>
+      <div
+        className={styles.darkPane}
+        style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
+        data-augmented-ui="tl-clip-x tr-clip-x br-clip bl-clip both"
+      >
+        <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
+          <Box sx={flexHeader}>
+            <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
+          </Box>
+          <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
+            <SimpleScrollContainer>
+              <Box sx={{maxWidth: '100%'}}>
+                <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
+                  {messages.map(item => (
+                    <ItemMessage
+                      key={item.ts}
+                      date={item.ts}
+                      text={item.text}
+                      username={item.from}
+                      id={item.fromid} />
+                  ))}
+                </Stack>
+              </Box>
+            </SimpleScrollContainer>
+          </Box>
+          <Box sx={flexFooter}>
+            <InputMessage 
+              value={msg} 
+              changeHandler={(event: React.ChangeEvent<HTMLInputElement>) => updateMessage(event)}
+              submitHandler={(event: React.ChangeEvent<HTMLInputElement>) => goSendMessage(event)}
+            />
+          </Box>
+        </Box>
+      </div>
+    </Container>
+  )
 }

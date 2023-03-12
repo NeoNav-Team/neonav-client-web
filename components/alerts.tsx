@@ -26,7 +26,6 @@ export default function Alerts(props:AlertsProps):JSX.Element {
   
   return (
     <>
-      {/* mid page alerts for success / error */}
       <Snackbar
         open={alert?.show}
         onClose={handleAlertClose}

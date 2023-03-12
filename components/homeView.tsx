@@ -1,14 +1,23 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { 
   Box,
   Container,
-  Grid
+  Grid,
+  Modal,
+  Typography
 } from '@mui/material';
+import MyQRCode from './myQRCode';
+import styles from '../styles/generic.module.css';
+import Diversity1Icon from '@mui/icons-material/Diversity1';
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import EngineeringIcon from '@mui/icons-material/Engineering';
 import IconFrame from './iconFrame';
 import Kitty from './svgr/kitty';
 import Cash from './svgr/cash';
-import Channels from './svgr/channels';
 import TanChat from './svgr/tanchat';
 import NeoSites from './svgr/neosites';
 import Contacts from './svgr/contacts';
@@ -25,6 +34,31 @@ const fixedHeight = '16vh';
 
 export default function HomeView(props:HomeViewProps):JSX.Element {
   //TODO: refact this to dynamically take an array of "app" data -- icon, label, link
+
+  const [openModel, setOpenModel] = useState(false);
+  const [submenu, setSubmenu] = useState('groupSettings');
+  const handleModelOpen = (submenu:string) => {
+    setSubmenu(submenu);
+    setOpenModel(true);
+  }
+  const handleModelClose = () => setOpenModel(false);
+
+  const modelStyle = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '100%',
+    maxWidth: '800px',
+    boxShadow: 24,
+  };
+  const modelTitleStyle = {
+    fontFamily: 'Jura',
+    fontSize: '18px',
+    letterSpacing: '0.1rem',
+    padding: '10px 16px 0',
+    filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)',
+  }
       
   return (
     <Container sx={{marginTop: '64px', minHeight: 'calc(100vh - 128px)'}}>
@@ -50,8 +84,8 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <Link href="/channels">
-                <IconFrame icon={<Channels fontSize="inherit" />} title="Channels"/>
+              <Link href="/sites">
+                <IconFrame icon={<NeoSites fontSize="inherit" />} title="NeoSites"/>
               </Link>
             </Box>
           </Grid>
@@ -75,10 +109,12 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               justifyContent="center"
               alignItems="center"
               minHeight={fixedHeight}
+              onClick={() => handleModelOpen('groupSettings')}
             >
-              <Link href="/sites">
-                <IconFrame icon={<NeoSites fontSize="inherit" />} title="NeoSites"/>
-              </Link>
+              <IconFrame 
+                icon={<Diversity1Icon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                title="Judgement"
+              />
             </Box>
           </Grid>
           <Grid item xs={4}>
@@ -88,7 +124,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <IconFrame icon={<Contacts fontSize="inherit" />} title="Contacts"/>
+              <IconFrame icon={<Contacts fontSize="inherit" />} title="Social Network"/>
             </Box>
           </Grid>
           <Grid item xs={4}>
@@ -111,10 +147,12 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               justifyContent="center"
               alignItems="center"
               minHeight={fixedHeight}
+              onClick={() => handleModelOpen('myQRCode')}
             >
-              <Link href="/announce">
-                <IconFrame icon={<Announcements fontSize="inherit" />} title="Annoucements"/>
-              </Link>
+              <IconFrame 
+                icon={<QrCodeIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                title="My QRCode"
+              />
             </Box>
           </Grid>
           <Grid item xs={4}>
@@ -179,6 +217,75 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
           </Grid>
         </Grid>
       </Grid>
+      <Modal
+        open={openModel}
+        onClose={handleModelClose}
+      >
+        <Box sx={modelStyle}>
+          {submenu === 'groupSettings' && (
+            <div
+              className={styles.submenuPane}
+              data-augmented-ui="tl-clip tr-clip-x  bl-clip br-clip  both"
+            >
+              <Typography sx={modelTitleStyle}>Group Settings</Typography>
+              <Grid container item spacing={3}>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/channels">
+                      <IconFrame
+                        icon={<RoomPreferencesIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        title="Channels"/>
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/contacts">
+                      <IconFrame
+                        icon={<ManageAccountsIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        title="Contacts"
+                      />
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/factions">
+                      <IconFrame
+                        icon={<EngineeringIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        title="Factions"
+                      />
+                    </Link>
+                  </Box>
+                </Grid>
+              </Grid>
+            </div>
+          )}
+          {submenu === 'myQRCode' && (
+            <div
+              className={styles.qrcodePane}
+              data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
+            >
+              <MyQRCode size={420} />
+            </div>
+          )}
+        </Box>
+      </Modal>
     </Container>
   )
 }

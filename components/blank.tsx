@@ -8,7 +8,7 @@ export default function Blank(props:BlankProps):JSX.Element {
 
   return (
     <>
-        {children}
+      {children}
     </>
   )
 }
