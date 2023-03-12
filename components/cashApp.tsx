@@ -9,7 +9,6 @@ import SimpleScrollContainer from './simpleScrollContainer';
 import InputBalance from './inputBalance';
 import FooterNav from './footerNav';
 import { 
-  Alert,
   Container,
   Typography,
   Box,
@@ -19,7 +18,6 @@ import {
   InputLabel,
   InputAdornment,
   OutlinedInput,
-  Snackbar,
   Stack
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -71,7 +69,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
-    closeAlert = () => {},
     fetchUserWallets = () => {},
     requestPayment = (user:string, amount:string) => {},
     sendPayment = (user:string, amount:string) => {},
@@ -125,14 +122,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       sendPayload();
     }
   }
-
-  const handleAlertClose = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    closeAlert();
-  };
-
+  
   const scrubErr = (errStr:string) => {
     const newErrFields = errFields;
     const scrubdex = errFields.indexOf(errStr);
@@ -295,23 +285,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
           </Box>
         </Box>
       </div>
-      {/* Refactor below into the header since it now universal */}
-      <Snackbar
-        open={alert?.show}
-        onClose={handleAlertClose}
-        autoHideDuration={2500}
-        style={{
-          bottom: '15vh',
-          filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)'
-        }}
-      >
-        <Alert 
-          severity={alert?.severity === 'error' ? 'error' : 'success'}
-          variant="outlined"
-        >
-          {alert?.message}
-        </Alert>
-      </Snackbar>
     </Container>
   )
 }

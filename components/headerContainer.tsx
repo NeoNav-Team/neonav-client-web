@@ -19,6 +19,7 @@ import AppsIcon from '@mui/icons-material/Apps';
 import styles from '../styles/generic.module.css';
 import Logo from './svgr/logo';
 import SelectFaction from './selectFaction';
+import Alerts from './alerts';
 
 interface PageContainerProps {}
 
@@ -49,6 +50,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
   return (
 
     <AppBar color='secondary'>
+      <Alerts />
       <div
         className={styles.indigoPane}
         data-augmented-ui="tl-clip tr-clip both"
