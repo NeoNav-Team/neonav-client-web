@@ -57,8 +57,8 @@ export type NnWallet = {
 }
 
 export type NnContact = {
-    id?: string,
-    username?: string,
+    id: string,
+    username: string,
     status?: string,
 }
 
