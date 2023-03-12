@@ -20,10 +20,9 @@ import Kitty from './svgr/kitty';
 import Cash from './svgr/cash';
 import TanChat from './svgr/tanchat';
 import NeoSites from './svgr/neosites';
-import Contacts from './svgr/contacts';
+import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import Map from './svgr/map';
 import Notes from './svgr/notes';
-import Announcements from './svgr/annoucements';
 import Notifcations from './svgr/notifications';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
@@ -124,7 +123,10 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <IconFrame icon={<Contacts fontSize="inherit" />} title="Social Network"/>
+              <IconFrame 
+                icon={<LocalFloristIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                title="Jaden / Garden"
+              />
             </Box>
           </Grid>
           <Grid item xs={4}>
