@@ -39,41 +39,41 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   let newState = null;
   let clonedState = JSON.parse(JSON.stringify(state));
   switch (type) {
-    case 'addMessage': 
-      break;
-    case 'setAlert':
-      clonedState.network.alert = {...clonedState.network.alert, ...payload}
-      break;
-    case 'initContext':
-      clonedState = {...clonedState, ...payload};
-      break;
-    case 'setUserChannels':
-        clonedState.user.channels = payload;
-        break;
-    case 'setUserFactions':
-        clonedState.user.factions = payload;
-        break;
-    case 'setUserWallets':
-      clonedState.user.wallets = payload;
-      break;
-    case 'setWalletTransactions':
-      clonedState.network.collections.transactions = payload;
-      break;
-    case 'setUserContacts':
-      clonedState.network.collections.contacts = payload;
-      break;
-    case 'setMessageHistory':
-      clonedState.network.collections.messages = payload;
-      break;
-    case 'updateMessageHistory':
-      clonedState.network.collections.messages.unshift(payload);
-      break;
-    case 'setNetwork':
-      clonedState.network.location = payload;
-      break;
-    case 'setSelected':
-        clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
-      break;
+  case 'addMessage': 
+    break;
+  case 'setAlert':
+    clonedState.network.alert = {...clonedState.network.alert, ...payload}
+    break;
+  case 'initContext':
+    clonedState = {...clonedState, ...payload};
+    break;
+  case 'setUserChannels':
+    clonedState.user.channels = payload;
+    break;
+  case 'setUserFactions':
+    clonedState.user.factions = payload;
+    break;
+  case 'setUserWallets':
+    clonedState.user.wallets = payload;
+    break;
+  case 'setWalletTransactions':
+    clonedState.network.collections.transactions = payload;
+    break;
+  case 'setUserContacts':
+    clonedState.network.collections.contacts = payload;
+    break;
+  case 'setMessageHistory':
+    clonedState.network.collections.messages = payload;
+    break;
+  case 'updateMessageHistory':
+    clonedState.network.collections.messages.unshift(payload);
+    break;
+  case 'setNetwork':
+    clonedState.network.location = payload;
+    break;
+  case 'setSelected':
+    clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
+    break;
   }
   newState = {...state, ...clonedState};
   setCookieContext(newState);
@@ -92,7 +92,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     const cookieDataObj =  JSON.parse(window.atob(cookieDataArr[1]));
     //creates empt default context with just the userID
     const jwtContext =  {
-        network: {
+      network: {
         selected:{
           account: cookieDataObj.id,
         },

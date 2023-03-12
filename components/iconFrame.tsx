@@ -11,79 +11,79 @@ interface ButtonIconProps {
 }
 
 const sizeValues = {
-    xs: {
-        width: 96,
-        height: 96,
-        fontSize: 64 
-    },
-    md: {
-        width: 96,
-        height: 96,
-        fontSize: 64 
-    },
-    lg: {
-        width: 96,
-        height: 96,
-        fontSize: 64 
-    },
-    xl: {
-        width: 96,
-        height: 96,
-        fontSize: 64 
-    }
+  xs: {
+    width: 96,
+    height: 96,
+    fontSize: 64 
+  },
+  md: {
+    width: 96,
+    height: 96,
+    fontSize: 64 
+  },
+  lg: {
+    width: 96,
+    height: 96,
+    fontSize: 64 
+  },
+  xl: {
+    width: 96,
+    height: 96,
+    fontSize: 64 
+  }
 }
 
 function ButtonIcon(props:ButtonIconProps):JSX.Element {
-    const { title, isEven, icon } = props;
-    const evenClass = isEven ? 'even' : '';
+  const { title, isEven, icon } = props;
+  const evenClass = isEven ? 'even' : '';
 
-    const boxSizing = {
-        top:0,
-        width: {
-            xs: 64,
-            sm: 64,
-            md: 96,
-            lg: 108,
-            xl: 120,
-        },
-        height: {
-            xs: 64,
-            sm: 64,
-            md: 96,
-            lg: 108,
-            xl: 120,
-        },
-        fontSize: {
-            xs: 48,
-            sm: 60,
-            md: 72,
-            lg: 88,
-            xl: 96,
-        }
-    };
+  const boxSizing = {
+    top:0,
+    width: {
+      xs: 64,
+      sm: 64,
+      md: 96,
+      lg: 108,
+      xl: 120,
+    },
+    height: {
+      xs: 64,
+      sm: 64,
+      md: 96,
+      lg: 108,
+      xl: 120,
+    },
+    fontSize: {
+      xs: 48,
+      sm: 60,
+      md: 72,
+      lg: 88,
+      xl: 96,
+    }
+  };
 
 
   return (
     <Box>
-        <Box className={styles.iconFrame} sx={boxSizing}>
-            <div className={evenClass && styles.even}>
-                <div className={styles.abg} data-augmented-ui="all-hexangle-down inlay" />
-                <div className={styles.augment} data-augmented-ui="all-hexangle-up border" />
-                    <div style={{position: 'relative', border: '1px'}}>
-                        <IconButton 
-                            className={styles.iconButton} 
-                            sx={boxSizing}
-                        >
-                            {icon}
-                        </IconButton>
-                    </div>
-            </div>
-        </Box>
-        {title &&
+      <Box className={styles.iconFrame} sx={boxSizing}>
+        <div className={evenClass && styles.even}>
+          <div className={styles.abg} data-augmented-ui="all-hexangle-down inlay" />
+          <div className={styles.augment} data-augmented-ui="all-hexangle-up border" />
+          <div style={{position: 'relative', border: '1px'}}>
+            <IconButton 
+              className={styles.iconButton} 
+              sx={boxSizing}
+            >
+              {icon}
+            </IconButton>
+          </div>
+        </div>
+      </Box>
+      {title &&
             <div className={styles.iconName} data-augmented-ui="tl-clip br-clip inlay">
-                <span>{title}</span>
+              <span>{title}</span>
             </div>
-        }
+      }
     </Box>
   )
 }

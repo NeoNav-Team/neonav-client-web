@@ -56,43 +56,43 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
 
   return (
     <>
-     <IconButton
+      <IconButton
         size="large"
         onClick={handleClick}
       >
         {selected === -1 ? <AccountCircle /> : <SupervisedUserCircleIcon sx={{color:colors[selected]}} />}
       </IconButton>
       {factions && (
-      <Menu
-        id="factions-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        sx={{maxWidth: '300px'}}
-      >
-      <MenuItem 
-        onClick={(event:any) => handleMenuItemClick(event, -1)}
-        selected={selected === -1}
+        <Menu
+          id="factions-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          sx={{maxWidth: '300px'}}
         >
-      <ListItemIcon>
-        <AccountCircle />
-      </ListItemIcon>
-        {user}
-      </MenuItem>
-      {factions.map((faction, index) => (
-        <MenuItem 
-          onClick={(event:any) => handleMenuItemClick(event, index)}
-          key={faction?.id}
-          selected={selected === index}
-        >
-        <ListItemIcon>
-          <SupervisedUserCircleIcon sx={{color:colors[index]}} />
-        </ListItemIcon>
-        <div style={{overflow:'hidden', textOverflow: 'ellipsis'}}>{faction.name}</div>
-      </MenuItem>
-      ))}
-      {children}
-      </Menu>
+          <MenuItem 
+            onClick={(event:any) => handleMenuItemClick(event, -1)}
+            selected={selected === -1}
+          >
+            <ListItemIcon>
+              <AccountCircle />
+            </ListItemIcon>
+            {user}
+          </MenuItem>
+          {factions.map((faction, index) => (
+            <MenuItem 
+              onClick={(event:any) => handleMenuItemClick(event, index)}
+              key={faction?.id}
+              selected={selected === index}
+            >
+              <ListItemIcon>
+                <SupervisedUserCircleIcon sx={{color:colors[index]}} />
+              </ListItemIcon>
+              <div style={{overflow:'hidden', textOverflow: 'ellipsis'}}>{faction.name}</div>
+            </MenuItem>
+          ))}
+          {children}
+        </Menu>
       )}
     </>
   )

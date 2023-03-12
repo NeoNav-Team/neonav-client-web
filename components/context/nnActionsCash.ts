@@ -1,8 +1,8 @@
 import executeApi from '@/utilites/executeApi';
 import { 
-    APIResponse,
-    DispatchFunc,
-    netcheckAPIResData,
+  APIResponse,
+  DispatchFunc,
+  netcheckAPIResData,
 } from "./nnTypes";
 import { getCookieToken } from "@/utilites/cookieContext";
 import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
@@ -62,50 +62,50 @@ export const requestPayment = (dispatch: DispatchFunc) => (id:string, amount:str
 }
 
 export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
-    const token = getCookieToken();
-    const onSuccess = (response:APIResponse) => {
-      const { data } = response;
-      dispatch({
-        type: 'setUserWallets',
-        payload: data,
-      });
-      return data;
-    };
-    const onError = (err:netcheckAPIResData) => {
-      const { message = 'Wallets failure' } = err;
-      dispatch({
-        type: 'setAlert',
-        payload: {severity: 'error', message, show: true},
-      })
-      return err;
-    };
-    executeApi('wallets', {token}, onSuccess, onError);
-  }
-  
- export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async () => {
-    const token = getCookieToken();
-    const onSuccess = (response:APIResponse) => {
-      const { data } = response;
-      storeFetched('userWallet', data);
-      dispatch({
-        type: 'setWalletTransactions',
-        payload: data,
-      })
-    };
-    const onError = (err:netcheckAPIResData) => {
-      const { message = 'Wallet History failure' } = err;
-      dispatch({
-        type: 'setAlert',
-        payload: {severity: 'error', message, show: true},
-      })
-    };
-    if (storedRecently('userWallet')) {
-      const data = getLocalStorage('userWallet');
-      dispatch({
-        type: 'setWalletTransactions',
-        payload: data,
-      })
-    } else {
-      executeApi('walletHistory', {token}, onSuccess, onError); 
-    }
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setUserWallets',
+      payload: data,
+    });
+    return data;
   };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Wallets failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('wallets', {token}, onSuccess, onError);
+}
+  
+export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    storeFetched('userWallet', data);
+    dispatch({
+      type: 'setWalletTransactions',
+      payload: data,
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Wallet History failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  if (storedRecently('userWallet')) {
+    const data = getLocalStorage('userWallet');
+    dispatch({
+      type: 'setWalletTransactions',
+      payload: data,
+    })
+  } else {
+    executeApi('walletHistory', {token}, onSuccess, onError); 
+  }
+};

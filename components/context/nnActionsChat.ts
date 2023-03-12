@@ -1,34 +1,34 @@
 import executeApi from '@/utilites/executeApi';
 import longPollApi from '@/utilites/longPollApi';
 import { 
-    APIResponse,
-    DispatchFunc,
-    netcheckAPIResData,
-    NnChatMessage,
+  APIResponse,
+  DispatchFunc,
+  netcheckAPIResData,
+  NnChatMessage,
 } from "./nnTypes";
 import { getCookieToken } from "@/utilites/cookieContext";
 import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
 
 export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
-    const token = getCookieToken();
-    const onSuccess = (response:APIResponse) => {
-      const { data } = response;
-      dispatch({
-        type: 'setUserChannels',
-        payload: data,
-      });
-      return data;
-    };
-    const onError = (err:netcheckAPIResData) => {
-      const { message = 'Channels failure' } = err;
-      dispatch({
-        type: 'setAlert',
-        payload: {severity: 'error', message, show: true},
-      })
-      return err;
-    };
-    executeApi('channels', {token}, onSuccess, onError);
-  }
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setUserChannels',
+      payload: data,
+    });
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Channels failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('channels', {token}, onSuccess, onError);
+}
 
 export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
