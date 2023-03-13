@@ -1,0 +1,22 @@
+.idCardFrame {
+  --aug-tr: 10px;
+  --aug-b-extend1: 50%;
+  --aug-border-all: 2px;
+  --aug-border-bg: radial-gradient(var(--background-color), var(--color-1)) 100% 100% / 100% 100%;
+  --aug-inlay-all: 4px;
+  --aug-inlay-bg: radial-gradient(ellipse at top, var(--color-2), transparent)  50% 50% / 100% 100%;
+  --aug-inlay-opacity: 0.5;
+  padding-top: 4px;
+}
+
+.idCard {
+  --aug-tr: 10px;
+  --aug-b-extend1: 50%;
+  --aug-border-all: 2px;
+  --aug-border-bg: radial-gradient(var(--background-color), var(--color-1)) 100% 100% / 100% 100%;
+  --aug-inlay-all: 4px;
+  --aug-inlay-bg: radial-gradient(ellipse at top, var(--color-2), var(--background-color))  50% 50% / 100% 100%;
+  --aug-inlay-opacity: 1;
+  margin: 0 4px;
+}
+

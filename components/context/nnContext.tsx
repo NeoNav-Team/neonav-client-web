@@ -6,12 +6,16 @@ import {
   DispatchFunc,
   NnProviderValues,
   NnStore,
-} from "./nnTypes";
+} from './nnTypes';
 import {
   closeAlert,
   fetchNetworkStatus,
   setSelected,
 } from './nnActionsNetwork';
+import {
+  fetchContact,
+  unfriend,
+} from './nnActionsUser';
 import {
   fetchUserWallets,
   fetchUserWalletHistory,
@@ -59,6 +63,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setWalletTransactions':
     clonedState.network.collections.transactions = payload;
     break;
+  case 'setEntity':
+    clonedState.network.entity = payload;
+    break;
   case 'setUserContacts':
     clonedState.network.collections.contacts = payload;
     break;
@@ -76,9 +83,10 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     break;
   }
   newState = {...state, ...clonedState};
-  setCookieContext(newState);
-  console.log(action, payload, newState);
-
+  const cookieState = JSON.parse(JSON.stringify(newState));
+  delete cookieState.entity;
+  setCookieContext(cookieState);
+  console.log('newState', type, newState);
   return newState;
 };
 
@@ -131,6 +139,7 @@ export const { Context, Provider } = DataContextCreator(
   { 
     closeAlert,
     fetchNetworkStatus,
+    fetchContact,
     fetchUserWallets,
     fetchUserWalletHistory,
     fetchUserContacts,
@@ -144,6 +153,7 @@ export const { Context, Provider } = DataContextCreator(
     sendPayment,
     sendFactionPayment,
     setSelected,
+    unfriend,
   },
   defaultNnContext,
 );

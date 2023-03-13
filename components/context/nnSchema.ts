@@ -2,7 +2,6 @@ import { NnStore } from "./nnTypes";
 import { globalChannel } from "@/utilites/constants";
 
 const GLOBAL_CHANNEL = globalChannel;
-const NOW = new Date().toISOString();
 
 export const nnSchema:NnStore = {
   network: { 
@@ -15,19 +14,16 @@ export const nnSchema:NnStore = {
     selected: {
       transactions: '',
       account: '',
+      contact: '',
       channel: GLOBAL_CHANNEL,
-    },
-    localStorage: {
-      transactions: [],
-      chats: [],
-      channels: [],
     },
     collections: {
       messages: [],
       transactions: [],
       contacts: [],
       scannedUsers: [],
-    }
+    },
+    entity: {}
   },
   user: {
     profile: {

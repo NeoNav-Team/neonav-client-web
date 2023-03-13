@@ -116,9 +116,6 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
           </Box>
           <Box sx={flexFooter}>
             <FooterNav
-              secondHexProps={{
-                disabled: true,
-              }}
               bigHexProps={{
                 icon: <PersonSearchIcon />,
                 disabled: true,

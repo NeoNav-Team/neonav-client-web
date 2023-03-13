@@ -111,7 +111,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
               thirdHexProps={{
                 icon: <QrCodeScannerIcon />,
                 disabled: true,
-                handleAction: () => scanForContact,
+                handleAction: scanForContact,
               }}
             />
           </Box>

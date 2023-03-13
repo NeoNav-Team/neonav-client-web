@@ -9,12 +9,11 @@ export type NnStore = {
     user?: NnUser,
 }
 
-export type NnAert = {
+export type NnAlert = {
     severity?: 'success' | 'error' | 'info' | 'warning',
     message?: string,
     show: boolean,
 }
-
 
 export type NnProfileAuth = {
     userid: string,
@@ -50,7 +49,7 @@ export type NnWalletTransaction = {
 
 export type NnWallet = {
     type?: string;
-    id?: string,
+    id: string,
     owner?: string,
     name?: string,
     balance?: number,
@@ -79,26 +78,30 @@ export type NnChatMessage = {
 }
 
 export type NnFaction = {
-    id: string,
+    id?: string,
     admin?: string,
     name?: string,
+}
+
+export type nnEntity = {
+    id?: string;
+    name?: string;
+    description?: string;
+    image?: string;
+    meta?: any;
 }
 
 export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];
 
 export type NnNetwork = {
-    alert: NnAert,
+    alert: NnAlert,
     location?: string,
     lastFetched?: string,
     selected: {
         transactions?: string,
         account?: string,
         channel?: string,
-    },
-    localStorage: {
-        chats?: String[],
-        transactions?: String[],
-        channels?: String[],
+        contact?: string,
     },
     collections: {
         messages?: NnChatMessage[],
@@ -106,6 +109,7 @@ export type NnNetwork = {
         contacts?: NnContact[],
         scannedUsers?: NnContact[],
     }
+    entity: nnEntity;
 }
 
 export type NnUser = {
@@ -122,6 +126,7 @@ export type ActionTypes =
   'addMessage' | 
   'setNetwork' | 
   'setAlert' |
+  'setEntity' | 
   'setUserChannels' |
   'setUserFactions' |
   'setUserWallets' | 
@@ -167,17 +172,19 @@ export type NnProviderDispatch = {
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;
+    fetchContact: (_userId:string, _verbose?:boolean) => void;
     fetchUserChannels: () => void;
     fetchUserFactions: () => void;
     fetchChannelHistory: (_channelId:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
     longPollMessages: (_since:string) => void;
-    requestPayment: (_user:string, _amount:string) => void;
+    requestPayment: (_userId:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
-    sendFactionPayment: (_factionId:string, _user:string, _amount:string) => void;
+    sendFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;
     sendChannelMessage: (_channelId:string, _text:string) => void;
     setSelected: (_indexType:string, _index:string) => void;
+    unfriend: (_exFriendId:string) => void;
 }
 
 export type NnProviderValues = ProviderValues & Partial<NnProviderDispatch>;

@@ -39,8 +39,6 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
   const userId:string = useMemo(() => { return state?.user?.profile?.auth?.userid || '' }, [state]);
   const [selected, setSelectedFaction] = useState<number>(defaultSelected);
 
-  console.log('USER ID', userId);
-
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
