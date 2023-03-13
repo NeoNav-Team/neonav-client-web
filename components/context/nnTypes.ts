@@ -40,7 +40,7 @@ export type NnUserProfile = {
 }
 
 export type NnWalletTransaction = {
-    id: any;
+    id?: any;
     ts?: string,
     amount?: number | string,
     user?: string,
@@ -49,7 +49,7 @@ export type NnWalletTransaction = {
 
 export type NnWallet = {
     type?: string;
-    id: string,
+    id?: string,
     owner?: string,
     name?: string,
     balance?: number,
@@ -85,6 +85,7 @@ export type NnFaction = {
 
 export type nnEntity = {
     id?: string;
+    type?: string;
     name?: string;
     description?: string;
     image?: string;
