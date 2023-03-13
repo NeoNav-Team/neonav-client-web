@@ -77,7 +77,6 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   }
 
   const isNewLetter = (a:NnContact, b:NnContact) => {
-
     return a?.username.toLowerCase().charAt(0) !== b?.username.toLowerCase().charAt(0)
   }
 

@@ -79,7 +79,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
   }, [fetched, fetchContact, userId]);
 
   useEffect(() => {
-    if (typeof entity?.id === 'undefined') {
+    if (typeof entity?.id === 'undefined' || entity?.id !== id) {
       goFetchUser();
     }
   }, [entity, goFetchUser]);
