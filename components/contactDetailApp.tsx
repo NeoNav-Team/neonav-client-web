@@ -10,6 +10,7 @@ import {
   Container,
   Box,
   Typography,
+  LinearProgress,
 } from '@mui/material';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import TocIcon from '@mui/icons-material/Toc';
@@ -134,51 +135,55 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT, height: SCROLL_HEIGHT }}>
-            <div
-              className={styles.idCard}
-              style={{...idCard, flexDirection: 'column', height: SCROLL_HEIGHT - 80}}
-              data-augmented-ui="tr-clip-x br-clip bl-clip both"
-            >
+            {entity?.id === id ? (
               <div
-                className={styles.idCardPictureFrame}
-                style={{flex: '0 0 auto', ...sizedImage}}
-                data-augmented-ui="tl-clip-x tr-clip-x br-2-clip-x bl-clip-x both"
+                className={styles.idCard}
+                style={{...idCard, flexDirection: 'column', height: SCROLL_HEIGHT - 80}}
+                data-augmented-ui="tr-clip-x br-clip bl-clip both"
               >
-                <div style={{
-                  ...sizedImage,
-                  backgroundImage: `url("${entity?.image}")`,
-                  backgroundSize: 'cover',
-                }}>
-                  <Stack
-                    direction="column"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ minHeight: '100%'}}
-                  >
-                    <Typography variant='h5'>{userId}</Typography>
-                    <Typography variant='h4'>{entity?.name}</Typography>
-                  </Stack>
+                <div
+                  className={styles.idCardPictureFrame}
+                  style={{flex: '0 0 auto', ...sizedImage}}
+                  data-augmented-ui="tl-clip-x tr-clip-x br-2-clip-x bl-clip-x both"
+                >
+                  <div style={{
+                    ...sizedImage,
+                    backgroundImage: `url("${entity?.image}")`,
+                    backgroundSize: 'cover',
+                  }}>
+                    <Stack
+                      direction="column"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{ minHeight: '100%'}}
+                    >
+                      <Typography variant='h5'>{userId}</Typography>
+                      <Typography variant='h4'>{entity?.name}</Typography>
+                    </Stack>
+                  </div>
+                </div>
+                <div 
+                  className={styles.idCardFlavorText}
+                  style={flavorText}
+                  data-augmented-ui="tl-clip bl-clip both"
+                >
+                  <SimpleScrollContainer>
+                    <Stack>
+                      <Typography variant='h6' color="primary">Name</Typography>
+                      <p>{name(entity?.meta?.firstname, entity?.meta?.lastname)}</p>
+                      <Typography variant='h6' color="primary">Occupation</Typography>
+                      <p>{entity?.meta?.occupation || 'N/A'}</p>
+                      <Typography variant='h6' color="primary">Skills</Typography>
+                      <p>{entity?.meta?.skills || 'N/A'}</p>
+                      <Typography variant='h6' color="primary">Description</Typography>
+                      <p>{entity?.description || 'N/A'}</p>
+                    </Stack>
+                  </SimpleScrollContainer>
                 </div>
               </div>
-              <div 
-                className={styles.idCardFlavorText}
-                style={flavorText}
-                data-augmented-ui="tl-clip bl-clip both"
-              >
-                <SimpleScrollContainer>
-                  <Stack>
-                    <Typography variant='h6' color="primary">Name</Typography>
-                    <p>{name(entity?.meta?.firstname, entity?.meta?.lastname)}</p>
-                    <Typography variant='h6' color="primary">Occupation</Typography>
-                    <p>{entity?.meta?.occupation || 'N/A'}</p>
-                    <Typography variant='h6' color="primary">Skills</Typography>
-                    <p>{entity?.meta?.skills || 'N/A'}</p>
-                    <Typography variant='h6' color="primary">Description</Typography>
-                    <p>{entity?.description || 'N/A'}</p>
-                  </Stack>
-                </SimpleScrollContainer>
-              </div>
-            </div>
+            ) : (
+              <LinearProgress  color="secondary" />
+            )}
           </Box>
           <Box sx={flexFooter}>
             <FooterNav

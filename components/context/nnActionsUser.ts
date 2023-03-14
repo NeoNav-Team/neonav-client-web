@@ -4,8 +4,8 @@ import {
   DispatchFunc,
   netcheckAPIResData,
 } from "./nnTypes";
-import { getCookieToken } from "@/utilites/cookieContext";
-// import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
+import { getCookieToken } from '@/utilites/cookieContext';
+import { clearLocalStorage } from '@/utilites/localStorage';
 
 export const fetchContact = (dispatch: DispatchFunc) => async (id:string, verbose:boolean) => {
   const token = getCookieToken();
@@ -37,6 +37,7 @@ export const unfriend = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
+    clearLocalStorage('lastFetch_contacts');
     dispatch({
       type: 'setAlert',
       payload: {severity: 'success', message:'Bye, Felicia.', show: true},
