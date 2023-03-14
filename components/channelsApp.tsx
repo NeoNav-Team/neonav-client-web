@@ -114,7 +114,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                     {administerdChannels.length === 0 && <Typography>Create a channel to subordinate.</Typography>}
                     <ItemContact
                       subtitle={'Subscribed Channels'}
-                      key={`admin-list`}
+                      key={`Subscribed-list`}
                     />
                     {subscribedChannels && subscribedChannels.map((item) => {
                       return (
