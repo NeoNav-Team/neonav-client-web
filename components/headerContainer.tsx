@@ -31,6 +31,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     fetchNetworkStatus = () => {},
     fetchUserContacts = () => {},
     fetchUserFactions = () => {},
+    fetchUserChannels = () => {},
     longPollMessages = (since:string) => {},
   }: NnProviderValues = useContext(NnContext);  
   const [ initialized, setInitialized ] = useState(false)
@@ -42,10 +43,18 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
       fetchNetworkStatus();
       fetchUserContacts();
       fetchUserFactions();
+      fetchUserChannels();
       setInitialized(true);
       longPollMessages('now');
     }
-  }, [fetchNetworkStatus, fetchUserContacts, fetchUserFactions,  initContext, longPollMessages, initialized]);
+  }, [
+    fetchNetworkStatus,
+    fetchUserContacts,
+    fetchUserFactions,
+    fetchUserChannels,
+    initContext,
+    longPollMessages,
+    initialized]);
 
   return (
 

@@ -1,21 +1,28 @@
 'use client';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { restrictedChannels } from '../utilites/constants';
+import { globalChannel } from '../utilites/constants';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues } from './context/nnTypes';
+import { NnProviderValues, NnChannel } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
+import ItemContact from './itemContact';
 import FooterNav from './footerNav';
 import { 
   Container,
   Box,
+  Typography,
+  CircularProgress
 } from '@mui/material';
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 
 interface ChannelsAppProps {};
+
+const forbiddenChannels = [ ...restrictedChannels, globalChannel ];
+
 
 const flexContainer = {
   height: '100%',
@@ -25,8 +32,8 @@ const flexContainer = {
   justifyContent: 'center',
   alignContent: 'space-around',
   alignItems: 'stretch',
-};
-  
+};  
+
 const flexBody = {
   order: 0,
   flex: '1',
@@ -50,23 +57,29 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
-    fetchUserContacts = () =>{},
+    fetchUserChannels = () =>{},
   }: NnProviderValues = useContext(NnContext);
-  const contacts = state?.network?.collections?.contacts || [];
-  const sortedContacts = contacts.sort((a, b) => a.username.localeCompare(b.username))
+  const channels:NnChannel[]  = useMemo(() => {
+    return state?.user?.channels || [];
+  }, [state]);
+  const accountId = state?.network?.selected?.account || '';
+  const sortedChannels = channels.sort((a, b) => a.name.localeCompare(b.name));
+  const userCreatedChannels = sortedChannels.filter(channel => forbiddenChannels.indexOf(channel.id) === -1);
+  const administerdChannels = userCreatedChannels.filter(channel => channel.admin === accountId);
+  const subscribedChannels = userCreatedChannels.filter(channel => channel.admin !== accountId);
+  const [ collectionFetched, setCollectionFetched ] = useState(false);
 
-  const [ contactsFetched, setContactsFetched ] = useState(false);
-
-  const goFetchContacts = useCallback(() => {
-    if (!contactsFetched) {
-      fetchUserContacts();
-      setContactsFetched(true);
+  const goFetchChannels = useCallback(() => {
+    if (!collectionFetched) {
+      fetchUserChannels();
+      setCollectionFetched(true);
     }
-  }, [contactsFetched, fetchUserContacts]);
+  }, [collectionFetched, fetchUserChannels]);
 
-  const scanForContact = () =>  {
-    console.log('scanning');
-  }
+  useEffect(() => {
+    const channelsSize = channels && channels.length;
+    channelsSize === 0 && goFetchChannels();
+  }, [channels, goFetchChannels]);
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -77,34 +90,65 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
-            <SimpleScrollContainer>
-              <Box sx={{minWidth: '100%', minHeight: '100%'}}>
-                <Stack spacing={0} sx={{ display: 'flex' }}>
-                  {sortedContacts && sortedContacts.map(item => {
-                    return (
-                      <div
-                        key={`${item.id}`}
-                        id={item.id || ''}
-                      >{item.username}</div>
-                    )
-                  })}
-                </Stack>
-              </Box>
-            </SimpleScrollContainer>
+            {channels.length !== 0 ?(
+              <SimpleScrollContainer>
+                <Box sx={{minWidth: '100%', minHeight: '100%'}}>
+                  <Stack spacing={0} sx={{ display: 'flex' }}>
+                    <ItemContact
+                      subtitle={'Subordinate Channels'}
+                      key={`admin-list`}
+                    />
+                    {administerdChannels && administerdChannels.map((item) => {
+                      return (
+                        <div
+                          key={`${item.id}-container`}
+                        >
+                          <ItemContact
+                            key={`${item.id}`}
+                            id={item.id || ''}
+                            username={item.name}
+                          />
+                        </div> 
+                      )
+                    })}
+                    {administerdChannels.length === 0 && <Typography>Create a channel to subordinate.</Typography>}
+                    <ItemContact
+                      subtitle={'Subscribed Channels'}
+                      key={`admin-list`}
+                    />
+                    {subscribedChannels && subscribedChannels.map((item) => {
+                      return (
+                        <div
+                          key={`${item.id}-container`}
+                        >
+                          <ItemContact
+                            key={`${item.id}`}
+                            id={item.id || ''}
+                            username={item.name}
+                          />
+                        </div> 
+                      )
+                    })}
+                    {administerdChannels.length === 0 && <Typography>Go make friends.</Typography>}
+                  </Stack>
+                </Box>
+              </SimpleScrollContainer>
+            ) : (
+              <Stack
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+                sx={{minHeight: '100%'}}
+              >
+                <CircularProgress color="secondary" />
+              </Stack>
+            )}
           </Box>
           <Box sx={flexFooter}>
             <FooterNav
-              secondHexProps={{
-                disabled: true,
-              }}
               bigHexProps={{
-                icon: <PersonSearchIcon />,
+                icon: <RateReviewIcon />,
                 disabled: true,
-              }}
-              thirdHexProps={{
-                icon: <QrCodeScannerIcon />,
-                disabled: true,
-                handleAction: scanForContact,
               }}
             />
           </Box>

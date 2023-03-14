@@ -16,6 +16,7 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import { defaultImg } from '@/utilites/defaultImg';
 
 
 interface ContactsAppProps {
@@ -148,7 +149,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 >
                   <div style={{
                     ...sizedImage,
-                    backgroundImage: `url("${entity?.image}")`,
+                    backgroundImage: `url("${entity?.image || defaultImg}")`,
                     backgroundSize: 'cover',
                   }}>
                     <Stack

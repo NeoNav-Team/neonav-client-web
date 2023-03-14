@@ -87,7 +87,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const selected = wallets?.map(function(x) {return x.id; }).indexOf(accountId) || 0;
   const wallet = wallets[selected];
   const balance = wallet ? wallet?.balance : null;
-  const alert = state?.network?.alert;
 
   const goFetchUserWallets = useCallback(() => {
     if (!fetched) {
