@@ -78,9 +78,9 @@ export type NnChatMessage = {
 }
 
 export type NnFaction = {
-    id?: string,
-    admin?: string,
-    name?: string,
+    id: string,
+    admin: string,
+    name: string,
 }
 
 export type nnEntity = {
