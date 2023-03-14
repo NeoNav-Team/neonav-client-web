@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import styles from '../styles/card.module.css';
@@ -8,8 +9,10 @@ import FooterNav from './footerNav';
 import { 
   Container,
   Box,
+  Typography,
 } from '@mui/material';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -54,6 +57,28 @@ const flexFooter = {
   width: '100%',
 };
 
+const sizedImage = {
+  maxWidth: '400px',
+  width: '100%',
+  aspectRatio: '1 / 1',
+  overflow: 'hidden',
+}
+
+const idCard = {
+  justifyContent: 'center',
+  padding: '10px',
+  display: 'flex',
+  alignItems: 'center',
+}
+
+const flavorText = {
+  flex: '1 1 auto',
+  padding: '5px',
+  margin: '5px',
+  overflow: 'auto',
+  minWidth: '100%',
+}
+
 export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
   const { params } = props;
   const { id } = params;
@@ -82,11 +107,23 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     if (typeof entity?.id === 'undefined' || entity?.id !== id) {
       goFetchUser();
     }
-  }, [entity, goFetchUser]);
+  }, [entity, goFetchUser, id]);
 
   const goUnfriend = () =>  {
     unfriend(userId);
   }
+
+  const name = (firstname: string, lastname: string) => {
+    let name = 'N/A';
+    if (firstname && lastname) {
+      name = `${lastname}, ${firstname}`;
+    } else if (lastname) {
+      name = lastname;
+    } else if (firstname) {
+      name = firstname;
+    }
+    return name;
+  };
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -96,24 +133,51 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
         data-augmented-ui="tr-clip-x br-clip bl-clip both"
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
-          <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
+          <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT, height: SCROLL_HEIGHT }}>
             <div
               className={styles.idCard}
-              style={{height: '100%'}}
+              style={{...idCard, flexDirection: 'column', height: SCROLL_HEIGHT - 80}}
               data-augmented-ui="tr-clip-x br-clip bl-clip both"
             >
-              <SimpleScrollContainer>
-                <Box sx={{minWidth: '100%', minHeight: '100%'}}>
-                  <Stack spacing={0} sx={{ display: 'flex' }}>
-                    {entity?.image  && (<img src={entity?.image || ''} width="100%" alt='😃' />)}
-                    {entity?.type} <br />
-                    {userId} <br />
-                    {entity?.name} <br />
-                    {entity?.description} <br />
-                    {JSON.stringify(entity?.meta)}
+              <div
+                className={styles.idCardPictureFrame}
+                style={{flex: '0 0 auto', ...sizedImage}}
+                data-augmented-ui="tl-clip-x tr-clip-x br-2-clip-x bl-clip-x both"
+              >
+                <div style={{
+                  ...sizedImage,
+                  backgroundImage: `url("${entity?.image}")`,
+                  backgroundSize: 'cover',
+                }}>
+                  <Stack
+                    direction="column"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ minHeight: '100%'}}
+                  >
+                    <Typography variant='h5'>{userId}</Typography>
+                    <Typography variant='h4'>{entity?.name}</Typography>
                   </Stack>
-                </Box>
-              </SimpleScrollContainer>
+                </div>
+              </div>
+              <div 
+                className={styles.idCardFlavorText}
+                style={flavorText}
+                data-augmented-ui="tl-clip bl-clip both"
+              >
+                <SimpleScrollContainer>
+                  <Stack>
+                    <Typography variant='h6' color="primary">Name</Typography>
+                    <p>{name(entity?.meta?.firstname, entity?.meta?.lastname)}</p>
+                    <Typography variant='h6' color="primary">Occupation</Typography>
+                    <p>{entity?.meta?.occupation || 'N/A'}</p>
+                    <Typography variant='h6' color="primary">Skills</Typography>
+                    <p>{entity?.meta?.skills || 'N/A'}</p>
+                    <Typography variant='h6' color="primary">Description</Typography>
+                    <p>{entity?.description || 'N/A'}</p>
+                  </Stack>
+                </SimpleScrollContainer>
+              </div>
             </div>
           </Box>
           <Box sx={flexFooter}>
@@ -132,7 +196,8 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 disabled: true,
               }}
               fourthHexProps={{
-                disabled: true,
+                icon: <TocIcon />,
+                link: '/contacts',
               }}
             />
           </Box>

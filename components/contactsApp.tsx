@@ -66,7 +66,7 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   const [ contactsFetched, setContactsFetched ] = useState(false);
 
   const goFetchContacts = useCallback(() => {
-    if (!contactsFetched) {
+    if (!contactsFetched && '') {
       fetchUserContacts();
       setContactsFetched(true);
     }

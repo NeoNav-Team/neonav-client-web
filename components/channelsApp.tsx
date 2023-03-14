@@ -27,13 +27,6 @@ const flexContainer = {
   alignItems: 'stretch',
 };
   
-const flexHeader = {
-  order: 0,
-  flex: '0 1 64px',
-  alignSelf: 'flex-start',
-  width: '100%',
-};
-
 const flexBody = {
   order: 0,
   flex: '1',
