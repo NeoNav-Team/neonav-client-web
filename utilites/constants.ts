@@ -77,6 +77,14 @@ export const authApiEnpoints = {
     method: "get",
     path: "/api/chat/channels"     
   },
+  channelUsers: {
+    method: "get",
+    path: "/api/chat/channels/$id/users",
+  },
+  channelLeave: {
+    method: "delete",
+    path: "/api/chat/channels/$channel/$id",
+  },
   chatHistory: {
     method: "get",
     path: "/api/chat/channels/$id/history"     

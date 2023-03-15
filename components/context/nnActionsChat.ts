@@ -7,7 +7,7 @@ import {
   NnChatMessage,
 } from "./nnTypes";
 import { getCookieToken } from "@/utilites/cookieContext";
-import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
+import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilites/localStorage';
 
 export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
@@ -30,34 +30,35 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   executeApi('channels', {token}, onSuccess, onError);
 }
 
-export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
+
+export const fetchChannelDetails = (dispatch: DispatchFunc) => async (id:string) => {
+
+};
+
+export const fetchChannelUsers = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
-    storeFetched('contacts', data);
     dispatch({
-      type: 'setUserContacts',
+      type: 'setEntityUserlist',
       payload: data,
-    })
+    });
+    return data;
   };
   const onError = (err:netcheckAPIResData) => {
-    const { message = 'Contact failure' } = err;
+    const { message = 'Channels failure' } = err;
     dispatch({
       type: 'setAlert',
       payload: {severity: 'error', message, show: true},
     })
+    return err;
   };
-
-  if (storedRecently('contacts')) {
-    const data = getLocalStorage('contacts');
-    dispatch({
-      type: 'setUserContacts',
-      payload: data,
-    })
-  } else {
-    executeApi('contacts', {token}, onSuccess, onError);
-  }
-}
+  dispatch({
+    type: 'setEntityUserlist',
+    payload: [],
+  });
+  executeApi('channelUsers', {id, token}, onSuccess, onError);
+};
 
 export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
@@ -131,3 +132,25 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since:string)
   };
   longPollApi('pollMessages', {token, since}, onSuccess, onError);
 }
+
+export const removeUserFromChannel = (dispatch: DispatchFunc) => async (id:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    clearLocalStorage('lastFetch_channels');
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message:'Adios, space cowboy.', show: true},
+    })
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Leave channel error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('leavelChannel', {id, token}, onSuccess, onError);
+};

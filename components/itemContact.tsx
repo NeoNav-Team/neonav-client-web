@@ -12,10 +12,11 @@ interface itemContactProps {
     id?: string;
     username?: string;
     subtitle?: string;
+    collection?: string;
   }
   
 export default function ItemContact(props:itemContactProps):JSX.Element {
-  const {id = '', username = '', subtitle } = props;
+  const {id = '', username = '', collection = 'contacts', subtitle } = props;
   
   return (
     <Box style={{padding: '4px 0', width: '100%'}}>
@@ -27,7 +28,7 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
           <Typography variant='h5'>{subtitle}</Typography>
         </div>
       ) : (
-        <Link href={`/contacts/${id}`}>
+        <Link href={`/${collection}/${id}`}>
           <div 
             className={styles.transactionLine}
             data-augmented-ui="tr-clip br-round bl-round inlay"

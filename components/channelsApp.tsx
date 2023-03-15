@@ -107,6 +107,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                             key={`${item.id}`}
                             id={item.id || ''}
                             username={item.name}
+                            collection="channels"
                           />
                         </div> 
                       )
@@ -125,6 +126,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                             key={`${item.id}`}
                             id={item.id || ''}
                             username={item.name}
+                            collection="channels"
                           />
                         </div> 
                       )

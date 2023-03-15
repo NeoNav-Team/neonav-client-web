@@ -108,7 +108,8 @@ export type NnNetwork = {
         messages?: NnChatMessage[],
         transactions?: NnWalletTransaction[],
         contacts?: NnContact[],
-        scannedUsers?: NnContact[],
+        entityUsers?: NnContact[],
+        scannedEntities?: NnContact[] | NnFaction[],
     }
     entity: nnEntity;
 }
@@ -128,6 +129,7 @@ export type ActionTypes =
   'setNetwork' | 
   'setAlert' |
   'setEntity' | 
+  'setEntityUserlist' | 
   'setUserChannels' |
   'setUserFactions' |
   'setUserWallets' | 
@@ -137,6 +139,7 @@ export type ActionTypes =
   'setMessageHistory' |
   'setSelected' |
   'updateMessageHistory' |
+  'removeUserFromChannel' | 
   'initContext';
 
 export interface Action {
@@ -177,9 +180,12 @@ export type NnProviderDispatch = {
     fetchUserChannels: () => void;
     fetchUserFactions: () => void;
     fetchChannelHistory: (_channelId:string) => void;
+    fetchChannelDetails: (_channelId:string) => void;
+    fetchChannelUsers: (_channelId:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
     longPollMessages: (_since:string) => void;
+    removeUserFromChannel: (_user:string) => void;
     requestPayment: (_userId:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
     sendFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;

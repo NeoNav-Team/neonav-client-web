@@ -15,6 +15,7 @@ import {
 import {
   fetchContact,
   unfriend,
+  fetchUserContacts,
 } from './nnActionsUser';
 import {
   fetchUserWallets,
@@ -24,11 +25,13 @@ import {
   requestPayment,
 } from './nnActionsCash';
 import {
-  fetchUserContacts,
   fetchUserChannels,
   fetchChannelHistory,
+  fetchChannelDetails,
+  fetchChannelUsers,
   longPollMessages,
   sendChannelMessage,
+  removeUserFromChannel,
 } from './nnActionsChat';
 import {
   fetchUserFactions,
@@ -65,6 +68,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     break;
   case 'setEntity':
     clonedState.network.entity = payload;
+    break;
+  case 'setEntityUserlist':
+    clonedState.network.collections.entityUsers = payload;
     break;
   case 'setUserContacts':
     clonedState.network.collections.contacts = payload;
@@ -146,8 +152,11 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserChannels,
     fetchUserFactions,
     fetchChannelHistory,
+    fetchChannelDetails,
+    fetchChannelUsers,
     initContext,
     longPollMessages,
+    removeUserFromChannel,
     requestPayment,
     sendChannelMessage,
     sendPayment,
