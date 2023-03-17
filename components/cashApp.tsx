@@ -10,10 +10,7 @@ import InputBalance from './inputBalance';
 import FooterNav from './footerNav';
 import { 
   Container,
-  Typography,
   Box,
-  ToggleButton,
-  ToggleButtonGroup,
   FormControl,
   InputLabel,
   InputAdornment,
@@ -27,6 +24,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import InputUser from './inputUser';
 import { use100vh } from 'react-div-100vh';
+import ToggleButtons from './toggleButtons';
 
 
 interface CashAppProps {};
@@ -67,6 +65,10 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
+  const requests = [
+    {label: 'Pay', value:'pay', icon: <TrendingDownIcon />},
+    {label: 'Request', value:'request', icon: <TrendingUpIcon />},
+  ];
   const { 
     state,
     fetchUserWallets = () => {},
@@ -76,9 +78,9 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }: NnProviderValues = useContext(NnContext);
   const [ fetched, setFetched ] = useState(false);
   const [ loading, setLoading ] = useState(false);
-  const [ processTypeValue, setProcessTypeValue ] = useState('pay');
-  const [ transactionValue, setTransactionValue ] = useState<number | string>(0);
-  const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]);
+  const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
+  const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
+  const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]); // TODO: refactor to payload form object
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
   const wallets = useMemo(() => { 
     return state?.user?.wallets || [];
@@ -168,7 +170,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         if(selected === 0) {
           limit(() =>{ sendPayment(userId, transactionValue as string)});
         } else {
-          console.log('pay with sendFactionPayment');
           limit(() =>{ sendFactionPayment(accountId, userId, transactionValue as string)});
         }
         break;
@@ -211,33 +212,11 @@ export default function CashApp(props: CashAppProps):JSX.Element {
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             <SimpleScrollContainer>
               <Stack>
-                <div
-                  className={styles.togglePanel}
-                  data-augmented-ui="inlay"
-                >
-                  <ToggleButtonGroup
-                    color="primary"
-                    exclusive
-                    aria-label="Transaction"
-                    sx={{width: '100%'}}
-                    onChange={handleRequestToggle}
-                  >
-                    <ToggleButton 
-                      value="pay"
-                      selected={processTypeValue == 'pay'}
-                      sx={{width: '50%'}}
-                    >
-                      <Typography variant='h6'>Pay </Typography><TrendingDownIcon sx={{marginLeft: '10px'}}/> 
-                    </ToggleButton>
-                    <ToggleButton
-                      value="request"
-                      selected={processTypeValue == 'request'}
-                      sx={{width: '50%'}}
-                    >
-                      <Typography variant='h6'>Request </Typography><TrendingUpIcon sx={{marginLeft: '10px'}} /> 
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </div>
+                <ToggleButtons
+                  handleAction={handleRequestToggle}
+                  requests={requests}
+                  defaultButton={requests[0].value}
+                />
                 <div style={{padding: '2vh'}}>
                   <FormControl fullWidth error={hasErr('amount')}>
                     <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>

@@ -23,7 +23,6 @@ interface ChannelsAppProps {};
 
 const forbiddenChannels = [ ...restrictedChannels, globalChannel ];
 
-
 const flexContainer = {
   height: '100%',
   display: 'flex',
