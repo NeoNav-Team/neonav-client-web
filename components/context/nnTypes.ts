@@ -56,7 +56,8 @@ export type NnWallet = {
 }
 
 export type NnContact = {
-    id: string,
+    id?: string,
+    userid?: string,
     username: string,
     status?: string,
 }
@@ -85,8 +86,10 @@ export type NnFaction = {
 
 export type nnEntity = {
     id?: string;
+    userid?: string;
     type?: string;
     name?: string;
+    username?: string;
     description?: string;
     image?: string;
     meta?: any;
@@ -172,6 +175,7 @@ export interface APIResponse {
 }
 
 export type NnProviderDispatch = {
+    adminUserToChannel: (_channelId:string,_userId:string)=> void;
     closeAlert: () => void;
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
@@ -185,7 +189,7 @@ export type NnProviderDispatch = {
     fetchUserWalletHistory: () => void;
     initContext: () => void;
     longPollMessages: (_since:string) => void;
-    removeUserFromChannel: (_user:string) => void;
+    removeUserFromChannel: (_channelId:string,_userId:string) => void;
     requestPayment: (_userId:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
     sendFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;

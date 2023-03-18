@@ -1,9 +1,14 @@
-import { cloneElement } from 'react';
+import { cloneElement, useState } from 'react';
 import {
   Box,
   Fab,
   Link,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import styles from '../styles/buttonHexFab.module.css';
@@ -22,6 +27,7 @@ export interface ButtonHexFabProps {
     icon?: JSX.Element;
     disabled?: boolean;
     size?: BtnSizes;
+    dialog?: string;
 }
 
 const small = {height: '50px', width: '50px'};
@@ -30,9 +36,26 @@ const large = {height: '100px', width: '100px'};
 const sizes = {small, medium, large};
 
 export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
-  const { handleAction, loading, link, icon, disabled, size = 'small'} = props;
+  const { dialog, handleAction, loading, link, icon, disabled, size = 'small'} = props;
+  const [open, setOpen] = useState(false); 
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
+  const handleconfirm = () => {
+    handleAction && handleAction();
+    setOpen(false);
+  }
+
+  const handleDialog = (dialog: string, dialogConfirm: Function) =>{
+    setOpen(true);
+  }
+
   const clickHandler = () => {
-    if (handleAction) {
+    if (dialog && handleAction) {
+      handleDialog(dialog, handleAction);
+    } else if (handleAction) {
       handleAction();
     }
   }
@@ -47,16 +70,34 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
   const clonedIconWithProps =  icon ? cloneElement(icon, { sx: iconStyles }) : null;
 
   const HexButton = () => { return (
-    <Fab color="secondary"
-      aria-label="scan"
-      sx={getsize(size)}
-      disabled={disabled}
-      onClick={() => clickHandler()}
-    >
-      {loading ? <CircularProgress/> : (
-        icon ? clonedIconWithProps : (<DoNotDisturbIcon sx={iconStyles} />)
-      )}
-    </Fab>
+    <>
+      <Fab color="secondary"
+        aria-label="scan"
+        sx={getsize(size)}
+        disabled={disabled}
+        onClick={() => clickHandler()}
+      >
+        {loading ? <CircularProgress/> : (
+          icon ? clonedIconWithProps : (<DoNotDisturbIcon sx={iconStyles} />)
+        )}
+      </Fab>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {dialog}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant="outlined" color="secondary">No</Button>
+          <Button onClick={handleconfirm}  variant="outlined" color="secondary" autoFocus>
+              Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )};
 
   return (

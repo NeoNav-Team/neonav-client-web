@@ -22,6 +22,9 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import InputUser from './inputUser';
 import { use100vh } from 'react-div-100vh';
 import ToggleButtons from './toggleButtons';
@@ -90,6 +93,27 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const wallet = wallets[selected];
   const balance = wallet ? wallet?.balance : null;
 
+  const usergroups = [
+    { 
+      label: 'Contacts',
+      value: 'contact',
+      icon: <PeopleAltIcon />,
+      users: state?.network?.collections?.contacts || [],
+    },
+    { 
+      label: 'Scanned',
+      value: 'scanned',
+      icon: <QrCodeIcon />,
+      users: [],
+    },
+    { 
+      label: 'Faction',
+      value: 'faction',
+      icon: <SupervisedUserCircleIcon />,
+      users: state?.user?.factions || [],
+    },
+  ]
+
   const goFetchUserWallets = useCallback(() => {
     if (!fetched) {
       setFetched(true);
@@ -97,7 +121,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     }
   }, [fetchUserWallets, fetched])
 
-  const handleRequestToggle = (event: React.MouseEvent<HTMLElement>, nextTransaction: string) => {
+  const handleRequestToggle = ( nextTransaction: string) => {
     setProcessTypeValue(nextTransaction);
   }
   const handleTransactionAmount = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -174,7 +198,9 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         }
         break;
       case 'request':
-        limit(() =>{ requestPayment(userId, transactionValue as string)});
+        if (userId.charAt(0) !== ('c' || 'C')) { //TODO: request money from factions...?
+          limit(() =>{ requestPayment(userId, transactionValue as string)});
+        }
         break;
       }
       return () => {};
@@ -238,7 +264,13 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                   </FormControl>
                 </div>
                 <div style={{padding: '2vh'}}>
-                  <InputUser changeHandler={handleRecipient} value={recpientsValue} error={hasErr('recipients')} />
+                  <InputUser
+                    changeHandler={handleRecipient}
+                    value={recpientsValue}
+                    contactGroups={usergroups}
+                    selectLimit={20}
+                    error={hasErr('recipients')}
+                  />
                 </div>
               </Stack>
             </SimpleScrollContainer>

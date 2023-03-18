@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Theme, useTheme } from '@mui/material/styles';
-import { Context as NnContext } from '../components/context/nnContext';
-import { NnContact, NnProviderValues } from '../components/context/nnTypes';
+import { NnContact, nnEntity, NnFaction } from '../components/context/nnTypes';
 import styles from '../styles/generic.module.css';
 import {
   Box,
@@ -21,22 +20,30 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import QrCodeIcon from '@mui/icons-material/QrCode';
 import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import WorkIcon from '@mui/icons-material/Work';
-import ThreePIcon from '@mui/icons-material/ThreeP';
+
+
+
+type contactGroup = {
+  label: string;
+  value: string;
+  icon?: React.ReactElement;
+  disabled?: boolean;
+  users: nnEntity[];
+}
 
 interface InputUserProps {
     changeHandler: Function;
     error?: boolean;
+    selectLimit?: number;
+    defaultList?: number;
     value: string[];
+    contactGroups: contactGroup[];
 }
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
-const options = ['scanned', 'contacts', 'chat', 'faction']; //TODO:  add faction to list if in factions
 
 function getStyles(name: string, userName: readonly string[], theme: Theme) {
   return {
@@ -48,29 +55,28 @@ function getStyles(name: string, userName: readonly string[], theme: Theme) {
 }
 
 export default function InputUser(props:InputUserProps):JSX.Element {
-  const { changeHandler, error, value } = props;
+  const { contactGroups, changeHandler, defaultList, error, value, selectLimit } = props;
   const theme = useTheme();
   const [userName, setUserName] = useState<string[]>(value);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = useState(1);
-  const { state }: NnProviderValues = useContext(NnContext); 
-  const contacts:NnContact[] = useMemo(() => { 
-    return state?.network?.collections?.contacts || [];
-  }, [state]);
-  const scannedUsers:NnContact[] = useMemo(() => { 
-    return state?.network?.collections?.scannedUsers || [];
-  }, [state]);
+  const [selectedIndex, setSelectedIndex] = useState(defaultList || 0);
+  let allKnownUsers:nnEntity[] = [];
+  contactGroups.map((group) => {
+    allKnownUsers = [...allKnownUsers, ...group.users ];
+  })
 
   const handleChange = (event: SelectChangeEvent<typeof userName>) => {
+    console.log('handleChange', event);
     const {
       target: { value },
     } = event;
-    setUserName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
-    changeHandler(value);
+    console.log('userName', userName, 'value', value);
+    const newValue: string[] = typeof value === 'string' ? value.split(',') : value;
+    if((selectLimit && newValue.length <= selectLimit) || typeof selectLimit === 'undefined') {
+      setUserName(newValue);
+      changeHandler(newValue);
+    }
   };
 
   // UI Handlers
@@ -98,27 +104,12 @@ export default function InputUser(props:InputUserProps):JSX.Element {
     value !== userName && setUserName(value);
   }, [userName, value]);
 
-  //JSX Elements
-  const collectionIcon = (icon: string) => {
-    switch (icon) {
-    case 'scanned':
-      return <QrCodeIcon />
-    case 'contacts':
-      return <PeopleAltIcon />
-    case 'faction':
-      return <WorkIcon />
-    case 'chat':
-      return <ThreePIcon />
-    default:
-      return <PsychologyAltIcon />
-    }
-  }
-  
   const nameById = (id:string) => {  
-    const allKnownUsers = [...contacts, ...scannedUsers] || [];
     if(allKnownUsers.length !== 0) {
-      const user = allKnownUsers.find(user => user.id === id);
-      return user ? user.username : id;
+      const user = allKnownUsers.find(user => (user.id || user.userid) === id);
+      const username = user?.username || user?.name || id;
+      const formattedName =  username && username?.length >= 12 ? `${username.substring(0, 12)}...` : username;
+      return formattedName;
     }
   }
 
@@ -139,8 +130,8 @@ export default function InputUser(props:InputUserProps):JSX.Element {
         }}
         renderValue={(selected) => (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {selected.map((value) => (
-              <Chip key={value} label={nameById(value)} />
+            {selected.map((value ) => (
+              <Chip key={`chip_${value}_select`} label={nameById(value)} />
             ))}
           </Box>
         )}
@@ -154,7 +145,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
               aria-haspopup="menu"
               onClick={handleToggle}
             >
-              {collectionIcon(options[selectedIndex])}
+              {contactGroups[selectedIndex].icon}
             </Button>
           </ButtonGroup>
           <Popper
@@ -178,14 +169,14 @@ export default function InputUser(props:InputUserProps):JSX.Element {
                 <Paper>
                   <ClickAwayListener onClickAway={handleClose}>
                     <MenuList id="split-button-menu" autoFocusItem>
-                      {options.map((option, index) => (
+                      {contactGroups.map((group, index) => (
                         <MenuItem
-                          key={option}
-                          disabled={index >= 2} //todo: add check for faction and recent chat
+                          key={`${group.value}_icon`}
+                          disabled={group.disabled}
                           selected={index === selectedIndex}
                           onClick={(event) => handleMenuItemClick(event, index)}
                         >
-                          {collectionIcon(option)}
+                          {group.icon || <PsychologyAltIcon />}
                         </MenuItem>
                       ))}
                     </MenuList>
@@ -197,13 +188,13 @@ export default function InputUser(props:InputUserProps):JSX.Element {
 
         </InputAdornment>}
       >
-        {contacts && contacts.map((user, index) => (
+        {contactGroups[selectedIndex].users && contactGroups[selectedIndex].users.map((user, index) => (
           <MenuItem
             key={`${user.id}_${index}`}
-            value={user.id}
+            value={user.id || user.userid}
             style={getStyles((user.id || ''), (user.username as unknown as string[] || user.id), theme)}
           >
-            {(user.username as unknown as string[] || user.id)}
+            {(user.username as unknown as string[] || user.name as unknown as string[] || user.id || user.userid)}
           </MenuItem>
         ))}
       </Select>

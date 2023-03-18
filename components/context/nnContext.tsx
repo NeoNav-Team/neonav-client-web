@@ -25,6 +25,7 @@ import {
   requestPayment,
 } from './nnActionsCash';
 import {
+  adminUserToChannel,
   fetchUserChannels,
   fetchChannelHistory,
   fetchChannelDetails,
@@ -143,6 +144,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
 export const { Context, Provider } = DataContextCreator(
   nnReducer,
   { 
+    adminUserToChannel,
     closeAlert,
     fetchNetworkStatus,
     fetchContact,

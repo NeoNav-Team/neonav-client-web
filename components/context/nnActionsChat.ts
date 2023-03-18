@@ -133,7 +133,7 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since:string)
   longPollApi('pollMessages', {token, since}, onSuccess, onError);
 }
 
-export const removeUserFromChannel = (dispatch: DispatchFunc) => async (id:string) => {
+export const removeUserFromChannel = (dispatch: DispatchFunc) => async (channel:string, id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
@@ -152,5 +152,28 @@ export const removeUserFromChannel = (dispatch: DispatchFunc) => async (id:strin
     })
     return err;
   };
-  executeApi('leavelChannel', {id, token}, onSuccess, onError);
+  executeApi('channelLeave', {channel, id, token}, onSuccess, onError);
+};
+
+export const adminUserToChannel = (dispatch: DispatchFunc) => async (channel:string, id:string) => {
+  const token = getCookieToken();
+  const newAdmin = id;
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    clearLocalStorage('lastFetch_channels');
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message: "You've done a man's job, sir. I guess you're through, huh?", show: true},
+    })
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Admin channel error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('channelAdmin', {channel, id, newAdmin, token}, onSuccess, onError);
 };

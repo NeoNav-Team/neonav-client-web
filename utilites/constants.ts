@@ -85,6 +85,10 @@ export const authApiEnpoints = {
     method: "delete",
     path: "/api/chat/channels/$channel/$id",
   },
+  channelAdmin: {
+    method: "put",
+    path: "/api/chat/channels/$channel/$id",
+  },
   chatHistory: {
     method: "get",
     path: "/api/chat/channels/$id/history"     
