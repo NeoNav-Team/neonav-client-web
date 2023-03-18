@@ -148,7 +148,6 @@ export default function ChannelDetailApp(props: ChannelDetailAppProps):JSX.Eleme
   } 
   const handleBigAction = () => {
     const selectedId = usersValue[0];
-    console.log('selectedId', selectedId, 'requestValue', requestValue);
     if (requestValue === 'admin') {
       adminUserToChannel(channelInfo?.id, selectedId);
     } else if (requestValue === 'remove') {
