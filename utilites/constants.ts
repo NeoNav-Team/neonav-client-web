@@ -81,6 +81,18 @@ export const authApiEnpoints = {
     method: "get",
     path: "/api/chat/channels/$id/users",
   },
+  channelCreate: {
+    method: "post",
+    path: "/api/chat/channels",
+  },
+  channelJoin: {
+    method: "put",
+    path: "/api/chat/channels/$channel",
+  },
+  channelScope: {
+    method: "put",
+    path: "/api/chat/public/$channel",
+  },
   channelLeave: {
     method: "delete",
     path: "/api/chat/channels/$channel/$id",

@@ -56,7 +56,8 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
-    fetchUserChannels = () =>{},
+    createNewChannel =  (channelName:string) => {},
+    fetchUserChannels = () => {},
   }: NnProviderValues = useContext(NnContext);
   const channels:NnChannel[]  = useMemo(() => {
     return state?.user?.channels || [];
@@ -75,10 +76,15 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
     }
   }, [collectionFetched, fetchUserChannels]);
 
+  const goCreateNewChannel = (newChannelName: string)=> {
+    createNewChannel(newChannelName);
+  }
+
   useEffect(() => {
     const channelsSize = channels && channels.length;
     channelsSize === 0 && goFetchChannels();
   }, [channels, goFetchChannels]);
+
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -130,7 +136,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                         </div> 
                       )
                     })}
-                    {administerdChannels.length === 0 && <Typography>Go make friends.</Typography>}
+                    {subscribedChannels.length === 0 && <Typography>Go make friends.</Typography>}
                   </Stack>
                 </Box>
               </SimpleScrollContainer>
@@ -149,7 +155,9 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
             <FooterNav
               bigHexProps={{
                 icon: <RateReviewIcon />,
-                disabled: true,
+                handleAction: goCreateNewChannel,
+                dialog: 'New channel name',
+                useInput: true,
               }}
             />
           </Box>

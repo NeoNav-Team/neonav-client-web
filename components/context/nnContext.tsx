@@ -14,18 +14,20 @@ import {
 } from './nnActionsNetwork';
 import {
   fetchContact,
-  unfriend,
   fetchUserContacts,
+  unfriend,
 } from './nnActionsUser';
 import {
   fetchUserWallets,
   fetchUserWalletHistory,
+  requestPayment,
   sendPayment,
   sendFactionPayment,
-  requestPayment,
 } from './nnActionsCash';
 import {
   adminUserToChannel,
+  createNewChannel,
+  joinUserToChannel,
   fetchUserChannels,
   fetchChannelHistory,
   fetchChannelDetails,
@@ -33,6 +35,7 @@ import {
   longPollMessages,
   sendChannelMessage,
   removeUserFromChannel,
+  toggleChannelScope,
 } from './nnActionsChat';
 import {
   fetchUserFactions,
@@ -146,6 +149,7 @@ export const { Context, Provider } = DataContextCreator(
   { 
     adminUserToChannel,
     closeAlert,
+    createNewChannel,
     fetchNetworkStatus,
     fetchContact,
     fetchUserWallets,
@@ -157,6 +161,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelDetails,
     fetchChannelUsers,
     initContext,
+    joinUserToChannel,
     longPollMessages,
     removeUserFromChannel,
     requestPayment,
@@ -164,6 +169,7 @@ export const { Context, Provider } = DataContextCreator(
     sendPayment,
     sendFactionPayment,
     setSelected,
+    toggleChannelScope,
     unfriend,
   },
   defaultNnContext,

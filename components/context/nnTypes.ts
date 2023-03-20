@@ -177,6 +177,7 @@ export interface APIResponse {
 export type NnProviderDispatch = {
     adminUserToChannel: (_channelId:string,_userId:string)=> void;
     closeAlert: () => void;
+    createNewChannel: (_channelName:string) => void;
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;
@@ -188,6 +189,7 @@ export type NnProviderDispatch = {
     fetchChannelUsers: (_channelId:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
+    joinUserToChannel: (_channelId:string) => void;
     longPollMessages: (_since:string) => void;
     removeUserFromChannel: (_channelId:string,_userId:string) => void;
     requestPayment: (_userId:string, _amount:string) => void;
@@ -195,6 +197,7 @@ export type NnProviderDispatch = {
     sendFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;
     sendChannelMessage: (_channelId:string, _text:string) => void;
     setSelected: (_indexType:string, _index:string) => void;
+    toggleChannelScope: (_channelId:string) => void;
     unfriend: (_exFriendId:string) => void;
 }
 

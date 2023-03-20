@@ -89,7 +89,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }
 
   const updateMessage = (event: React.ChangeEvent<HTMLInputElement>)  => {
-    setMsg( event?.target?.value);
+    setMsg(event?.target?.value);
   }
 
   const goSendMessage = (event: React.ChangeEvent<HTMLInputElement>) => {

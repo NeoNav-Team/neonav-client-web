@@ -1,17 +1,13 @@
-import { cloneElement, useState } from 'react';
+import { cloneElement, useRef, useState } from 'react';
 import {
   Box,
   Fab,
   Link,
   CircularProgress,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
 } from '@mui/material';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import styles from '../styles/buttonHexFab.module.css';
+import SimpleDialog from './simpleDialog';
 
 
 type BtnSizes = 'small' | 'medium' | 'large';
@@ -28,6 +24,7 @@ export interface ButtonHexFabProps {
     disabled?: boolean;
     size?: BtnSizes;
     dialog?: string;
+    useInput?: boolean;
 }
 
 const small = {height: '50px', width: '50px'};
@@ -36,29 +33,25 @@ const large = {height: '100px', width: '100px'};
 const sizes = {small, medium, large};
 
 export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
-  const { dialog, handleAction, loading, link, icon, disabled, size = 'small'} = props;
-  const [open, setOpen] = useState(false); 
-
-  const handleClose = () => {
-    setOpen(false);
-  }
-
-  const handleconfirm = () => {
-    handleAction && handleAction();
-    setOpen(false);
-  }
-
-  const handleDialog = (dialog: string, dialogConfirm: Function) =>{
-    setOpen(true);
-  }
+  const { dialog, handleAction, useInput, loading, link, icon, disabled, size = 'small'} = props;
+  const [open, setOpen] = useState(false);
 
   const clickHandler = () => {
     if (dialog && handleAction) {
-      handleDialog(dialog, handleAction);
+      setOpen(true);
     } else if (handleAction) {
       handleAction();
     }
   }
+
+  const dialogCloseAction = (value:any) => {
+    handleAction && handleAction(value);
+    setOpen(false);
+  }
+  const handleClose = () => {
+    setOpen(false);
+  }
+
   const getsize = (size:BtnSizes) => {
     let pickedSize:SizeDimension = small;
     if (size) {
@@ -81,22 +74,7 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
           icon ? clonedIconWithProps : (<DoNotDisturbIcon sx={iconStyles} />)
         )}
       </Fab>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-      >
-        <DialogContent>
-          <DialogContentText>
-            {dialog}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} variant="outlined" color="secondary">No</Button>
-          <Button onClick={handleconfirm}  variant="outlined" color="secondary" autoFocus>
-              Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <SimpleDialog handleAction={dialogCloseAction} handleClose={handleClose} open={open} useInput={useInput} dialog={dialog} />
     </>
   )};
 

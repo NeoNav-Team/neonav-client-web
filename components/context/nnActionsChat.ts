@@ -30,7 +30,6 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   executeApi('channels', {token}, onSuccess, onError);
 }
 
-
 export const fetchChannelDetails = (dispatch: DispatchFunc) => async (id:string) => {
 
 };
@@ -176,4 +175,69 @@ export const adminUserToChannel = (dispatch: DispatchFunc) => async (channel:str
     return err;
   };
   executeApi('channelAdmin', {channel, id, newAdmin, token}, onSuccess, onError);
+};
+
+export const joinUserToChannel  = (dispatch: DispatchFunc) => async (channel:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    clearLocalStorage('lastFetch_channels');
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message: "Joined channel.", show: true},
+    })
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Join channel error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('channelJoin', {channel, token}, onSuccess, onError);
+};
+
+export const createNewChannel = (dispatch: DispatchFunc) => async (name:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    clearLocalStorage('lastFetch_channels');
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message: `Created "${name}"`, show: true},
+    })
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Create channel error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('channelCreate', {name, token}, onSuccess, onError);
+};
+
+export const toggleChannelScope = (dispatch: DispatchFunc) => async (channel:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message: data?.message, show: true},
+    })
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Scope channel error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('channelScope', {channel, token}, onSuccess, onError);
 };

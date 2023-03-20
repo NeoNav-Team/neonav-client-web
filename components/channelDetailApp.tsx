@@ -84,6 +84,7 @@ export default function ChannelDetailApp(props: ChannelDetailAppProps):JSX.Eleme
     fetchChannelDetails = (id:string) =>{},
     fetchChannelUsers = (id:string) =>{},
     removeUserFromChannel = (channel:string, id:string) => {},
+    toggleChannelScope = (id:string) =>{},
     adminUserToChannel = (channel:string, id:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const userId:string = state?.user?.profile?.auth?.userid || '';
@@ -99,6 +100,7 @@ export default function ChannelDetailApp(props: ChannelDetailAppProps):JSX.Eleme
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
   const [ requestValue, setRequestValue ] = useState<string>(requests[0].value);
   const [ usersValue, setUsersValue ] = useState<string[]>([]);
+  const [ scope, setScope ] = useState<string>(channelInfo?.scope);
 
   const usergroups = [
     { 
@@ -135,8 +137,9 @@ export default function ChannelDetailApp(props: ChannelDetailAppProps):JSX.Eleme
     removeUserFromChannel(channelInfo?.id, userId);
   }
   const goSetChannelScope = () => {
-    console.log('channelInfo', channelInfo);
-    // setChannelScope(channelInfo?.id);
+    toggleChannelScope(channelInfo?.id);
+    const newScope = scope === 'group' ? 'public' : 'group';
+    setScope(newScope);
   }
 
   const handleRequestToggle = (nextRequestValue: string) => {
@@ -234,8 +237,7 @@ export default function ChannelDetailApp(props: ChannelDetailAppProps):JSX.Eleme
                 dialog: "Leave this channel?"
               }}
               secondHexProps={{
-                //   icon: {channelInfo?.type == 'public' ? <LockOpenIcon /> : <LockIcon />},
-                icon:  <LockIcon />,
+                icon: scope == 'group' ? <LockOpenIcon /> : <LockIcon />,
                 disabled: !isAdmin,
                 handleAction: goSetChannelScope,
               }}
