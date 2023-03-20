@@ -1,9 +1,9 @@
-import ChannelDetailApp from "@/components/channelDetailApp";
+import ChannelAdminApp from "@/components/channelAdminApp";
 
-export default function ContactDetail({
+export default function ChannelAdmin({
   params,
 }: {
   params: { id: string };
 }) {
-  return (<ChannelDetailApp params={params}/>);
+  return (<ChannelAdminApp params={params}/>);
 }

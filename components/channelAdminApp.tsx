@@ -28,7 +28,7 @@ import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 
-interface ChannelDetailAppProps {
+interface ChannelAdminAppProps {
   params: {
     id: string;
   }
@@ -69,7 +69,7 @@ const flexFooter = {
 };
 
 
-export default function ChannelDetailApp(props: ChannelDetailAppProps):JSX.Element {
+export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element {
   const { params } = props;
   const { id } = params;
   const FULL_HEIGHT = use100vh() || 600;
