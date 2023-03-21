@@ -137,23 +137,26 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
           <Box sx={flexHeader}>
             <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
           </Box>
-          {!channelFound && (
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              spacing={0}
-            >
-              <SpeakerNotesOffIcon sx={{fontSize:'100px'}}/>
-              <Typography variant="h3" style={{ color: 'white' }}>
-               404 
-              </Typography>
-              <Typography variant="h4" style={{ color: 'white' }}>
-                        Channel not found
-              </Typography>
-            </Stack>
-          )}
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
+            {!channelFound && (
+              <Stack
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+                spacing={0}
+              >
+                <SpeakerNotesOffIcon sx={{fontSize:'100px'}}/>
+                <Typography variant="h3">
+                404 
+                </Typography>
+                <Typography variant="h5">
+                Channel not found
+                </Typography>
+                <Typography sx={{margin: '10px auto'}}>
+                Check if channel exists and you have access.
+                </Typography>
+              </Stack>
+            )}
             <SimpleScrollContainer>
               <Box sx={{maxWidth: '100%'}}>
                 <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
