@@ -186,14 +186,6 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
     }
   }
 
-  const adminBage = (id:string) => {
-    let icon = <></>;
-    if (id === entity?.admin) {
-      icon = <LocalPoliceIcon />;
-    } 
-    return icon;
-  }
-
   return (
     <Container disableGutters style={{height: '100%'}}>
       <div
@@ -245,9 +237,9 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                       <div>
                         <Chip
                           sx={{margin: '2px'}}
-                          label={entity.admin}
-                          icon={adminBage(entity.admin)} 
-                          key={`chip_${entity.admin}_rep_display`}
+                          label={entity.admin[0].username || entity.admin[0].userid}
+                          icon={<LocalPoliceIcon />} 
+                          key={`chip_${entity.admin?.userid}_rep_display`}
                         />
                         {repsList.length >= 1 && (repsList as NnContact[]).map(item => {
                           return (
@@ -271,7 +263,6 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                             <Chip
                               sx={{margin: '2px'}}
                               label={item.username || item.id}
-                              icon={adminBage(item?.id || item.userid || '')} 
                               key={`chip_${item.username || item.id}_member_display`}
                             />
                           )
