@@ -39,6 +39,11 @@ import {
 } from './nnActionsChat';
 import {
   fetchUserFactions,
+  fetchFactionDetails,
+  fetchFactionUsers,
+  removeUserFromFaction,
+  addUserToFaction,
+  adminUserToFaction,
 } from './nnActionsFaction';
 import { nnSchema } from "./nnSchema";
 import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/cookieContext";
@@ -160,6 +165,11 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelHistory,
     fetchChannelDetails,
     fetchChannelUsers,
+    fetchFactionDetails,
+    fetchFactionUsers,
+    removeUserFromFaction,
+    addUserToFaction,
+    adminUserToFaction,
     initContext,
     joinUserToChannel,
     longPollMessages,

@@ -101,6 +101,7 @@ export default function FactionsApp(props: FactionsAppProps):JSX.Element {
                             key={`${item.id}`}
                             id={item.id || ''}
                             username={item.name}
+                            collection="factions/admin"
                           />
                         </div> 
                       )
@@ -119,6 +120,7 @@ export default function FactionsApp(props: FactionsAppProps):JSX.Element {
                             key={`${item.id}`}
                             id={item.id || ''}
                             username={item.name}
+                            collection="factions/admin"
                           />
                         </div> 
                       )

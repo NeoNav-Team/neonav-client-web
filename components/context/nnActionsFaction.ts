@@ -27,3 +27,20 @@ export const fetchUserFactions = (dispatch: DispatchFunc) => async () => {
   };
   executeApi('factions', {token}, onSuccess, onError);
 }
+
+export const fetchFactionDetails = (dispatch: DispatchFunc) => async (id:string) => {
+  console.log(id)
+}
+
+export const fetchFactionUsers = (dispatch: DispatchFunc) => async (id:string) => {
+  console.log(id)
+}
+export const removeUserFromFaction = (dispatch: DispatchFunc) => (faction:string, id:string)  => {
+  console.log(faction, id)
+}
+export const addUserToFaction = (dispatch: DispatchFunc) => (faction:string, id:string)  => {
+  console.log(faction, id)
+}
+export const adminUserToFaction = (dispatch: DispatchFunc) => (faction:string, id:string)  => {
+  console.log(faction, id)
+}
