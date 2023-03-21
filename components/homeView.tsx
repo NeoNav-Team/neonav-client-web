@@ -112,7 +112,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
             >
               <IconFrame 
                 icon={<Diversity1Icon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
-                title="Judgement"
+                title="HR Portal"
               />
             </Box>
           </Grid>

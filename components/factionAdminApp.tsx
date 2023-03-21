@@ -18,8 +18,12 @@ import {
 } from '@mui/material';
 import TocIcon from '@mui/icons-material/Toc';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import ShieldIcon from '@mui/icons-material/Shield';
+import AddModeratorIcon from '@mui/icons-material/AddModerator';
 import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
+import RemoveModeratorIcon from '@mui/icons-material/RemoveModerator';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import NoMeetingRoomIcon from '@mui/icons-material/NoMeetingRoom';
 import { Stack } from '@mui/system';
@@ -74,9 +78,10 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const requests = [
-    {label: 'Add', value:'add', icon: <PersonRemoveIcon />},
-    {label: 'Remove', value:'remove', icon: <LocalPoliceIcon />},
-    {label: 'Promote', value:'admin', icon: <LocalPoliceIcon />},
+    {label: '', value:'add', icon: <PersonAddIcon />},
+    {label: '', value:'remove', icon: <PersonRemoveIcon />},
+    {label: '', value:'admin', icon: <AddModeratorIcon />},
+    {label: '', value:'deadmin', icon: <RemoveModeratorIcon />},
   ];
 
   const objectifyIds = (collection: Array<string | object>) => {
@@ -218,6 +223,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                           handleAction={handleRequestToggle}
                           requests={requests}
                           defaultButton={requests[0].value}
+                          size="small"
                         />
                         <InputUser
                           changeHandler={handleUsers}
@@ -237,12 +243,18 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                         <Typography variant="h6">Reps</Typography>
                       </Divider>
                       <div>
+                        <Chip
+                          sx={{margin: '2px'}}
+                          label={entity.admin}
+                          icon={adminBage(entity.admin)} 
+                          key={`chip_${entity.admin}_rep_display`}
+                        />
                         {repsList.length >= 1 && (repsList as NnContact[]).map(item => {
                           return (
                             <Chip
                               sx={{margin: '2px'}}
                               label={item.username || item.id}
-                              icon={adminBage(item.id || item.userid || '')} 
+                              icon={<ShieldIcon />} 
                               key={`chip_${item.username || item.id}_rep_display`}
                             />
                           )
@@ -254,7 +266,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                         <Typography variant="h6">Members</Typography>
                       </Divider>
                       <div>
-                        {memberList.length >= 1 && (memberList as NnContact[]).map(item => {
+                        {memberList.length >= 1 ? (memberList as NnContact[]).map(item => {
                           return (
                             <Chip
                               sx={{margin: '2px'}}
@@ -263,7 +275,9 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                               key={`chip_${item.username || item.id}_member_display`}
                             />
                           )
-                        })}
+                        }) : (
+                          <Typography>Go find members.</Typography>
+                        )}
                       </div>
                     </Box>
                   </Stack>
