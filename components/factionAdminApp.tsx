@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnFaction, nnEntity, NnProviderValues } from './context/nnTypes';
+import { NnFaction, nnEntity, NnProviderValues, NnContact } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ToggleButtons from './toggleButtons';
 import InputUser from './inputUser';
@@ -76,38 +76,63 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const requests = [
     {label: 'Add', value:'add', icon: <PersonRemoveIcon />},
     {label: 'Remove', value:'remove', icon: <LocalPoliceIcon />},
-    {label: 'Admin', value:'admin', icon: <LocalPoliceIcon />},
+    {label: 'Promote', value:'admin', icon: <LocalPoliceIcon />},
   ];
+
+  const objectifyIds = (collection: Array<string | object>) => {
+    let objectArr = []
+    if (typeof collection[0] === 'string') {
+      objectArr = collection.map(id => {
+        return {id:id, username: id};
+      })
+    } else {
+      objectArr = collection;
+    }
+    return objectArr;
+  }
+
   const { 
     state,
     fetchFactionDetails = (id:string) =>{},
-    fetchFactionUsers = (id:string) =>{},
+    addUserToFaction = (faction:string, id:string) => {},
     removeUserFromFaction = (faction:string, id:string) => {},
-    toggleFactionScope = (id:string) =>{},
     adminUserToFaction = (faction:string, id:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const userId:string = state?.user?.profile?.auth?.userid || '';
   const entityId:string = id || '';
-  const factions = state?.user?.factions || [];
-  const factionInfo:NnFaction = factions.filter(arrItem => arrItem.id == entityId)[0];
-  const userList = state.network?.collections.entityUsers || [];
-  const isAdmin = userId === factionInfo?.admin;
   const entity:nnEntity  = useMemo(() => {
     return state?.network?.entity || {};
   }, [state]);
+  const repsList = objectifyIds(entity?.reps || []);
+  const memberList = objectifyIds(entity?.members || []);
+  const userlist = [...repsList, ...memberList];
+  const contacts = state?.network?.collections?.contacts || [];
+  const sortedContacts = contacts.sort((a, b) => a.username.localeCompare(b.username));
+  const isAdmin = userId === entity?.admin;
+
   const [ fetched, setFetched ] = useState(false);
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
   const [ requestValue, setRequestValue ] = useState<string>(requests[0].value);
   const [ usersValue, setUsersValue ] = useState<string[]>([]);
 
-  const usergroups = [
+  const addGroups = [
     { 
       label: 'Contacts',
       value: 'contact',
       icon: <PeopleAltIcon />,
-      users: userList || [],
+      users: sortedContacts || [],
     },
   ];
+
+  const factionGroups = [
+    { 
+      label: 'Faction',
+      value: 'faction',
+      icon: <PeopleAltIcon />,
+      users: userlist || [],
+    },
+  ];
+
 
   const scrubErr = (errStr:string) => {
     const newErrFields = errFields;
@@ -122,17 +147,16 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const goFetchFactionUsers = useCallback(() => {
     if (!fetched) {
       fetchFactionDetails(entityId);
-      fetchFactionUsers(entityId);
       setFetched(true);
     }
-  }, [fetched, fetchFactionUsers, entityId, fetchFactionDetails]);
+  }, [fetched, entityId, fetchFactionDetails]);
 
   useEffect(() => {
     goFetchFactionUsers();
-  }, [factionInfo?.id, entity, goFetchFactionUsers, id, userList.length]);
+  }, [goFetchFactionUsers]);
 
   const goLeaveFaction = () =>  {
-    removeUserFromFaction(factionInfo?.id, userId);
+    removeUserFromFaction(entity?.id || '', userId);
   }
 
   const handleRequestToggle = (nextRequestValue: string) => {
@@ -144,16 +168,22 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   } 
   const handleBigAction = () => {
     const selectedId = usersValue[0];
-    if (requestValue === 'admin') {
-      adminUserToFaction(factionInfo?.id, selectedId);
-    } else if (requestValue === 'remove') {
-      removeUserFromFaction(factionInfo?.id, selectedId);
+    switch (requestValue) {
+    case 'admin':
+      adminUserToFaction(entity?.id || '', selectedId);
+      break;
+    case 'add':
+      addUserToFaction(entity?.id || '', selectedId);
+      break;
+    case 'remove':
+      removeUserFromFaction(entity?.id || '', selectedId);
+      break;
     }
   }
 
   const adminBage = (id:string) => {
     let icon = <></>;
-    if (id === factionInfo?.admin) {
+    if (id === entity?.admin) {
       icon = <LocalPoliceIcon />;
     } 
     return icon;
@@ -168,7 +198,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT, height: SCROLL_HEIGHT }}>
-            {factionInfo?.id === id ? (
+            {entity?.id === id ? (
               <>
                 <Container>
                   <div
@@ -176,7 +206,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                     data-augmented-ui="tr-clip-x br-clip bl-clip both"
                     style={{margin: '10px 0', padding: '8px'}}
                   >
-                    <Typography variant="h5" >{factionInfo.name}</Typography>
+                    <Typography variant="h5" >{entity.name}</Typography>
                   </div>
                   {isAdmin && (
                     <>
@@ -192,30 +222,51 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                         <InputUser
                           changeHandler={handleUsers}
                           value={usersValue}
-                          contactGroups={usergroups}
+                          contactGroups={addGroups}
                           selectLimit={1}
                           error={hasErr('users')}
                         />
                       </Stack>
                     </>
                   )}
-                  <Divider variant="middle"  color="primary">
-                    <Typography variant="h6">Users</Typography>
-                  </Divider>
                 </Container>
                 <SimpleScrollContainer>
-                  <div>
-                    {userList.length >= 1 && userList.map(item => {
-                      return (
-                        <Chip
-                          sx={{margin: '2px'}}
-                          label={item.username || item.id}
-                          icon={adminBage(item?.id || item.userid || '')} 
-                          key={`chip_${item.username || item.id}_display`}
-                        />
-                      )
-                    })}
-                  </div>
+                  <Stack>
+                    <Box sx={{minWidth: '100%'}}>
+                      <Divider variant="middle"  color="primary">
+                        <Typography variant="h6">Reps</Typography>
+                      </Divider>
+                      <div>
+                        {repsList.length >= 1 && (repsList as NnContact[]).map(item => {
+                          return (
+                            <Chip
+                              sx={{margin: '2px'}}
+                              label={item.username || item.id}
+                              icon={adminBage(item.id || item.userid || '')} 
+                              key={`chip_${item.username || item.id}_rep_display`}
+                            />
+                          )
+                        })}
+                      </div>
+                    </Box>
+                    <Box sx={{minWidth: '100%'}}>
+                      <Divider variant="middle"  color="primary">
+                        <Typography variant="h6">Members</Typography>
+                      </Divider>
+                      <div>
+                        {memberList.length >= 1 && (memberList as NnContact[]).map(item => {
+                          return (
+                            <Chip
+                              sx={{margin: '2px'}}
+                              label={item.username || item.id}
+                              icon={adminBage(item?.id || item.userid || '')} 
+                              key={`chip_${item.username || item.id}_member_display`}
+                            />
+                          )
+                        })}
+                      </div>
+                    </Box>
+                  </Stack>
                 </SimpleScrollContainer>
               </>
             ) : (

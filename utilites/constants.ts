@@ -112,5 +112,9 @@ export const authApiEnpoints = {
   pollMessages: {
     method: "get",
     path: "/api/chat/channels/all/?since=$since"   
-  }
+  },
+  factionProfile: {
+    method: "get",
+    path: "/api/factions/$id",
+  },
 };

@@ -84,6 +84,8 @@ export type NnFaction = {
     name: string,
 }
 
+
+/* Entity is currently a catch-all but realistically shoudld be <NnFaction | NnChannel | NnUser | NnProduct> */
 export type nnEntity = {
     id?: string;
     userid?: string;
@@ -93,6 +95,9 @@ export type nnEntity = {
     description?: string;
     image?: string;
     meta?: any;
+    reps?: any;
+    members?: any;
+    admin?: any;
 }
 
 export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];
