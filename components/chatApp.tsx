@@ -1,8 +1,10 @@
 'use client';
+
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
 import { globalChannel } from '../utilites/constants';
 import styles from '../styles/generic.module.css';
-import { Container, Box, Stack } from '@mui/material';
+import { Container, Box, Stack, Typography} from '@mui/material';
+import SpeakerNotesOffIcon from '@mui/icons-material/SpeakerNotesOff';
 import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
 import { orderbyDate } from '@/utilites/fomat';
@@ -14,6 +16,9 @@ import { use100vh } from 'react-div-100vh';
 
 interface ChatAppProps {
   msgBtn?: boolean;
+  params?: {
+    id: string;
+  }
 }
 
 const GLOBAL_CHAT = globalChannel;
@@ -53,7 +58,8 @@ const flexFooter = {
 };
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
-  const { msgBtn } = props;
+  const { msgBtn, params } = props;
+  const idFromParams = params?.id;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
@@ -64,7 +70,9 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     setSelected = (indexType:string, channelId:string) => {},
     sendChannelMessage = (channelId:string, text: string) => {},
   }: NnProviderValues = useContext(NnContext);
-  const selectedChannel:string = state.network?.selected?.channel || GLOBAL_CHAT;
+  const selectedChannel:string = useMemo(() => { 
+    return idFromParams || state.network?.selected?.channel || GLOBAL_CHAT;
+  }, [idFromParams, state.network?.selected?.channel]);
   const messages:NnChatMessage[] = useMemo(() => {
     const chatArr = state?.network?.collections?.messages || [];
     const orderChatArr = orderbyDate(chatArr, 'ts');
@@ -73,7 +81,9 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     return last30;
   }, [state?.network?.collections?.messages]);
   const [ initFetched, setInitFetched ] = useState<boolean>(false);
+  const [ initSelected, setInitSelected ] = useState<boolean>(false);
   const [ msg, setMsg ] = useState<string>('');
+  const channelFound = state?.user?.channels?.filter(channel => channel.id === selectedChannel).length === 1;
 
   const initChat = useCallback(() => {
     if (!initFetched) {
@@ -103,6 +113,13 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [initChat]);
 
   useEffect(() => {
+    if (!initSelected) {
+      idFromParams && setSelected('channel', idFromParams);
+      setInitSelected(true);
+    }
+  }, [idFromParams, initSelected, setSelected]);
+
+  useEffect(() => {
     const scoller = document.getElementById('simpleScoll');
     if (scoller){
       scoller.scrollTop = scoller.scrollHeight;
@@ -120,6 +137,22 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
           <Box sx={flexHeader}>
             <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
           </Box>
+          {!channelFound && (
+            <Stack
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              spacing={0}
+            >
+              <SpeakerNotesOffIcon sx={{fontSize:'100px'}}/>
+              <Typography variant="h3" style={{ color: 'white' }}>
+               404 
+              </Typography>
+              <Typography variant="h4" style={{ color: 'white' }}>
+                        Channel not found
+              </Typography>
+            </Stack>
+          )}
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             <SimpleScrollContainer>
               <Box sx={{maxWidth: '100%'}}>
@@ -138,7 +171,8 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
           </Box>
           <Box sx={flexFooter}>
             <InputMessage 
-              value={msg} 
+              value={msg}
+              disabled={!channelFound}
               changeHandler={(event: React.ChangeEvent<HTMLInputElement>) => updateMessage(event)}
               submitHandler={(event: React.ChangeEvent<HTMLInputElement>) => goSendMessage(event)}
             />

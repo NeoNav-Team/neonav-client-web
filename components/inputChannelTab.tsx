@@ -1,23 +1,26 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { restrictedChannels } from '../utilites/constants';
 import { Box, Tab, Tabs } from '@mui/material';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 
-  interface InputChannelTabProps {
-    changeHandler?: Function;
-    value?: string;
-  }
+interface InputChannelTabProps {
+  changeHandler?: Function;
+  value?: string;
+}
+type InputChannelScope = 'global' | 'public' | 'group';
 
-  type InputChannelScope = 'global' | 'public' | 'group';
 const GLOBAL_CHAT = restrictedChannels[0];
   
 export default function InputChannelTab(props:InputChannelTabProps):JSX.Element {
   const { changeHandler, value } = props;
-  const [scope, setScope] = useState<InputChannelScope>('global');
   const [selected, setSelected] = useState<string | null>(null);
   const { state }: NnProviderValues = useContext(NnContext);
-  const channels = state.user?.channels || []; 
+  const channels = useMemo(()=>{
+    return state.user?.channels || []
+  }, [state.user?.channels]); 
+  const [scope, setScope] = useState<InputChannelScope>('global');
+  const channelFound = value && channels.filter(channel => channel.id === value).length === 1;
   const scopedChannels = (scope: string) => {
     return channels.filter(channel => channel.scope === scope);
   }
@@ -49,6 +52,28 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
     changeHandler && changeHandler(defaultChannelListIndex);
     setSelected(defaultSelected);
   };
+
+  const setUniqueName = (name: string) => {
+    if (name === '谈.global') {
+      return '谈.neonav global coms'
+    } else {
+      return name;
+    }
+  } 
+
+  useEffect(()=>{
+    if (selected !== GLOBAL_CHAT) {
+      const channel = channels.filter(channel => channel.id === selected)[0];
+      const channelScope = channel?.scope || 'global';
+      setScope(channelScope as InputChannelScope);
+    }
+  }, [channels, selected]);
+
+  useEffect(()=> {
+    if (channelFound) {
+      setSelected(value);
+    }
+  }, [channelFound, channels, value])
   
   return (<>
     <Box sx={{ maxWidth: '100%', borderBottom: 1, borderColor: 'divider' }}>
@@ -59,9 +84,9 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
         scrollButtons
         allowScrollButtonsMobile
       >
-        <Tab key={'chat_global'} label={`${scopeLabel('global')}`} value={'global'} />
-        <Tab key={'chat_public'} label={`${scopeLabel('public')}`} value={'public'} disabled={scopeDisable('public')} />
-        <Tab key={'chat_group'} label={`${scopeLabel('group')}`} value={'group'} disabled={scopeDisable('group')} />
+        <Tab key={'chat_global'} label={`${scopeLabel('global')}`} value={'global'} disabled={!channelFound}/>
+        <Tab key={'chat_public'} label={`${scopeLabel('public')}`} value={'public'} disabled={!channelFound || scopeDisable('public')} />
+        <Tab key={'chat_group'} label={`${scopeLabel('group')}`} value={'group'} disabled={!channelFound || scopeDisable('group')} />
       </Tabs>
     </Box>
     <Box sx={{ maxWidth: '100%', borderBottom: 1, borderColor: 'divider' }}>
@@ -74,7 +99,7 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
           allowScrollButtonsMobile
         >
           {scopedChannels(scope).map(channel => {
-            return <Tab key={channel.name} label={channel.name} value={channel.id} />
+            return <Tab key={channel.name} label={setUniqueName(channel.name)} value={channel.id} />
           })}
         </Tabs>
       )}

@@ -8,12 +8,13 @@ import styles from '../styles/generic.module.css';
 
 interface InputMessageProps {
   value?: string | null;
+  disabled?: boolean;
   changeHandler: Function;
   submitHandler: Function;
 }
 
 export default function InputMessage(props:InputMessageProps):JSX.Element {
-  const { value, changeHandler, submitHandler } = props;
+  const { disabled, value, changeHandler, submitHandler } = props;
 
   return (
     <div
@@ -41,13 +42,14 @@ export default function InputMessage(props:InputMessageProps):JSX.Element {
             <TextField
               onChange={event => changeHandler(event)}
               value={value}
+              disabled={disabled}
               sx={{minWidth: '85%'}}
               placeholder="type message here"
               inputProps={{
                 autoComplete: "chrome-off",
               }}
             />
-            <input type="submit" style={{'visibility':'hidden', 'position':'absolute'}}/>
+            <input type="submit" disabled={disabled} style={{'visibility':'hidden', 'position':'absolute'}}/>
           </form>
         </Box>
       </Stack>
