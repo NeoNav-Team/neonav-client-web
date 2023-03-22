@@ -1,24 +1,33 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
-import { restrictedChannels } from '../utilites/constants';
+import { restrictedChannels, globalChannel } from '../utilites/constants';
 import { Box, Tab, Tabs } from '@mui/material';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 
 interface InputChannelTabProps {
   changeHandler?: Function;
+  notify?: boolean;
   value?: string;
 }
 type InputChannelScope = 'global' | 'public' | 'group';
 
-const GLOBAL_CHAT = restrictedChannels[0];
+const GLOBAL_CHAT = globalChannel;
+const NOTIFCATIONS = restrictedChannels[0];
+const ALERTS = restrictedChannels[1];
+
+const notifyChannels = [
+  {name:'Notifcations', id: NOTIFCATIONS, scope: 'global'},
+  {name: 'Alerts', id: ALERTS, scope: 'global'},
+]
   
 export default function InputChannelTab(props:InputChannelTabProps):JSX.Element {
-  const { changeHandler, value } = props;
-  const [selected, setSelected] = useState<string | null>(null);
+  const { changeHandler, notify, value } = props;
+  const [selected, setSelected] = useState<string | null>(notify ? NOTIFCATIONS : null);
   const { state }: NnProviderValues = useContext(NnContext);
   const channels = useMemo(()=>{
-    return state.user?.channels || []
-  }, [state.user?.channels]); 
+    const userChannels = state.user?.channels || [];
+    return notify ? notifyChannels : userChannels;
+  }, [notify, state.user?.channels]); 
   const [scope, setScope] = useState<InputChannelScope>('global');
   const channelFound = value && channels.filter(channel => channel.id === value).length === 1;
   const scopedChannels = (scope: string) => {
@@ -48,7 +57,7 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
   const handleScope = (event: React.SyntheticEvent, newValue: InputChannelScope) => {
     setScope(newValue);
     const { showChannelList, defaultChannelListIndex } = getScopeChannelVars(newValue);
-    const defaultSelected = showChannelList ? defaultChannelListIndex : null;
+    const  defaultSelected = showChannelList ? defaultChannelListIndex : null;
     changeHandler && changeHandler(defaultChannelListIndex);
     setSelected(defaultSelected);
   };
@@ -76,7 +85,7 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
   }, [channelFound, channels, value])
   
   return (<>
-    <Box sx={{ maxWidth: '100%', borderBottom: 1, borderColor: 'divider' }}>
+    {!notify && (<Box sx={{ maxWidth: '100%', borderBottom: 1, borderColor: 'divider' }}>
       <Tabs
         value={scope}
         onChange={handleScope}
@@ -89,8 +98,9 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
         <Tab key={'chat_group'} label={`${scopeLabel('group')}`} value={'group'} disabled={!channelFound || scopeDisable('group')} />
       </Tabs>
     </Box>
+    )}
     <Box sx={{ maxWidth: '100%', borderBottom: 1, borderColor: 'divider' }}>
-      {selected && (
+      {(selected || notify) && (
         <Tabs
           value={selected}
           onChange={handleChange}

@@ -1,5 +1,5 @@
-import FactionsApp from '@/components/factionsApp';
+import FactionsAllApp from '@/components/factionsAllApp';
 
-export default function Factions() {
-  return (<FactionsApp />);
+export default function FactionsAll() {
+  return (<FactionsAllApp />);
 }

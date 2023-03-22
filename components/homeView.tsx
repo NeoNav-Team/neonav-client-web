@@ -15,6 +15,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import EngineeringIcon from '@mui/icons-material/Engineering';
+import CastleIcon from '@mui/icons-material/Castle';
 import IconFrame from './iconFrame';
 import Kitty from './svgr/kitty';
 import Cash from './svgr/cash';
@@ -136,8 +137,8 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <Link href="/notes">
-                <IconFrame icon={<Notes fontSize="inherit" />} title="Notes"/>
+              <Link href="/factions">
+                <IconFrame icon={<CastleIcon fontSize="inherit" />} title="Factions"/>
               </Link>
             </Box>
           </Grid>
@@ -267,7 +268,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                     alignItems="center"
                     minHeight={fixedHeight}
                   >
-                    <Link href="/factions">
+                    <Link href="/factions/admin">
                       <IconFrame
                         icon={<EngineeringIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
                         title="Factions"

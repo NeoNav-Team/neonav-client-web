@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
-import { globalChannel } from '../utilites/constants';
+import { restrictedChannels, globalChannel } from '../utilites/constants';
 import styles from '../styles/generic.module.css';
 import { Container, Box, Stack, Typography} from '@mui/material';
 import SpeakerNotesOffIcon from '@mui/icons-material/SpeakerNotesOff';
@@ -16,13 +16,14 @@ import { use100vh } from 'react-div-100vh';
 
 interface ChatAppProps {
   msgBtn?: boolean;
+  notify?: boolean;
   params?: {
     id: string;
   }
 }
 
 const GLOBAL_CHAT = globalChannel;
-
+const NOTIFCATIONS = restrictedChannels[0];
 
 const flexContainer = {
   height: '100%',
@@ -58,7 +59,7 @@ const flexFooter = {
 };
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
-  const { msgBtn, params } = props;
+  const { msgBtn, notify, params } = props;
   const idFromParams = params?.id;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
@@ -71,8 +72,9 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     sendChannelMessage = (channelId:string, text: string) => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = useMemo(() => { 
-    return idFromParams || state.network?.selected?.channel || GLOBAL_CHAT;
-  }, [idFromParams, state.network?.selected?.channel]);
+    const channel = idFromParams || state.network?.selected?.channel || GLOBAL_CHAT;
+    return notify ? NOTIFCATIONS : channel;
+  }, [idFromParams, notify, state.network?.selected?.channel]);
   const messages:NnChatMessage[] = useMemo(() => {
     const chatArr = state?.network?.collections?.messages || [];
     const orderChatArr = orderbyDate(chatArr, 'ts');
@@ -135,7 +137,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={flexHeader}>
-            <InputChannelTab changeHandler={channelSelection} value={selectedChannel} />
+            <InputChannelTab changeHandler={channelSelection} notify={notify} value={selectedChannel} />
           </Box>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {!channelFound && (
@@ -159,7 +161,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
             )}
             <SimpleScrollContainer>
               <Box sx={{maxWidth: '100%'}}>
-                <Stack spacing={0} style={{display: 'flex', flexDirection: 'column-reverse' }}>
+                <Stack spacing={0} style={{display: 'flex', flexDirection: `${notify ? 'column' : 'column-reverse'}` }}>
                   {messages.map(item => (
                     <ItemMessage
                       key={item.ts}
@@ -172,14 +174,16 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
               </Box>
             </SimpleScrollContainer>
           </Box>
-          <Box sx={flexFooter}>
-            <InputMessage 
-              value={msg}
-              disabled={!channelFound}
-              changeHandler={(event: React.ChangeEvent<HTMLInputElement>) => updateMessage(event)}
-              submitHandler={(event: React.ChangeEvent<HTMLInputElement>) => goSendMessage(event)}
-            />
-          </Box>
+          {msgBtn && (
+            <Box sx={flexFooter}>
+              <InputMessage 
+                value={msg}
+                disabled={!channelFound}
+                changeHandler={(event: React.ChangeEvent<HTMLInputElement>) => updateMessage(event)}
+                submitHandler={(event: React.ChangeEvent<HTMLInputElement>) => goSendMessage(event)}
+              />
+            </Box>
+          )}
         </Box>
       </div>
     </Container>
