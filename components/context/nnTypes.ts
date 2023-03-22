@@ -117,8 +117,9 @@ export type NnNetwork = {
         transactions?: NnWalletTransaction[],
         contacts?: NnContact[],
         entityUsers?: NnContact[],
+        factions?: NnFaction[],
         scannedEntities?: NnContact[] | NnFaction[],
-    }
+    },
     entity: nnEntity;
 }
 
@@ -140,6 +141,7 @@ export type ActionTypes =
   'setEntityUserlist' | 
   'setUserChannels' |
   'setUserFactions' |
+  'setFactions' | 
   'setUserWallets' | 
   'setWalletTransactions' |
   'setUserContacts' | 

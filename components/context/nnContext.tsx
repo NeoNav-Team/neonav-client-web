@@ -40,10 +40,12 @@ import {
 import {
   fetchUserFactions,
   fetchFactionDetails,
-  fetchFactionUsers,
+  fetchAllFactions,
   removeUserFromFaction,
+  joinFaction,
   addUserToFaction,
-  adminUserToFaction,
+  addRepToFaction,
+  removeRepToFaction,
 } from './nnActionsFaction';
 import { nnSchema } from "./nnSchema";
 import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/cookieContext";
@@ -83,6 +85,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     break;
   case 'setUserContacts':
     clonedState.network.collections.contacts = payload;
+    break;
+  case 'setFactions':
+    clonedState.network.collections.factions = payload;
     break;
   case 'setMessageHistory':
     clonedState.network.collections.messages = payload;
@@ -166,10 +171,12 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelDetails,
     fetchChannelUsers,
     fetchFactionDetails,
-    fetchFactionUsers,
+    fetchAllFactions,
     removeUserFromFaction,
     addUserToFaction,
-    adminUserToFaction,
+    addRepToFaction,
+    joinFaction,
+    removeRepToFaction,
     initContext,
     joinUserToChannel,
     longPollMessages,

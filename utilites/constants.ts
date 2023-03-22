@@ -41,10 +41,6 @@ export const authApiEnpoints = {
     method: "post",
     path: "/api/user/id"       
   },
-  factions: {
-    method: "get",
-    path: "/api/factions"       
-  },
   wallet: {
     method: "get",
     path: "/api/user/wallet"  
@@ -113,8 +109,40 @@ export const authApiEnpoints = {
     method: "get",
     path: "/api/chat/channels/all/?since=$since"   
   },
+  factionsList: {
+    method: "get",
+    path: "/api/factions/all"       
+  },
+  factions: {
+    method: "get",
+    path: "/api/factions"       
+  },
   factionProfile: {
     method: "get",
     path: "/api/factions/$id",
+  },
+  factionInvite: {
+    method: "put",
+    path: "/api/factions/$faction/invite/$id",
+  },
+  factionJoin: {
+    method: "put",
+    path: "/api/factions/$faction",
+  },
+  factionLeave: {
+    method: "delete",
+    path: "/api/factions/$faction",
+  },
+  factionAddRep: {
+    method: "put",
+    path: "/api/factions/$faction/rep/$user",
+  },
+  factionRemoveRep: {
+    method: "delete",
+    path: "/api/factions/$faction/rep/$user",
+  },
+  factionUpdateProfile: {
+    method: "patch",
+    path: "/api/factions/$faction",
   },
 };
