@@ -165,7 +165,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <Link href="/notify">
+              <Link href="/notifcations">
                 <IconFrame icon={<Notifcations fontSize="inherit" />} title="Notifcations"/>
               </Link>
             </Box>
