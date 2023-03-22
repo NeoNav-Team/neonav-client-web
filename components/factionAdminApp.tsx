@@ -80,8 +80,8 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const requests = [
     {label: '', value:'add', icon: <PersonAddIcon />},
     {label: '', value:'remove', icon: <PersonRemoveIcon />},
-    {label: '', value:'admin', icon: <AddModeratorIcon />},
-    {label: '', value:'deadmin', icon: <RemoveModeratorIcon />},
+    {label: '', value:'addRep', icon: <AddModeratorIcon />},
+    {label: '', value:'removeRep', icon: <RemoveModeratorIcon />},
   ];
 
   const objectifyIds = (collection: Array<string | object>) => {
@@ -101,7 +101,8 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
     fetchFactionDetails = (id:string) =>{},
     addUserToFaction = (faction:string, id:string) => {},
     removeUserFromFaction = (faction:string, id:string) => {},
-    adminUserToFaction = (faction:string, id:string) => {},
+    addRepToFaction = (faction:string, id:string) => {},
+    removeRepToFaction = (faction:string, id:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const userId:string = state?.user?.profile?.auth?.userid || '';
   const entityId:string = id || '';
@@ -113,7 +114,8 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const userlist = [...repsList, ...memberList];
   const contacts = state?.network?.collections?.contacts || [];
   const sortedContacts = contacts.sort((a, b) => a.username.localeCompare(b.username));
-  const isAdmin = userId === entity?.admin;
+  const adminUser = entity.admin ? entity?.admin[0] :  {};
+  const isAdmin = userId === adminUser.userid;
 
   const [ fetched, setFetched ] = useState(false);
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
@@ -174,8 +176,11 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const handleBigAction = () => {
     const selectedId = usersValue[0];
     switch (requestValue) {
-    case 'admin':
-      adminUserToFaction(entity?.id || '', selectedId);
+    case 'addRep':
+      addRepToFaction(entity?.id || '', selectedId);
+      break;
+    case 'removeRep':
+      removeRepToFaction(entity?.id || '', selectedId);
       break;
     case 'add':
       addUserToFaction(entity?.id || '', selectedId);
@@ -237,9 +242,9 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                       <div>
                         <Chip
                           sx={{margin: '2px'}}
-                          label={entity.admin[0].username || entity.admin[0].userid}
+                          label={entity?.admin[0].username || entity?.admin[0].userid}
                           icon={<LocalPoliceIcon />} 
-                          key={`chip_${entity.admin?.userid}_rep_display`}
+                          key={`chip_${entity?.admin[0].userid}_rep_display`}
                         />
                         {repsList.length >= 1 && (repsList as NnContact[]).map(item => {
                           return (
@@ -286,12 +291,11 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                 dialog: "Leave this faction?"
               }}
               secondHexProps={{
-                icon: <ManageAccountsIcon />,
                 disabled: true,
               }}
               bigHexProps={{
                 icon: <ManageAccountsIcon />,
-                disabled: true,
+                disabled: !isAdmin,
                 handleAction: handleBigAction,
               }}
               thirdHexProps={{

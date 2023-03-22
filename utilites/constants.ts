@@ -135,11 +135,11 @@ export const authApiEnpoints = {
   },
   factionAddRep: {
     method: "put",
-    path: "/api/factions/$faction/rep/$user",
+    path: "/api/factions/$faction/reps/$id",
   },
   factionRemoveRep: {
     method: "delete",
-    path: "/api/factions/$faction/rep/$user",
+    path: "/api/factions/$faction/reps/$id",
   },
   factionUpdateProfile: {
     method: "patch",
