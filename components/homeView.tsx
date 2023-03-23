@@ -124,10 +124,12 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <IconFrame 
-                icon={<LocalFloristIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
-                title="Jaden / Garden"
-              />
+              <Link href="/garden">
+                <IconFrame 
+                  icon={<LocalFloristIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                  title="Jaden / Garden"
+                />
+              </Link>
             </Box>
           </Grid>
           <Grid item xs={4}>

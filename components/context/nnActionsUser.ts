@@ -86,31 +86,64 @@ export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
 }
 
 
-export const fetchUserStatus = (dispatch: DispatchFunc) => async () => {
+export const fetchUserStatuses = (dispatch: DispatchFunc) => async (id: string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
-    storeFetched('contacts', data);
+    clearLocalStorage('statuses');
     dispatch({
-      type: 'setUserContacts',
+      type: 'setUserStatuses',
       payload: data,
     })
   };
   const onError = (err:netcheckAPIResData) => {
-    const { message = 'Contact failure' } = err;
+    const { message = 'Status failure' } = err;
     dispatch({
       type: 'setAlert',
       payload: {severity: 'error', message, show: true},
     })
   };
+  executeApi('statuses', {token, id}, onSuccess, onError);
+}
 
-  if (storedRecently('contacts')) {
-    const data = getLocalStorage('contacts');
+export const setUserStatus = (dispatch: DispatchFunc) => async (id: string, body:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    const { message } = data;
     dispatch({
-      type: 'setUserContacts',
+      type: 'setAlert',
+      payload: {severity: 'success', message, show: true},
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Status failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  executeApi('statusSet', {id, body, token}, onSuccess, onError);
+}
+export const setUserHiddenStatus = (dispatch: DispatchFunc) => async () => {}
+export const fetchUserSetStatuses = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    clearLocalStorage('statuses');
+    dispatch({
+      type: 'setUserStatuses',
       payload: data,
     })
-  } else {
-    executeApi('contacts', {token}, onSuccess, onError);
-  }
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Status failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  executeApi('statusesSet', {token}, onSuccess, onError);
 }
+export const toggleStatusClass = (dispatch: DispatchFunc) => async () => {}
+export const userSearch = (dispatch: DispatchFunc) => async () => {}

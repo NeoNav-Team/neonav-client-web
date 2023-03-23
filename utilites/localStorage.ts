@@ -24,15 +24,16 @@ export const localStorageExists = (key:string) => {
   return Object.keys(storage).length >= 1;
 }
 
-export const storedRecently = (key:string) => {
+export const storedRecently = (key:string, mins?:number) => {
   let isRecent = false;
+  const delayLimit = mins ? mins : LAST_FETCHED_LIMIT;
   const last = getLocalStorage(`lastFetch_${key}`);
   if (Object.keys(last).length >= 1) {
     const now = new Date().getTime();
     const lastdate = last ? new Date(last.date).getTime() : now;
     const difference = now - lastdate;
     const minutes = Math.round(((difference % 86400000) % 3600000) / 60000);
-    isRecent = minutes < LAST_FETCHED_LIMIT;
+    isRecent = minutes < delayLimit;
     console.log(`last fetch was ${minutes} mins ago so data is ${isRecent ? `local storage` : `new fetch`}`);
   }
   return isRecent;

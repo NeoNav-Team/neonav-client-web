@@ -69,6 +69,16 @@ export type NnChannel = {
     admin: string,
 }
 
+export type NnStatus = {
+    id: string,
+    class: string,
+    sender: string,
+    ts?: string,
+    from?: string,
+    body?: string,
+    target?: string,
+}
+
 export type NnChatMessage = {
     id?: string,
     ts?: string,
@@ -118,6 +128,8 @@ export type NnNetwork = {
         contacts?: NnContact[],
         entityUsers?: NnContact[],
         factions?: NnFaction[],
+        statuses: any[],
+        privateStatuses: any[],
         scannedEntities?: NnContact[] | NnFaction[],
     },
     entity: nnEntity;
@@ -146,6 +158,7 @@ export type ActionTypes =
   'setWalletTransactions' |
   'setUserContacts' | 
   'setChatMessages' |
+  'setUserStatuses' |
   'setMessageHistory' |
   'setSelected' |
   'updateMessageHistory' |
@@ -214,6 +227,12 @@ export type NnProviderDispatch = {
     sendFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;
     sendChannelMessage: (_channelId:string, _text:string) => void;
     setSelected: (_indexType:string, _index:string) => void;
+    fetchUserStatuses: (_userId:string) => void;
+    setUserStatus: (_userId:string, _body:string) => void;
+    setUserHiddenStatus: (_userId:string, _body:string) => void;
+    getUserSetStatuses: (_userId:string) => void;
+    toggleStatusClass: (_userId:string) => void;
+    userSearch: (_userId:string) => void;
     toggleChannelScope: (_channelId:string) => void;
     unfriend: (_exFriendId:string) => void;
 }

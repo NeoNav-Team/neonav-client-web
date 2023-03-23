@@ -145,4 +145,24 @@ export const authApiEnpoints = {
     method: "patch",
     path: "/api/factions/$faction",
   },
+  statuses: {
+    method: "get",
+    path: "/api/user/statuses/$id"       
+  },
+  statusSet: {
+    method: "post",
+    path: "/api/user/statuses/$id"       
+  },
+  statusSetHidden: {
+    method: "post",
+    path: "/api/user/statuses/$id/hidden"       
+  },
+  statussesSet: {
+    method: "get",
+    path: "/api/user/statuses/set/$id"       
+  },
+  toggleStatusScope: {
+    method: "get",
+    path: "/api/user/statuses/set/$id"       
+  },
 };
