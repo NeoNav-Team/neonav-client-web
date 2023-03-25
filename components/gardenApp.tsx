@@ -5,12 +5,11 @@ import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnStatus } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemContact from './itemContact';
-import ItemMessage from './itemMessage';
+import ItemStatus from './itemStatus';
 import FooterNav from './footerNav';
 import { 
   Container,
   Box,
-  Typography,
   CircularProgress
 } from '@mui/material';
 import RateReviewIcon from '@mui/icons-material/RateReview';
@@ -18,7 +17,14 @@ import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 
-interface FactionsAllAppProps {};
+type filters = {
+  class?: string;
+  from?: string;
+}
+
+interface FactionsAllAppProps {
+  filter: filters;
+};
 
 const flexContainer = {
   height: '100%',
@@ -48,6 +54,7 @@ const flexFooter = {
 };
 
 export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
+  const { filter } = props;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
@@ -57,9 +64,13 @@ export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
     setUserStatus = (id:string, status: string) =>{},
   }: NnProviderValues = useContext(NnContext);
   const statuses:NnStatus[]  = useMemo(() => {
-    return state?.network?.collections?.statuses || [];
-  }, [state]);
+    const statuses = state?.network?.collections?.statuses || [];
+    const classFilteredStatuses = filter?.class ? statuses.filter(status => status.class === filter.class) : statuses;
+    const filteredStatuses = filter?.from ? classFilteredStatuses.filter(status => status.from === filter.from) : classFilteredStatuses;
+    return filteredStatuses;
+  }, [filter?.class, filter?.from, state?.network?.collections?.statuses]);
   const userId = state?.user?.profile?.auth?.userid || '';
+  const userName = state?.user?.profile?.meta?.username || userId || '';
   const accountId = state?.network?.selected?.account || '';
   const [ collectionFetched, setCollectionFetched ] = useState(false);
 
@@ -93,7 +104,7 @@ export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
                 <Box sx={{minWidth: '100%', minHeight: '100%'}}>
                   <Stack spacing={0} sx={{ display: 'flex' }}>
                     <ItemContact
-                      subtitle={'Recent Status'}
+                      subtitle={`${userName}'s Garden Activity`}
                       key={`admin-list`}
                     />
                     {statuses && statuses.length >= 1 && statuses.map(item => {
@@ -101,11 +112,12 @@ export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
                         <div
                           key={`${item.id}-container`}
                         >
-                          <ItemMessage
+                          <ItemStatus
                             id={item.id}
                             username={item.from}
                             date={item.ts}
-                            text={JSON.stringify(item.body)}
+                            text={item.body}
+                            collection="status"
                           />
                         </div> 
                       )

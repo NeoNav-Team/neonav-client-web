@@ -26,6 +26,15 @@
     --aug-inlay-all: 4px;
     --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-2), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
 }
+
+.statusLine {
+    padding: 10px;
+    --aug-inlay-all: 4px;
+    --aug-inlay-bg: radial-gradient(ellipse at bottom, var(--color-2), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
+    --aug-border-all: 1px;
+    --aug-border-bg: radial-gradient(var(--color-3), var(--color-4)) 100% 100% / 100% 100%;
+    text-indent: 10px;
+}
 .nameLine {
     padding: 6px;
     --aug-tr: 5px;
@@ -47,10 +56,10 @@
 }
 
 .dateText span {
-    opacity: 0.35;
+    opacity: 0.75;
     letter-spacing: inherit;
     font-weight: 300;
-    filter: drop-shadow(var(--color-2) 0 0 2px);
+    filter: drop-shadow(var(--color-4) 0 0 2px);
 }
 .idText {
     font-family: 'Jura';
@@ -103,9 +112,21 @@
 .name {
     font-weight: 700;
 }
+
+.action {
+    font-weight: 500;
+    color: var(--color-3);
+    filter: drop-shadow(var(--color-2) 0 0 5px);
+}
+
 .id {
     font-weight: 100;
     opacity: 0.5;
+}
+
+.comment {
+    display: inline-block;
+    border-left: 3px solid  var(--color-2);
 }
 
 @media screen and (max-width: 800px) {

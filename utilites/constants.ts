@@ -153,6 +153,10 @@ export const authApiEnpoints = {
     method: "post",
     path: "/api/user/statuses/$id"       
   },
+  statusRemove: {
+    method: "delete",
+    path: "/api/user/statuses/$id"       
+  },
   statusSetHidden: {
     method: "post",
     path: "/api/user/statuses/$id/hidden"       
@@ -162,7 +166,7 @@ export const authApiEnpoints = {
     path: "/api/user/statuses/set/$id"       
   },
   toggleStatusScope: {
-    method: "get",
-    path: "/api/user/statuses/set/$id"       
+    method: "put",
+    path: "/api/user/statuses/$id"       
   },
 };

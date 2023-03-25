@@ -85,7 +85,6 @@ export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
   }
 }
 
-
 export const fetchUserStatuses = (dispatch: DispatchFunc) => async (id: string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
@@ -125,7 +124,10 @@ export const setUserStatus = (dispatch: DispatchFunc) => async (id: string, body
   };
   executeApi('statusSet', {id, body, token}, onSuccess, onError);
 }
-export const setUserHiddenStatus = (dispatch: DispatchFunc) => async () => {}
+export const setUserHiddenStatus = (dispatch: DispatchFunc) => async () => {
+
+
+}
 export const fetchUserSetStatuses = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
@@ -145,5 +147,44 @@ export const fetchUserSetStatuses = (dispatch: DispatchFunc) => async () => {
   };
   executeApi('statusesSet', {token}, onSuccess, onError);
 }
-export const toggleStatusClass = (dispatch: DispatchFunc) => async () => {}
+export const toggleStatusClass = (dispatch: DispatchFunc) => async (id: string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    const { message } = data;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message, show: true},
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Status failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  executeApi('toggleStatusScope', {id, token}, onSuccess, onError);
+}
+
+export const removeStatus = (dispatch: DispatchFunc) => async (id: string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    const { message } = data;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message, show: true},
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Status failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  executeApi('statusRemove', {id, token}, onSuccess, onError);
+}
+
 export const userSearch = (dispatch: DispatchFunc) => async () => {}

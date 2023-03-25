@@ -160,6 +160,7 @@ export type ActionTypes =
   'setChatMessages' |
   'setUserStatuses' |
   'setMessageHistory' |
+  'removeStatus' |
   'setSelected' |
   'updateMessageHistory' |
   'removeUserFromChannel' | 
@@ -229,6 +230,7 @@ export type NnProviderDispatch = {
     setSelected: (_indexType:string, _index:string) => void;
     fetchUserStatuses: (_userId:string) => void;
     setUserStatus: (_userId:string, _body:string) => void;
+    removeStatus: (_statusId:string) => void;
     setUserHiddenStatus: (_userId:string, _body:string) => void;
     getUserSetStatuses: (_userId:string) => void;
     toggleStatusClass: (_userId:string) => void;

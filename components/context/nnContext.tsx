@@ -21,6 +21,7 @@ import {
   setUserHiddenStatus,
   fetchUserSetStatuses,
   toggleStatusClass,
+  removeStatus,
   userSearch,
 } from './nnActionsUser';
 import {
@@ -198,6 +199,7 @@ export const { Context, Provider } = DataContextCreator(
     sendFactionPayment,
     setSelected,
     setUserStatus,
+    removeStatus,
     setUserHiddenStatus,
     toggleStatusClass,
     userSearch,
