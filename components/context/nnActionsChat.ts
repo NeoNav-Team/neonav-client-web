@@ -7,6 +7,7 @@ import {
   NnChatMessage,
 } from "./nnTypes";
 import { getCookieToken } from "@/utilites/cookieContext";
+import { globalChannel } from '@/utilites/constants';
 import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilites/localStorage';
 
 export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
@@ -109,7 +110,7 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since:string)
     // add the message to the local storage 
     if (id !== null && channel !== null) {
       const messages = getLocalStorage(channel);
-      const selectedChannel = messages[0].channel;
+      const selectedChannel = messages ? messages[0].channel : globalChannel;
       if (!messages.some((item:NnChatMessage) => item.id === id)) {
         messages.push(message);
         storeFetched(channel, messages);

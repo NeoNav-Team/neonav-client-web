@@ -140,7 +140,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
             <InputChannelTab changeHandler={channelSelection} notify={notify} value={selectedChannel} />
           </Box>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
-            {!channelFound && (
+            {initFetched && !channelFound && (
               <Stack
                 direction="column"
                 justifyContent="center"

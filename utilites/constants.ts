@@ -29,6 +29,10 @@ export const authApiEnpoints = {
     method: "get",
     path: "/api/user"       
   },
+  profileUpdate: {
+    method: "put",
+    path: "/api/user"       
+  },
   befriend: {
     method: "post",
     path: "/api/user/friends/$id"       

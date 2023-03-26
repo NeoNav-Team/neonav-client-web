@@ -2,9 +2,9 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, NnStatus } from './context/nnTypes';
+import { NnProviderValues, NnStatus, nnEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
-import ItemContact from './itemContact';
+import SubheaderGarden from './subheaderEntity';
 import ItemStatus from './itemStatus';
 import FooterNav from './footerNav';
 import { 
@@ -12,9 +12,14 @@ import {
   Box,
   CircularProgress
 } from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import InboxIcon from '@mui/icons-material/Inbox';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import { IncomingMessage } from 'http';
 
 
 type filters = {
@@ -22,8 +27,8 @@ type filters = {
   from?: string;
 }
 
-interface FactionsAllAppProps {
-  filter: filters;
+interface GardenAppProps {
+  incoming: boolean;
 };
 
 const flexContainer = {
@@ -53,33 +58,40 @@ const flexFooter = {
   width: '100%',
 };
 
-export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
-  const { filter } = props;
+export default function GardenApp(props: GardenAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
+  const { incoming = false } = props;
   const { 
     state,
-    fetchUserStatuses = (id:string) =>{},
-    setUserStatus = (id:string, status: string) =>{},
+    fetchUserStatuses = (id:string) => {},
+    setUserStatus = (id:string, status: string) => {},
+    fetchContact = (id:string) => {},
   }: NnProviderValues = useContext(NnContext);
+  const [ filter, setFilter ] = useState(true)
   const statuses:NnStatus[]  = useMemo(() => {
     const statuses = state?.network?.collections?.statuses || [];
-    const classFilteredStatuses = filter?.class ? statuses.filter(status => status.class === filter.class) : statuses;
-    const filteredStatuses = filter?.from ? classFilteredStatuses.filter(status => status.from === filter.from) : classFilteredStatuses;
-    return filteredStatuses;
-  }, [filter?.class, filter?.from, state?.network?.collections?.statuses]);
+    return filter ? statuses.filter(status => status.class === 'public') : statuses;
+  }, [filter, state?.network?.collections?.statuses]);
+  const entity:nnEntity  = useMemo(() => {
+    return state?.network?.entity || {};
+  }, [state]);
   const userId = state?.user?.profile?.auth?.userid || '';
-  const userName = state?.user?.profile?.meta?.username || userId || '';
-  const accountId = state?.network?.selected?.account || '';
+  const isAdmin = userId === entity.id;
   const [ collectionFetched, setCollectionFetched ] = useState(false);
 
   const goFetchFactions = useCallback(() => {
-    if (!collectionFetched) {
+    if (userId.length >= 9 && !collectionFetched) {
+      if (incoming) {
       fetchUserStatuses(userId);
+      } else {
+        fetchUserStatuses(userId);
+      }
+      fetchContact(userId);
       setCollectionFetched(true);
     }
-  }, [collectionFetched, fetchUserStatuses, userId]);
+  }, [collectionFetched, fetchContact, fetchUserStatuses, userId]);
 
   useEffect(() => {
     const factionsSize = statuses && statuses.length;
@@ -90,23 +102,24 @@ export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
     setUserStatus(userId, status);
   }
 
+  const toggleFilter = () => {
+    setFilter(!filter);
+  }
+
   return (
     <Container disableGutters style={{height: '100%'}}>
       <div
         className={styles.darkPane}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
-        data-augmented-ui="tl-clip-x tr-rect br-clip bl-clip both"
+        data-augmented-ui="tr-rect br-clip bl-clip both"
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
+          <SubheaderGarden photo={entity.image} title={entity.name} />
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {collectionFetched ? (
-              <SimpleScrollContainer>
-                <Box sx={{minWidth: '100%', minHeight: '100%'}}>
-                  <Stack spacing={0} sx={{ display: 'flex' }}>
-                    <ItemContact
-                      subtitle={`${userName}'s Garden Activity`}
-                      key={`admin-list`}
-                    />
+              <><SimpleScrollContainer>
+                <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
+                  <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
                     {statuses && statuses.length >= 1 && statuses.map(item => {
                       return (
                         <div
@@ -118,13 +131,14 @@ export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
                             date={item.ts}
                             text={item.body}
                             collection="status"
+                            hidden={item.class !== 'public'}
                           />
-                        </div> 
-                      )
+                        </div>
+                      );
                     })}
                   </Stack>
                 </Box>
-              </SimpleScrollContainer>
+              </SimpleScrollContainer></>
             ) : (
               <Stack
                 direction="column"
@@ -138,11 +152,27 @@ export default function GardenApp(props: FactionsAllAppProps):JSX.Element {
           </Box>
           <Box sx={flexFooter}>
             <FooterNav
+              firstHexProps={{
+                icon: filter ? <FilterListIcon /> : <FilterListOffIcon />,
+                handleAction: toggleFilter,
+                disabled: !isAdmin,
+              }}
+              secondHexProps={{
+                disabled: true,
+              }}
               bigHexProps={{
                 icon: <RateReviewIcon />,
                 handleAction: handleBigAction,
                 dialog: 'What would you like to share?',
                 useInput: true,
+              }}
+              thirdHexProps={{
+                disabled: true,
+                icon: <InboxIcon />
+              }}
+              fourthHexProps={{
+                disabled: true,
+                icon: <PersonSearchIcon />
               }}
             />
           </Box>

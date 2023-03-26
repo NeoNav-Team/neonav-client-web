@@ -151,6 +151,7 @@ export type ActionTypes =
   'setAlert' |
   'setEntity' | 
   'setEntityUserlist' | 
+  'setProfile' | 
   'setUserChannels' |
   'setUserFactions' |
   'setFactions' | 
@@ -184,9 +185,11 @@ export interface walletAPIResData {
   
 export interface netcheckAPIResData {
     message?: String;
+    status?: number;
   }
   
 export interface APIResData extends walletAPIResData, netcheckAPIResData {
+    profile: any;
     _id: String;
     _rev: String;
   }
@@ -202,7 +205,7 @@ export type NnProviderDispatch = {
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: () => void;
-    fetchContact: (_userId:string, _verbose?:boolean) => void;
+    fetchContact: (_userId:string) => void;
     fetchUserChannels: () => void;
     fetchUserFactions: () => void;
     fetchAllFactions: () => void;
@@ -210,6 +213,7 @@ export type NnProviderDispatch = {
     fetchChannelDetails: (_channelId:string) => void;
     fetchChannelUsers: (_channelId:string) => void;
     fetchFactionDetails: (_factionId:string) => void;
+    fetchUserProfile: () => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
     addUserToFaction: (_factionId:string, _userId:string) => void;
     adminUserToFaction: (_factionId:string, _userId:string) => void;

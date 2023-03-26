@@ -14,6 +14,7 @@ import {
 } from './nnActionsNetwork';
 import {
   fetchContact,
+  fetchUserProfile,
   fetchUserContacts,
   unfriend,
   setUserStatus,
@@ -74,6 +75,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     break;
   case 'setUserChannels':
     clonedState.user.channels = payload;
+    break;
+  case 'setProfile': 
+    clonedState.user.profile = payload;
     break;
   case 'setUserFactions':
     clonedState.user.factions = payload;
@@ -179,6 +183,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserFactions,
     fetchUserStatuses,
     fetchUserSetStatuses,
+    fetchUserProfile,
     fetchChannelHistory,
     fetchChannelDetails,
     fetchChannelUsers,

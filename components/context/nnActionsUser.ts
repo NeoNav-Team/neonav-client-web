@@ -8,7 +8,35 @@ import { getCookieToken } from '@/utilites/cookieContext';
 import { clearLocalStorage } from '@/utilites/localStorage';
 import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
 
-export const fetchContact = (dispatch: DispatchFunc) => async (id:string, verbose:boolean) => {
+export const fetchUserProfile = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    const payload = {
+      meta: {
+        username: data?.profile?.username,
+      }
+    }; 
+    console.log('payload', payload);
+    dispatch({
+      type: 'setProfile',
+      payload: data,
+    });
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    console.log('err', err);
+    const { message = 'Profile failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('profile', {token}, onSuccess, onError);
+}
+
+export const fetchContact = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
@@ -19,19 +47,15 @@ export const fetchContact = (dispatch: DispatchFunc) => async (id:string, verbos
     return data;
   };
   const onError = (err:netcheckAPIResData) => {
-    const { message = 'Factions failure' } = err;
+    const { message = 'Contact failure' } = err;
     dispatch({
       type: 'setAlert',
       payload: {severity: 'error', message, show: true},
     })
     return err;
   };
-  if (verbose) {
-    executeApi('profile', {id, token}, onSuccess, onError);
-  } else {
-    const requestId = id;
-    executeApi('identify', {requestId, token}, onSuccess, onError);
-  }
+  const requestId = id;
+  executeApi('identify', {requestId, token}, onSuccess, onError);
 }
 
 export const unfriend = (dispatch: DispatchFunc) => async (id:string) => {

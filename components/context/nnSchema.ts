@@ -33,20 +33,9 @@ export const nnSchema:NnStore = {
     profile: {
       auth: {
         userid: '',
-        email: '',
-        emailverified: false,
-        lastlogin: '',
-        lastip: '',
       },
       meta: {
-        firstname: '',
-        lastname: '',
         username: '',
-        skills: '',
-        status: '',
-        occupation: '',
-        avatar: '',
-        bio: '',
       }
     },
     channels: [],
