@@ -97,6 +97,8 @@ export type NnFaction = {
 
 /* Entity is currently a catch-all but realistically shoudld be <NnFaction | NnChannel | NnUser | NnProduct> */
 export type nnEntity = {
+    avatar?: string;
+    profile?: any;
     id?: string;
     userid?: string;
     type?: string;
@@ -151,7 +153,6 @@ export type ActionTypes =
   'setAlert' |
   'setEntity' | 
   'setEntityUserlist' | 
-  'setProfile' | 
   'setUserChannels' |
   'setUserFactions' |
   'setFactions' | 

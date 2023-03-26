@@ -76,9 +76,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setUserChannels':
     clonedState.user.channels = payload;
     break;
-  case 'setProfile': 
-    clonedState.user.profile = payload;
-    break;
   case 'setUserFactions':
     clonedState.user.factions = payload;
     break;

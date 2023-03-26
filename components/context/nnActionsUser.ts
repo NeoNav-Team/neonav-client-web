@@ -17,9 +17,8 @@ export const fetchUserProfile = (dispatch: DispatchFunc) => async () => {
         username: data?.profile?.username,
       }
     }; 
-    console.log('payload', payload);
     dispatch({
-      type: 'setProfile',
+      type: 'setEntity',
       payload: data,
     });
     return data;
@@ -33,6 +32,7 @@ export const fetchUserProfile = (dispatch: DispatchFunc) => async () => {
     })
     return err;
   };
+  console.log('fetchUserProfile');
   executeApi('profile', {token}, onSuccess, onError);
 }
 
@@ -217,7 +217,6 @@ export const userSearch = (dispatch: DispatchFunc) => async (query:string) => {
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
     clearLocalStorage('entityUsers');
-    console.log('response', response);
     dispatch({
       type: 'setEntityUserlist',
       payload: data,
