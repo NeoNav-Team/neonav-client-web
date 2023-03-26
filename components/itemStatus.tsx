@@ -9,6 +9,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilites/fomat';
+import { ReactNode } from 'react';
 
 interface itemStatusProps {
     date?: string;
@@ -24,8 +25,8 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
   const { date = '', id = '', username = '', text = '', action, hidden, collection } = props;
   const statusText = action ? action : 'comments';
 
-  return (
-    <Box style={{padding: '1vh 0', width: '100%'}}>
+  const status:ReactNode = (
+    <>
       <div className={styles.statusLine} data-augmented-ui="tr-clip inlay">
         <Box>
           <Stack direction="row"
@@ -40,11 +41,10 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
             {collection && (<Link href={`/${collection}/${id}`}><MoreVertIcon /></Link>)}
           </Stack>
         </Box>
-      </div>
-      <Stack direction="row" spacing={1} alignItems="flex-end" justifyContent="flex-end">
-        <Box sx={{minWidth:'50%', maxWidth: '79%'}}>
+      </div><Stack direction="row" spacing={1} alignItems="flex-end" justifyContent="flex-end">
+        <Box sx={{ minWidth: '50%', maxWidth: '79%' }}>
           <Stack direction="row" spacing={1}>
-            <div>{hidden && <VisibilityOffIcon sx={{fontSize: 16, opacity: 0.25}} />}</div>
+            <div>{hidden && <VisibilityOffIcon sx={{ fontSize: 16, opacity: 0.25 }} />}</div>
             <div className={styles.dateLine} data-augmented-ui="br-clip both">
               <Stack direction="row" spacing={1}>
                 <div className={styles.dateText}>{isoDateToDaily(date)}</div>
@@ -54,6 +54,13 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
           </Stack>
         </Box>
       </Stack>
+    </>
+  );
+
+
+  return (
+    <Box style={{padding: '1vh 0', width: '100%'}}>
+      {collection ? (<Link href={`/${collection}/${id}`}>{status}</Link>) : status}
     </Box>
   )
 }

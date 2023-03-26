@@ -21,9 +21,11 @@ import Kitty from './svgr/kitty';
 import Cash from './svgr/cash';
 import TanChat from './svgr/tanchat';
 import NeoSites from './svgr/neosites';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
 import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import Map from './svgr/map';
 import Notes from './svgr/notes';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import Notifcations from './svgr/notifications';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
@@ -192,6 +194,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               justifyContent="center"
               alignItems="center"
               minHeight={fixedHeight}
+              onClick={() => handleModelOpen('userSettings')}
             >
               <IconFrame icon={<UserSettings fontSize="inherit" />} title="Settings"/>
             </Box>
@@ -276,6 +279,54 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                         title="Factions"
                       />
                     </Link>
+                  </Box>
+                </Grid>
+              </Grid>
+            </div>
+          )}
+          {submenu === 'userSettings' && (
+            <div
+              className={styles.submenuPane}
+              data-augmented-ui="tl-clip tr-clip-x  bl-clip br-clip  both"
+            >
+              <Typography sx={modelTitleStyle}>User Settings</Typography>
+              <Grid container item spacing={3}>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/profile">
+                      <IconFrame
+                        icon={<ContactPageIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        title="Profile"/>
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/account">
+                      <IconFrame
+                        icon={<AdminPanelSettingsIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        title="Account"
+                      />
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
                   </Box>
                 </Grid>
               </Grid>
