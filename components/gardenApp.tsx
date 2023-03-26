@@ -19,16 +19,12 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import InboxIcon from '@mui/icons-material/Inbox';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
-import { IncomingMessage } from 'http';
-
-
-type filters = {
-  class?: string;
-  from?: string;
-}
 
 interface GardenAppProps {
   incoming: boolean;
+  params: {
+    id:string
+  }
 };
 
 const flexContainer = {
@@ -62,7 +58,8 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
-  const { incoming = false } = props;
+  const { incoming = false, params } = props;
+  const { id } = params;
   const { 
     state,
     fetchUserStatuses = (id:string) => {},
@@ -81,22 +78,23 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   const isAdmin = userId === entity.id;
   const [ collectionFetched, setCollectionFetched ] = useState(false);
 
-  const goFetchFactions = useCallback(() => {
-    if (userId.length >= 9 && !collectionFetched) {
+  const goFetchStatues = useCallback(() => {
+    if (userId.length >= 10 && !collectionFetched) {
       if (incoming) {
-      fetchUserStatuses(userId);
-      } else {
         fetchUserStatuses(userId);
+      } else {
+        fetchUserStatuses(id || userId);
       }
-      fetchContact(userId);
+      fetchContact(id || userId);
       setCollectionFetched(true);
     }
-  }, [collectionFetched, fetchContact, fetchUserStatuses, userId]);
+  }, [collectionFetched, fetchContact, fetchUserStatuses, id, incoming, userId]);
 
   useEffect(() => {
-    const factionsSize = statuses && statuses.length;
-    factionsSize === 0 && !collectionFetched && goFetchFactions();
-  }, [collectionFetched, goFetchFactions, statuses]);
+    const statusSize = statuses && statuses.length;
+    (statusSize === 0 || !collectionFetched) && goFetchStatues();
+  }, [collectionFetched, goFetchStatues, statuses]);
+  
 
   const handleBigAction = (status:string) => {
     setUserStatus(userId, status);
@@ -105,6 +103,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   const toggleFilter = () => {
     setFilter(!filter);
   }
+
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -153,9 +152,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
           <Box sx={flexFooter}>
             <FooterNav
               firstHexProps={{
-                icon: filter ? <FilterListIcon /> : <FilterListOffIcon />,
-                handleAction: toggleFilter,
-                disabled: !isAdmin,
+                disabled: true,
               }}
               secondHexProps={{
                 disabled: true,
@@ -167,12 +164,13 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
                 useInput: true,
               }}
               thirdHexProps={{
-                disabled: true,
-                icon: <InboxIcon />
+                icon: filter ? <FilterListIcon /> : <FilterListOffIcon />,
+                handleAction: toggleFilter,
+                disabled: !isAdmin,
               }}
               fourthHexProps={{
-                disabled: true,
-                icon: <PersonSearchIcon />
+                icon: <PersonSearchIcon />,
+                link: '/garden/search'
               }}
             />
           </Box>

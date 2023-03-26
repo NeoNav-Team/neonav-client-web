@@ -113,6 +113,7 @@ export const fetchUserStatuses = (dispatch: DispatchFunc) => async (id: string) 
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
+    console.log('status data', data);
     clearLocalStorage('statuses');
     dispatch({
       type: 'setUserStatuses',
@@ -211,4 +212,24 @@ export const removeStatus = (dispatch: DispatchFunc) => async (id: string) => {
   executeApi('statusRemove', {id, token}, onSuccess, onError);
 }
 
-export const userSearch = (dispatch: DispatchFunc) => async () => {}
+export const userSearch = (dispatch: DispatchFunc) => async (query:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    clearLocalStorage('entityUsers');
+    console.log('response', response);
+    dispatch({
+      type: 'setEntityUserlist',
+      payload: data,
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Search failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  console.log('search users', query);
+  executeApi('searchUsers', {query, token}, onSuccess, onError);
+}

@@ -173,4 +173,8 @@ export const authApiEnpoints = {
     method: "put",
     path: "/api/user/statuses/$id"       
   },
+  searchUsers: {
+    method: "post",
+    path: "/api/user/search"
+  }
 };

@@ -238,7 +238,7 @@ export type NnProviderDispatch = {
     setUserHiddenStatus: (_userId:string, _body:string) => void;
     getUserSetStatuses: (_userId:string) => void;
     toggleStatusClass: (_userId:string) => void;
-    userSearch: (_userId:string) => void;
+    userSearch: (_search:string) => void;
     toggleChannelScope: (_channelId:string) => void;
     unfriend: (_exFriendId:string) => void;
 }

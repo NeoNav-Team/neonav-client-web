@@ -13,6 +13,7 @@ import {
   LinearProgress,
 } from '@mui/material';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
@@ -113,6 +114,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
 
   const goUnfriend = () =>  {
     unfriend(userId);
+    setFetched(false);
   }
 
   const name = (firstname: string, lastname: string) => {
@@ -199,7 +201,8 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 disabled: true,
               }}
               thirdHexProps={{
-                disabled: true,
+                icon: <LocalFloristIcon />,
+                link: `/garden/${userId}`,
               }}
               fourthHexProps={{
                 icon: <TocIcon />,

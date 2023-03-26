@@ -10,13 +10,15 @@ import {
   Container,
   Box,
 } from '@mui/material';
+import LocalFloristIcon from '@mui/icons-material/LocalFlorist'
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
+const MAX_USERS = 25;
 
-interface ContactsAppProps {};
+
+interface GardenSearchAppProps {};
 
 const flexContainer = {
   height: '100%',
@@ -52,33 +54,32 @@ const flexFooter = {
   width: '100%',
 };
 
-export default function ContactsApp(props: ContactsAppProps):JSX.Element {
+export default function GardenSearchApp(props: GardenSearchAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
-    fetchUserContacts = () =>{},
+    userSearch = (search:string) => {},
   }: NnProviderValues = useContext(NnContext);
-  const contacts = state?.network?.collections?.contacts || [];
-  const sortedContacts = contacts.sort((a, b) => a.username.localeCompare(b.username))
+  const searchArr:NnContact[] = state?.network?.collections?.entityUsers || [];
+  const sortedSearch = searchArr.sort((a, b) => a.username.localeCompare(b.username))
 
-  const [ contactsFetched, setContactsFetched ] = useState(false);
+  const [ contactsFetched, setContactsFetched ] = useState<boolean>(false);
+  const [ search, setSearch ] = useState<string>('');
 
-  const goFetchContacts = useCallback(() => {
-    if (!contactsFetched && '') {
-      fetchUserContacts();
+  const goSearch = useCallback((search:string) => {
+    if (!contactsFetched) {
+      userSearch(search);
       setContactsFetched(true);
     }
-  }, [contactsFetched, fetchUserContacts]);
+  }, [contactsFetched, userSearch]);
 
-  const scanForContact = () =>  {
-    console.log('scanning');
+  const searchForContact = (search:string) =>  {
+    console.log('scanning for', search);
     setContactsFetched(false);
-  }
-
-  const isNewLetter = (a:NnContact, b:NnContact) => {
-    return a?.username.toLowerCase().charAt(0) !== b?.username.toLowerCase().charAt(0)
+    setSearch(search);
+    goSearch(search);
   }
 
   return (
@@ -93,37 +94,48 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
             <SimpleScrollContainer>
               <Box sx={{minWidth: '100%', minHeight: '100%'}}>
                 <Stack spacing={0} sx={{ display: 'flex' }}>
-                  {sortedContacts && sortedContacts.map((item, index) => {
-                    return (
+                  <ItemContact
+                    subtitle={`Search for "${search.length >= 1 ? search : '...?'}"`}
+                    key={'Search List'}
+                  />
+                  {sortedSearch && sortedSearch.map((item, index) => {
+                    return (index <= MAX_USERS && (
                       <div
-                        key={`${item.id}-container`}
+                        key={`${item.userid}-${index}-container`}
                       >
-                        {isNewLetter(sortedContacts[index], sortedContacts[index - 1]) ? <ItemContact
-                          subtitle={item.username.charAt(0).toUpperCase()}
-                          key={`${item.username.charAt(0).toUpperCase()}-list`}
-                        />  : null}
                         <ItemContact
-                          key={`${item.id}`}
-                          id={item.id || ''}
+                          key={`${item.userid}-${index}`}
+                          id={item.userid || ''}
                           username={item.username}
                         />
                       </div> 
-                    )
+                    ))
                   })}
                 </Stack>
               </Box>
             </SimpleScrollContainer>
           </Box>
           <Box sx={flexFooter}>
+            
             <FooterNav
-              bigHexProps={{
-                icon: <PersonSearchIcon />,
+              firstHexProps={{
                 disabled: true,
               }}
-              thirdHexProps={{
-                icon: <QrCodeScannerIcon />,
+              secondHexProps={{
                 disabled: true,
-                handleAction: () => scanForContact,
+              }}
+              bigHexProps={{
+                icon: <PersonSearchIcon />,
+                dialog: 'Search for a User',
+                handleAction: searchForContact,
+                useInput: true,
+              }}
+              thirdHexProps={{
+                disabled: true,
+              }}
+              fourthHexProps={{
+                icon: <LocalFloristIcon />,
+                link: `/garden`,
               }}
             />
           </Box>
