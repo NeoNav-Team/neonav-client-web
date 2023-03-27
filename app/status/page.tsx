@@ -5,5 +5,5 @@ export default function Notifications({
 }: {
   params: { id: string };
 }) {
-  return (<GardenApp filter={{class:'private'}} />);
+  return (<GardenApp incoming={false} params={params} />);
 }
