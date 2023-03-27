@@ -97,7 +97,8 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   
 
   const handleBigAction = (status:string) => {
-    setUserStatus(userId, status);
+    console.log('entity?.id ', entity?.id );
+    setUserStatus(entity?.id, status);
   }
 
   const toggleFilter = () => {
