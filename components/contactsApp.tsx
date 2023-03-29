@@ -106,6 +106,7 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
                           key={`${item.id}`}
                           id={item.id || ''}
                           username={item.username}
+                          thumbnail={item.thumbnail}
                         />
                       </div> 
                     )

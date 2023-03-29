@@ -56,6 +56,7 @@ export type NnWallet = {
 }
 
 export type NnContact = {
+    thumbnail: string | undefined;
     id?: string,
     userid?: string,
     username: string,
