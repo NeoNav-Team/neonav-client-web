@@ -1,5 +1,9 @@
-import FactionsApp from '@/components/factionsApp';
+import FactionProfileApp from '@/components/factionProfileApp';
 
-export default function Factions() {
-  return (<FactionsApp />);
+export default function FactionProfile({
+  params,
+}: {
+  params: { id: string };
+}) {
+  return (<FactionProfileApp params={params} />);
 }

@@ -229,6 +229,7 @@ export type NnProviderDispatch = {
     fetchUserWalletHistory: () => void;
     initContext: () => void;
     leaveFaction: () => void;
+    updateFactionProfile: (_factionId:string, _document:any, _update:any) => void;
     inviteUserToFaction: () => void;
     addRepToFaction: (_factionId:string, _userId:string) => void;
     removeRepToFaction: (_factionId:string, _userId:string) => void;

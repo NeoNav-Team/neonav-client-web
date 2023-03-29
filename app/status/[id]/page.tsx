@@ -1,6 +1,6 @@
 import StatusAdminApp from "@/components/statusAdminApp";
 
-export default function Notifications({
+export default function Status({
   params,
 }: {
   params: { id: string };

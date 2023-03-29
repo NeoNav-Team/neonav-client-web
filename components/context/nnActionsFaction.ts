@@ -29,6 +29,7 @@ export const fetchAllFactions = (dispatch: DispatchFunc) => async () => {
 }
 
 
+
 export const fetchUserFactions = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
@@ -69,6 +70,29 @@ export const fetchFactionDetails = (dispatch: DispatchFunc) => async (id:string)
     return err;
   };
   executeApi('factionProfile', {id, token}, onSuccess, onError);
+}
+
+//TODO: remove any of document
+export const updateFactionProfile = (dispatch: DispatchFunc) => async (id:string, doc:any, payload: any) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setEntity',
+      payload: data,
+    });
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    console.log('err', err);
+    const { message = 'Profile failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('factionProfileUpdate', {...doc, id, ...payload, token}, onSuccess, onError);
 }
 
 export const removeUserFromFaction = (dispatch: DispatchFunc) => (faction:string, id:string)  => {

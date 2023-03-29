@@ -125,6 +125,10 @@ export const authApiEnpoints = {
     method: "get",
     path: "/api/factions/$id",
   },
+  factionProfileUpdate: {
+    method: "patch",
+    path: "/api/factions/$id",
+  },
   factionInvite: {
     method: "put",
     path: "/api/factions/$faction/invite/$id",
