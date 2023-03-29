@@ -17,7 +17,7 @@ import {
   TextField,
   Button,
 } from '@mui/material';
-import RateReviewIcon from '@mui/icons-material/RateReview';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import SaveIcon from '@mui/icons-material/Save';
 import { Stack } from '@mui/system';
@@ -156,7 +156,6 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
     files && setPhoto(avatar as string);
   }
 
-
   const saveProfileChanges = () => {
     const doc = {
       _id: state?.network?.entity?._id,
@@ -276,7 +275,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
           <Box sx={flexFooter}>
             <FooterNav
               bigHexProps={{
-                icon: editMode ? <SaveIcon /> : <RateReviewIcon />,
+                icon: editMode ? <SaveIcon /> : <BorderColorIcon />,
                 disabled: isAdmin,
                 handleAction: bigButtonAction,
               }}

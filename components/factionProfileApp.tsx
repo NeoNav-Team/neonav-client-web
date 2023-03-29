@@ -4,22 +4,26 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, nnEntity } from './context/nnTypes';
+import { NnProviderValues, nnEntity, NnContact } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
+import SubheaderFaction from './subheaderFaction';
 import FooterNav from './footerNav';
 import { 
   Container,
   Box,
   Typography,
-  Divider,
   CircularProgress,
-  Avatar,
   TextField,
   Button,
+  Divider,
 } from '@mui/material';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import TocIcon from '@mui/icons-material/Toc';
+import TagIcon from '@mui/icons-material/Tag';
 import SaveIcon from '@mui/icons-material/Save';
+import AllInboxIcon from '@mui/icons-material/AllInbox';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -92,19 +96,22 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const userId = state?.user?.profile?.auth?.userid;
   const accountId = id || state?.network?.selected?.account || '';
   const admin = profile && profile?.admin?.length && profile?.admin[0];
+  const reps = profile && profile?.reps;
   const isAdmin = profile && userId === admin?.userid;
+  const isRep = isAdmin || (reps && reps.filter((user:NnContact) => user.id === userId).length >= 1);
   const [ profileFetched, setProfileFetched ] = useState(false);
   const [ editMode, setEditMode ] = useState(false);
   const [ form, setForm ] = useState<Form>(defaultForm);
   const { name, image, tagline, description } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
+  const isRecentEntity = profile.id === accountId;
 
   const goFetchFactionProfile = useCallback(() => {
-    if (!profileFetched) {
+    if (!profileFetched || !isRecentEntity) {
       fetchFactionDetails(accountId);
       setProfileFetched(true);
     }
-  }, [profileFetched, fetchFactionDetails, accountId]);
+  }, [profileFetched, isRecentEntity, fetchFactionDetails, accountId]);
 
   const updateDefaultForm = (profile:nnEntity) => {
     let updatedDefaultForm:Form = defaultForm;
@@ -159,7 +166,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     updateFactionProfile(accountId, doc, form);
   } 
 
-  const bigButtonAction = ()=> {
+  const editButtonAction = ()=> {
     if (editMode) {
       saveProfileChanges();
       setPhoto(image);
@@ -167,6 +174,10 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       goFetchFactionProfile(); //get latest before editing
     }
     setEditMode(!editMode);
+  }
+
+  const writeButtonAction = (value:string) => {
+    console.log('value', value);
   }
 
   return (
@@ -178,58 +189,42 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
-            {profileFetched ? (
+            {(profileFetched && isRecentEntity) ? (
               profile && Object.keys(profile).length !== 0 ?(
                 <SimpleScrollContainer>
                   <Box sx={{minWidth: '100%', minHeight: '100%'}}>
                     <Stack spacing={0} sx={{ display: 'flex' }}>
                       <div>
-                        <Divider variant="middle"  color="primary"><Typography variant="h6">Photo</Typography></Divider>
                         <Box
                           display="flex"
                           justifyContent="center"
                           alignItems="center"
                         >
                           {editMode ? (
-                            <Stack spacing={1} >
-                              <img src={photo || image} alt="Please upload an image" style={{minWidth: 200, minHeight: 200}} />
+                            <Stack spacing={2} >
+                              <img src={photo || image} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%'}} />
                               <Button variant="contained" component="label" endIcon={<PhotoCameraIcon />}>
                                 Upload
                                 <input hidden multiple type="file" onChange={uploadHandler} accept="image/png, image/jpeg" />
                               </Button>
+                              <TextField onChange={changeHandler} name="name" value={name} label="Faction Name" sx={{width: '100%'}} variant="outlined" />
+                              <TextField onChange={changeHandler} name="tagline" value={tagline} label="tagline" sx={{width: '100%'}} variant="outlined" />
+                              <TextField onChange={changeHandler} name="description" value={description} multiline rows={4} label="Description" variant="outlined" />
                             </Stack>
                           ) : (
                             <>
-                              <Avatar src={image} alt="its you in the future" style={{width: 200, minHeight: 200}} />
+                              <SubheaderFaction title={name} subtitle={tagline} photo={image}/>
                             </>
                           )}
                         </Box>
                       </div>
-                      <Divider variant="middle" color="primary"><Typography variant="h5">{name}</Typography></Divider>
-                      <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                      >
-                        {editMode && (
-                          <>
-                            <TextField onChange={changeHandler} name="name" value={name} label="Faction Name" variant="outlined" />
-                          </>
-                        )}
-                      </Box>
-                      <Divider variant="middle" color="primary"><Typography variant="h6">{tagline}</Typography></Divider>
-                      {editMode && (
-                        <>
-                          <TextField onChange={changeHandler} name="tagline" value={tagline} label="tagline" variant="outlined" />
-                        </>
-                      )}
-                      <Divider variant="middle" color="primary"><Typography variant="h6">description</Typography></Divider>
-                      {editMode ? (
-                        <>
-                          <TextField onChange={changeHandler} name="description" value={description} multiline rows={4} label="Description" variant="outlined" />
-                        </>
-                      ) : (
-                        <p>{description}</p>
+                      {!editMode && (
+                        <Box>
+                          <Divider variant="middle" color="primary"><Typography variant="h6">About Us</Typography></Divider>
+                          <p>{description}</p>
+                          <Divider variant="middle" color="primary"><Typography variant="h6">Recent News</Typography></Divider>
+                          <p>{description}</p>
+                        </Box>
                       )}
                     </Stack>
                   </Box>
@@ -250,9 +245,34 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
           <Box sx={flexFooter}>
             <FooterNav
               firstHexProps={{
-                icon: editMode ? <SaveIcon /> : <RateReviewIcon />,
+                icon: editMode ? <SaveIcon /> : <BorderColorIcon />,
                 disabled: !isAdmin,
-                handleAction: bigButtonAction,
+                handleAction: editButtonAction,
+              }}
+              secondHexProps={{
+                disabled: true,
+                icon: <AllInboxIcon />,
+                link: `/factions/${accountId}/statuses`,
+              }}
+              bigHexProps={
+                isRep ? {
+                  icon: <RateReviewIcon />,
+                  link: `/factions/${accountId}/status`,
+                } : {
+                  icon: <RateReviewIcon />,
+                  handleAction: writeButtonAction,
+                  dialog: 'Share your thoughts with us?',
+                  useInput: true,
+                }
+              }
+              thirdHexProps={{
+                disabled: true,
+                icon: <TagIcon />,
+                link: `/factions/${accountId}/tags`,
+              }}
+              fourthHexProps={{
+                icon: <TocIcon />,
+                link: '/factions',
               }}
             />
           </Box>
