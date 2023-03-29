@@ -172,12 +172,9 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 >
                   <SimpleScrollContainer>
                     <Stack>
-                      <Typography variant='h6' color="primary">Name</Typography>
-                      <p>{name(entity?.meta?.firstname, entity?.meta?.lastname)}</p>
-                      <Typography variant='h6' color="primary">Occupation</Typography>
-                      <p>{entity?.meta?.occupation || 'N/A'}</p>
-                      <Typography variant='h6' color="primary">Skills</Typography>
-                      <p>{entity?.meta?.skills || 'N/A'}</p>
+                      <Typography variant='h6' color="primary">{name(entity?.meta?.firstname, entity?.meta?.lastname)}</Typography>
+                      <Typography variant='h6' color="primary">Occupation <span>{entity?.meta?.occupation || 'N/A'}</span></Typography>
+                      <Typography variant='h6' color="primary">Skills <span>{entity?.meta?.skills || 'N/A'}</span></Typography>
                       <Typography variant='h6' color="primary">Description</Typography>
                       <p>{entity?.description || 'N/A'}</p>
                     </Stack>

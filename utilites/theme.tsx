@@ -93,7 +93,7 @@ export const themeOptions: ExtendedThemeOptions = {
           },
         },
       },
-    }
+    },
   },
   spacing: 8,
 };

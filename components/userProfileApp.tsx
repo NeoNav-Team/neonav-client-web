@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, nnEntity } from './context/nnTypes';
@@ -12,14 +13,48 @@ import {
   Typography,
   Divider,
   CircularProgress,
-  Avatar
+  Avatar,
+  TextField,
+  Button,
 } from '@mui/material';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import SaveIcon from '@mui/icons-material/Save';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
-
 interface UserProfileAppProps {};
+
+type Form = {
+  avatar?: string;
+  thumbnail?: string;
+  username?: string;
+  firstname?: string;
+  lastname?: string;
+  skills?: string;
+  occupation?: string;
+  bio?: string;
+}
+type FormKey = 
+'avatar' | 
+'thumbnail' | 
+'username' | 
+'firstname' | 
+'lastname' | 
+'skills' | 
+'occupation' | 
+'bio';
+
+const defaultForm = {
+  avatar: '',
+  thumbnail: '',
+  username: '',
+  firstname: '',
+  lastname: '',
+  skills: '',
+  occupation: '',
+  bio: '',
+};
 
 const flexContainer = {
   height: '100%',
@@ -54,13 +89,19 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
-    fetchUserProfile = () =>{},
+    fetchUserProfile = () => {},
+    updateUserProfile = (document:any, update:any) => {},
   }: NnProviderValues = useContext(NnContext);
   const profile:nnEntity = useMemo(() => {
     return state?.network?.entity?.profile || {};
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
+  const isAdmin = accountId === profile.id;
   const [ profileFetched, setProfileFetched ] = useState(false);
+  const [ editMode, setEditMode ] = useState(false);
+  const [ form, setForm ] = useState<Form>(defaultForm);
+  const { avatar, username, firstname, lastname, skills, occupation, thumbnail, bio } = form;
+  const [ photo, setPhoto ] = useState<string | undefined>();
 
   const goFetchProfile = useCallback(() => {
     if (!profileFetched) {
@@ -69,9 +110,70 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
     }
   }, [profileFetched, fetchUserProfile]);
 
+  const updateDefaultForm = (profile:nnEntity) => {
+    let updatedDefaultForm:Form = defaultForm;
+    Object.keys(updatedDefaultForm).map(function(key){
+      if((profile as any)[key]) (updatedDefaultForm as any)[key]=(profile as any)[key]
+    });
+    setForm(updatedDefaultForm);
+  }
+
   useEffect(() => {
     goFetchProfile();
   }, [goFetchProfile, profile]);
+
+  useEffect(() => {
+    if (Object.keys(profile).length >= 3) {
+      updateDefaultForm(profile);
+    }
+  }, [profile]);
+
+  const resizeFile = (file:File, field:FormKey, size:number) => {
+    Resizer.imageFileResizer(
+      file,
+      size,
+      size,
+      "PNG",
+      100,
+      0,
+      (uri) => {
+        console.log('field', field);
+        setForm({...form, [field]:uri } );
+        field !== 'thumbnail' && setPhoto(uri as string);
+      },
+      "base64"
+    );
+  };
+
+  const changeHandler = (event:React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event?.target;
+    setForm({...form, [name]: value } );
+  }
+
+  const uploadHandler = async (event:React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = event?.currentTarget;
+    files && resizeFile(files[0], 'avatar', 600);
+    files && setPhoto(avatar as string);
+  }
+
+
+  const saveProfileChanges = () => {
+    const doc = {
+      _id: state?.network?.entity?._id,
+      _rev: state?.network?.entity?._rev,
+    }
+    updateUserProfile(doc, form);
+  } 
+
+  const bigButtonAction = ()=> {
+    if (editMode) {
+      saveProfileChanges();
+      setPhoto(avatar);
+    } else {
+      goFetchProfile(); //get latest before editing
+    }
+    setEditMode(!editMode);
+  }
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -94,7 +196,19 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
                           justifyContent="center"
                           alignItems="center"
                         >
-                          <img src={profile?.avatar} alt="its you in the future" style={{width: 200}} />
+                          {editMode ? (
+                            <Stack spacing={1} >
+                              <img src={photo || avatar} alt="Please upload an image" style={{minWidth: 200, minHeight: 200}} />
+                              <Button variant="contained" component="label" endIcon={<PhotoCameraIcon />}>
+                                Upload
+                                <input hidden multiple type="file" onChange={uploadHandler} accept="image/png, image/jpeg" />
+                              </Button>
+                            </Stack>
+                          ) : (
+                            <>
+                              <Avatar src={avatar} alt="its you in the future" style={{width: 200, minHeight: 200}} />
+                            </>
+                          )}
                         </Box>
                       </div>
                       <Divider variant="middle" color="primary"><Typography variant="h6">Name</Typography></Divider>
@@ -103,14 +217,46 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
                         justifyContent="center"
                         alignItems="center"
                       >
-                        <p>{profile?.username} [ {profile?.firstname} {profile?.lastname} ]</p>
+                        {editMode ? (
+                          <Stack spacing={1}>
+                            <div>
+                              <TextField onChange={changeHandler} name="username" value={username} label="Username" variant="outlined" style={{width: '100%'}} />
+                            </div>
+                            <Stack direction="row" spacing={1}>
+                              <TextField onChange={changeHandler} name="firstname" value={firstname} label="First Name" variant="outlined" />
+                              <TextField onChange={changeHandler} name="lastname" value={lastname} label="Last Name" variant="outlined" />
+                            </Stack>
+                          </Stack>
+                        ) :(
+                          <>
+                            <p>{profile?.username} [ {profile?.firstname} {profile?.lastname} ]</p>
+                          </>
+                        )}
                       </Box>
                       <Divider variant="middle" color="primary"><Typography variant="h6">Occupation</Typography></Divider>
-                      {profile?.occupation}
+                      {editMode ? (
+                        <>
+                          <TextField onChange={changeHandler} name="occupation" value={occupation} label="Occupation" variant="outlined" />
+                        </>
+                      ) : (
+                        <p>{profile?.occupation}</p>
+                      )}
                       <Divider variant="middle" color="primary"><Typography variant="h6">Skills</Typography></Divider>
-                      {profile?.skills}
+                      {editMode ? (
+                        <>
+                          <TextField onChange={changeHandler} name="skills" value={skills} label="Skills" variant="outlined" />
+                        </>
+                      ) : (
+                        <p>{profile?.skills}</p>
+                      )}
                       <Divider variant="middle" color="primary"><Typography variant="h6">Bio</Typography></Divider>
-                      {profile?.bio}
+                      {editMode ? (
+                        <>
+                          <TextField onChange={changeHandler} name="bio" value={bio} multiline rows={4} label="Bio" variant="outlined" />
+                        </>
+                      ) : (
+                        <p>{profile?.bio}</p>
+                      )}
                     </Stack>
                   </Box>
                 </SimpleScrollContainer>
@@ -130,8 +276,9 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
           <Box sx={flexFooter}>
             <FooterNav
               bigHexProps={{
-                icon: <RateReviewIcon />,
-                disabled: true,
+                icon: editMode ? <SaveIcon /> : <RateReviewIcon />,
+                disabled: isAdmin,
+                handleAction: bigButtonAction,
               }}
             />
           </Box>

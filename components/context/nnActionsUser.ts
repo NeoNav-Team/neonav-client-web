@@ -12,11 +12,6 @@ export const fetchUserProfile = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
-    const payload = {
-      meta: {
-        username: data?.profile?.username,
-      }
-    }; 
     dispatch({
       type: 'setEntity',
       payload: data,
@@ -32,8 +27,30 @@ export const fetchUserProfile = (dispatch: DispatchFunc) => async () => {
     })
     return err;
   };
-  console.log('fetchUserProfile');
   executeApi('profile', {token}, onSuccess, onError);
+}
+
+//TODO: remove any of document
+export const updateUserProfile = (dispatch: DispatchFunc) => async (doc:any, profile: any) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setEntity',
+      payload: data,
+    });
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    console.log('err', err);
+    const { message = 'Profile failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('profileUpdate', {...doc, profile, token}, onSuccess, onError);
 }
 
 export const fetchContact = (dispatch: DispatchFunc) => async (id:string) => {
@@ -229,6 +246,5 @@ export const userSearch = (dispatch: DispatchFunc) => async (query:string) => {
       payload: {severity: 'error', message, show: true},
     })
   };
-  console.log('search users', query);
   executeApi('searchUsers', {query, token}, onSuccess, onError);
 }

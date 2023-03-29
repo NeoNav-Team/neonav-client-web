@@ -95,7 +95,7 @@ export type NnFaction = {
 }
 
 
-/* Entity is currently a catch-all but realistically shoudld be <NnFaction | NnChannel | NnUser | NnProduct> */
+/* Entity is currently a catch-all but realistically shoudld be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
 export type nnEntity = {
     firstname?: string;
     lastname?: string;
@@ -105,6 +105,8 @@ export type nnEntity = {
     avatar?: string;
     profile?: any;
     id?: string;
+    _id?: string;
+    _rev?: string;
     userid?: string;
     type?: string;
     name?: string;
@@ -220,6 +222,7 @@ export type NnProviderDispatch = {
     fetchChannelUsers: (_channelId:string) => void;
     fetchFactionDetails: (_factionId:string) => void;
     fetchUserProfile: () => void;
+    updateUserProfile: (_document:any, _update:any) => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
     addUserToFaction: (_factionId:string, _userId:string) => void;
     adminUserToFaction: (_factionId:string, _userId:string) => void;

@@ -71,7 +71,6 @@ export default function InputUser(props:InputUserProps):JSX.Element {
     const {
       target: { value },
     } = event;
-    console.log('userName', userName, 'value', value);
     const newValue: string[] = typeof value === 'string' ? value.split(',') : value;
     if((selectLimit && newValue.length <= selectLimit) || typeof selectLimit === 'undefined') {
       setUserName(newValue);
