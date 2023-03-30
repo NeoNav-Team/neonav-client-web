@@ -51,7 +51,7 @@ interface MissionStatusForm {
   tag?: string;
   type?: string;
   hidden?: boolean;
-  score?: number;
+  score?: string;
   rank?: string;
   value?: string |  number;
   recipients?: string[];
@@ -114,7 +114,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
   const [ loading, setLoading ] = useState<boolean>(false);
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
   const isRecentEntity = profile.id === accountId;
-  const { message = '', tag = '', type = 'message', rank = 'D', score = 0, recipients = [], hidden = false } = form;
+  const { message = '', tag = '', type = 'message', rank = 'D', score = '', recipients = [], hidden = false } = form;
   const usergroups = [
     { 
       label: 'Contacts',
@@ -137,7 +137,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
   ]
 
   const resetForm = () => {
-    setForm({message:'', tag:'', type:'message', rank:'D', score :0, recipients:[], hidden:false})
+    setForm({message:'', tag:'', type:'message', rank:'D', score:'', recipients:[], hidden:false})
   };
 
   const statusFromForm = () => {
