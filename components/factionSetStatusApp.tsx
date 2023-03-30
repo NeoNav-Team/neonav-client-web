@@ -162,12 +162,14 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
       rank: z.string(),
       type: z.string(),
       message: type === 'message' ? z.string().min(1) : z.string().optional(),
+      tag: type !== 'message' ? z.string().min(3) : z.string().optional(),
       hidden: z.boolean(),
     }).safeParse({ 
       recipients,
       score,
       type,
       rank,
+      tag,
       message,
       hidden
     });
@@ -368,6 +370,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
                   )}
                   <FormControl fullWidth>
                     <TextField
+                       error={hasErr('tag')}
                       name="tag"
                       label="Hashtag"
                       value={tag}
