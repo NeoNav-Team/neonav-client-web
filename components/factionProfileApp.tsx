@@ -4,10 +4,11 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, nnEntity, NnContact } from './context/nnTypes';
+import { NnProviderValues, nnEntity, NnContact, NnStatus } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import SubheaderFaction from './subheaderFaction';
 import FooterNav from './footerNav';
+import ItemStatus from './itemStatus';
 import { 
   Container,
   Box,
@@ -88,11 +89,16 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const { 
     state,
     fetchFactionDetails = (accountId:string) => {},
+    fetchFactionStatuses = (accountId:string) => {},
     updateFactionProfile = (factionId:string, document:any, update:any) => {},
   }: NnProviderValues = useContext(NnContext);
   const profile:nnEntity = useMemo(() => {
     return state?.network?.entity || {};
   }, [state]);
+  const statuses:NnStatus[] = useMemo(() => {
+    const statuses = state?.network?.collections?.statuses || [];
+    return statuses.filter(status => status.class === 'public');
+  }, [state?.network?.collections?.statuses]);
   const userId = state?.user?.profile?.auth?.userid;
   const accountId = id || state?.network?.selected?.account || '';
   const admin = profile && profile?.admin?.length && profile?.admin[0];
@@ -109,9 +115,10 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const goFetchFactionProfile = useCallback(() => {
     if (!profileFetched || !isRecentEntity) {
       fetchFactionDetails(accountId);
+      fetchFactionStatuses(accountId);
       setProfileFetched(true);
     }
-  }, [profileFetched, isRecentEntity, fetchFactionDetails, accountId]);
+  }, [profileFetched, isRecentEntity, fetchFactionDetails, accountId, fetchFactionStatuses]);
 
   const updateDefaultForm = (profile:nnEntity) => {
     let updatedDefaultForm:Form = defaultForm;
@@ -222,8 +229,31 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                         <Box>
                           <Divider variant="middle" color="primary"><Typography variant="h6">About Us</Typography></Divider>
                           <p>{description}</p>
-                          <Divider variant="middle" color="primary"><Typography variant="h6">Recent News</Typography></Divider>
-                          <p>{description}</p>
+                          <Divider variant="middle" color="(primary"><Typography variant="h6">Recent News</Typography></Divider>
+                          {statuses && statuses.length >= 1 ? (
+                            <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
+                              <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
+                                {statuses && statuses.length >= 1 && statuses.map(item => {
+                                  return (
+                                    <div
+                                      key={`${item.id}-container`}
+                                    >
+                                      <ItemStatus
+                                        id={item.id}
+                                        username={item.from}
+                                        date={item.ts}
+                                        text={item.body}
+                                        collection="status"
+                                        hidden={item.class !== 'public'}
+                                      />
+                                    </div>
+                                  );
+                                })}
+                              </Stack>
+                            </Box>
+                          ): (
+                            <p><em>Nothing to report.</em></p>
+                          )}
                         </Box>
                       )}
                     </Stack>
@@ -257,7 +287,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
               bigHexProps={
                 isRep ? {
                   icon: <RateReviewIcon />,
-                  link: `/factions/${accountId}/status`,
+                  link: `/factions/${accountId}/setstatus`,
                 } : {
                   icon: <RateReviewIcon />,
                   handleAction: writeButtonAction,

@@ -222,8 +222,10 @@ export const factionUpdateProfile = (dispatch: DispatchFunc) => (faction:string,
   executeApi('factionUpdateProfile', {faction, id,  token}, onSuccess, onError);
 }
 
-export const fetchFactionStatuses = (dispatch: DispatchFunc) => async (faction: string, user: string) => {
+export const fetchFactionStatuses = (dispatch: DispatchFunc) => async (faction: string) => {
+  console.log('fetchFactionStatuses', fetchFactionStatuses);
   const token = getCookieToken();
+  const id = faction;
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
     clearLocalStorage('statuses');
@@ -239,11 +241,12 @@ export const fetchFactionStatuses = (dispatch: DispatchFunc) => async (faction: 
       payload: {severity: 'error', message, show: true},
     })
   };
-  executeApi('factionStatuses', {token, faction, user}, onSuccess, onError);
+  executeApi('statuses', {token, id}, onSuccess, onError);
 }
 
-export const setFactionUserStatus = (dispatch: DispatchFunc) => async (faction: string, body:string, user:string) => {
+export const setFactionUserStatus = (dispatch: DispatchFunc) => async (faction: string, body:string, userId:string) => {
   const token = getCookieToken();
+  const id = userId ? userId : '';
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
     const { message } = data;
@@ -259,7 +262,7 @@ export const setFactionUserStatus = (dispatch: DispatchFunc) => async (faction: 
       payload: {severity: 'error', message, show: true},
     })
   };
-  executeApi('factionStatusSet', {faction, user, body, token}, onSuccess, onError);
+  executeApi('factionSetStatus', {faction, id, body, token}, onSuccess, onError);
 }
 export const setUserHiddenStatus = (dispatch: DispatchFunc) => async () => {
 
@@ -282,7 +285,7 @@ export const fetchFactionUserSetStatuses = (dispatch: DispatchFunc) => async () 
       payload: {severity: 'error', message, show: true},
     })
   };
-  executeApi('statusesSet', {token}, onSuccess, onError);
+  executeApi('factionStatusesSet', {token}, onSuccess, onError);
 }
 export const toggleFactionStatusClass = (dispatch: DispatchFunc) => async (id: string) => {
   const token = getCookieToken();

@@ -153,6 +153,14 @@ export const authApiEnpoints = {
     method: "patch",
     path: "/api/factions/$faction",
   },
+  factionStatuses: {
+    method: "get",
+    path: "/api/factions/$faction/statuses/$id"      
+  },
+  factionSetStatus: {
+    method: "post",
+    path: "/api/factions/$faction/statuses/$id"      
+  },
   statuses: {
     method: "get",
     path: "/api/user/statuses/$id"       

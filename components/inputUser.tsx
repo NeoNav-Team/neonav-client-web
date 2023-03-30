@@ -18,6 +18,7 @@ import {
   MenuList,
   ClickAwayListener,
   InputAdornment,
+  Checkbox,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
@@ -67,7 +68,6 @@ export default function InputUser(props:InputUserProps):JSX.Element {
   })
 
   const handleChange = (event: SelectChangeEvent<typeof userName>) => {
-    console.log('handleChange', event);
     const {
       target: { value },
     } = event;
@@ -193,7 +193,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
             value={user.id || user.userid}
             style={getStyles((user.id || ''), (user.username as unknown as string[] || user.id), theme)}
           >
-            {(user.username as unknown as string[] || user.name as unknown as string[] || user.id || user.userid)}
+            <Checkbox checked={value.indexOf(user?.id as string || user?.userid as string) !== -1} />{(user.username as unknown as string[] || user.name as unknown as string[] || user.id || user.userid)}
           </MenuItem>
         ))}
       </Select>

@@ -90,6 +90,7 @@ export type NnChatMessage = {
 }
 
 export type NnFaction = {
+    thumbnail: string | undefined;
     id: string,
     admin: string,
     name: string,
@@ -222,11 +223,13 @@ export type NnProviderDispatch = {
     fetchChannelDetails: (_channelId:string) => void;
     fetchChannelUsers: (_channelId:string) => void;
     fetchFactionDetails: (_factionId:string) => void;
+    fetchFactionStatuses: (_factionId:string) => void;
     fetchUserProfile: () => void;
     updateUserProfile: (_document:any, _update:any) => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
     addUserToFaction: (_factionId:string, _userId:string) => void;
     adminUserToFaction: (_factionId:string, _userId:string) => void;
+    setFactionUserStatus: (_factionId:string, _body:string, _userId?:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
     leaveFaction: () => void;
