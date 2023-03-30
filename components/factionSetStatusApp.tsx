@@ -197,7 +197,10 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
     //validate payload
     const data = z.object({
       recipients: z.array(z.string()).nonempty(),
-      score: z.string(),
+      score: z.preprocess(
+        (a) => parseInt(z.string().parse(a), 10),
+        z.number()
+      ),
       rank: z.string(),
       type: z.string(),
       message: type === 'message' ? z.string().min(1) : z.string().optional(),
