@@ -111,6 +111,7 @@ export default function GardenSearchApp(props: GardenSearchAppProps):JSX.Element
                           key={`${item.userid}-${index}`}
                           id={item.userid || ''}
                           username={item.username}
+                          collection="garden"
                         />
                       </div> 
                     ))
