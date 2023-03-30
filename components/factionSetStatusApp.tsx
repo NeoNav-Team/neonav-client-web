@@ -38,6 +38,7 @@ import InboxIcon from '@mui/icons-material/Inbox';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import { Tag } from '@mui/icons-material';
 
 interface FactionSetStatusAppProps {
   params: {
@@ -52,6 +53,7 @@ interface MissionStatusForm {
   hidden?: boolean;
   score?: number;
   rank?: string;
+  value?: string |  number;
   recipients?: string[];
 }
 
@@ -134,6 +136,25 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
     }
   ]
 
+  const resetForm = () => {
+    setForm({message:'', tag:'', type:'message', rank:'D', score :0, recipients:[], hidden:false})
+  };
+
+  const statusFromForm = () => {
+    let statusMsgStr = '';
+    if (type === 'message') {
+      statusMsgStr = `${message}${tag.length >= 1 && ` #${tag}`}`
+    } else {
+      let statusMsgObj:MissionStatusForm = { type };
+      if (type === 'score') { statusMsgObj.value = score }
+      if (type === 'rank') { statusMsgObj.value = rank }
+      if (tag.length >= 1) { statusMsgObj.tag = tag }
+      statusMsgStr = JSON.stringify(statusMsgObj);
+    }
+    console.log('statusMsgStr', statusMsgStr);
+    return statusMsgStr;
+  }
+
   const goFetchFactionProfile = useCallback(() => {
     if (!profileFetched || !isRecentEntity) {
       fetchFactionDetails(accountId);
@@ -152,13 +173,31 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
     return errFields.indexOf(errStr) !== -1;
   }
 
-  const processTransactionQueue = () => {}
+  const processTransactionQueue = () => {
+    const transactionQueue = recipients;
+    const statusStringObj = statusFromForm();
+    const limit = pLimit(1);
+    const promises:Function[] = transactionQueue.map( userId => {
+      if(!hidden) {
+        limit(() => {setFactionUserStatus(accountId, statusStringObj, userId)});
+      } else {
+        limit(() => {setFactionUserStatus(accountId, statusStringObj, userId)}); //TODO: set hidden
+      }
+      return () => {};
+    });
+
+    const p = Promise.resolve(promises)
+      .then((data)=>{
+        resetForm();
+        setTimeout(()=> setLoading(false), 300); // shows indicator briefly for user feedback
+      });
+  }
 
   const sendPayload = () => {
     //validate payload
     const data = z.object({
       recipients: z.array(z.string()).nonempty(),
-      score: z.number(),
+      score: z.string(),
       rank: z.string(),
       type: z.string(),
       message: type === 'message' ? z.string().min(1) : z.string().optional(),
@@ -180,14 +219,14 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
         errFields = [...errFields, ...errObj.path]
       });
       setErrFields(errFields);
+      console.log('errFields', errFields);
     } else {
       setLoading(true);
-      console.log('processTransactionQueue()');
       setErrFields([]);
       processTransactionQueue();
     }
   }
-
+  
   const changeHandler = (event:React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event?.target;
     setForm({...form, [name]: value } );
@@ -214,7 +253,6 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
   const handleBigAction = () => {
     sendPayload();
   }
-
 
   useEffect(() => {
     goFetchFactionProfile();
@@ -370,7 +408,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
                   )}
                   <FormControl fullWidth>
                     <TextField
-                       error={hasErr('tag')}
+                      error={hasErr('tag')}
                       name="tag"
                       label="Hashtag"
                       value={tag}
@@ -416,7 +454,8 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
               bigHexProps={{
                 icon: <RateReviewIcon />,
                 handleAction: handleBigAction,
-                disabled: !isRep,
+                disabled: !isRep || loading,
+                loading: loading,
               }}
               thirdHexProps={{
                 disabled: true,

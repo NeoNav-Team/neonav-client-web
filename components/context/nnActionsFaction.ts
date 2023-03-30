@@ -223,7 +223,6 @@ export const factionUpdateProfile = (dispatch: DispatchFunc) => (faction:string,
 }
 
 export const fetchFactionStatuses = (dispatch: DispatchFunc) => async (faction: string) => {
-  console.log('fetchFactionStatuses', fetchFactionStatuses);
   const token = getCookieToken();
   const id = faction;
   const onSuccess = (response:APIResponse) => {
