@@ -3,6 +3,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
+import { isJsonStringValid } from '@/utilites/json';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, nnEntity, NnContact, NnStatus } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
@@ -233,16 +234,22 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                           {statuses && statuses.length >= 1 ? (
                             <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                               <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
-                                {statuses && statuses.length >= 1 && statuses.map(item => {
+                                {statuses && statuses.length >= 1 && statuses.map((item:NnStatus) => {
+                                  const { id, ts, from, body } = item;
+                                  const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
+                                  const stringTags:String[] = (body || '').match(/#\w+/g) || [];
                                   return (
                                     <div
                                       key={`${item.id}-container`}
                                     >
                                       <ItemStatus
-                                        id={item.id}
-                                        username={item.from}
-                                        date={item.ts}
-                                        text={item.body}
+                                        id={id}
+                                        username={from}
+                                        date={ts}
+                                        text={body}
+                                        action={type}
+                                        value={value}
+                                        tag={type ? tag : stringTags[0]}
                                         collection="status"
                                         hidden={item.class !== 'public'}
                                       />

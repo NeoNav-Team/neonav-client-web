@@ -2,11 +2,13 @@
 import { 
   Box,
   Stack,
-  Typography
+  Typography,
+  Chip,
 } from '@mui/material';
 import Link from 'next/link';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import Tag from '@mui/icons-material/Tag';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilites/fomat';
 import { ReactNode } from 'react';
@@ -19,11 +21,44 @@ interface itemStatusProps {
     action?: string;
     collection?: string;
     hidden?: boolean;
+    tag?: string;
+    value?: string
   }
   
 export default function ItemStatus(props:itemStatusProps):JSX.Element {
-  const { date = '', id = '', username = '', text = '', action, hidden, collection } = props;
-  const statusText = action ? action : 'comments';
+  const { date = '', id = '', username = '', text = '', value = '', action = 'comment', hidden, collection, tag } = props;
+
+  const statusAction  = (type:string) => {
+    let verb = 'comments';
+    switch(type) {
+    case 'score':
+      verb = 'distributes'
+      break;
+    case 'tally':
+      verb = 'recognises'
+      break;
+    case 'rank':
+      verb = 'ranks'
+      break;
+    }
+    return verb;
+  }
+
+  const statusText = (type:string) => {
+    let msg = text;
+    switch(type) {
+    case 'score':
+      msg = `[${value}] points for`
+      break;
+    case 'tally':
+      msg = 'your efforts in'
+      break;
+    case 'rank':
+      msg = `[Class ${value}] in`
+      break;
+    }
+    return msg;
+  }
 
   const status:ReactNode = (
     <>
@@ -35,8 +70,8 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
             alignItems="center"
           >
             <Typography>
-              <span className={styles.name}>{username}</span>  <span className={styles.action}>{statusText}</span> 》
-              <span className={styles.comment}>{text}</span>
+              <span className={styles.name}>{username}</span>  <span className={styles.action}>{statusAction(action)}</span> 》
+              <span className={styles.comment}>{statusText(action)}</span> {tag && <Chip icon={<Tag />} label={tag} style={{paddingLeft:0}} />}
             </Typography>
             {collection && (<Link href={`/${collection}/${id}`}><MoreVertIcon /></Link>)}
           </Stack>
