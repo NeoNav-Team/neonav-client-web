@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnContact } from './context/nnTypes';
@@ -14,6 +14,7 @@ import LocalFloristIcon from '@mui/icons-material/LocalFlorist'
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import { clearLocalStorage } from '@/utilites/localStorage';
 
 const MAX_USERS = 25;
 
@@ -69,18 +70,21 @@ export default function GardenSearchApp(props: GardenSearchAppProps):JSX.Element
   const [ search, setSearch ] = useState<string>('');
 
   const goSearch = useCallback((search:string) => {
+    clearLocalStorage('entityUsers');
     if (!contactsFetched) {
       userSearch(search);
       setContactsFetched(true);
     }
   }, [contactsFetched, userSearch]);
 
-  const searchForContact = (search:string) =>  {
-    console.log('scanning for', search);
+  const searchForContact = useCallback((search:string) =>  {
     setContactsFetched(false);
     setSearch(search);
-    goSearch(search);
-  }
+  }, []);
+
+  useEffect(() => {
+    search && goSearch(search)
+  }, [goSearch, search])
 
   return (
     <Container disableGutters style={{height: '100%'}}>
