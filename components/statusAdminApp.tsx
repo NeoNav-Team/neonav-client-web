@@ -25,7 +25,7 @@ import ItemStatus from './itemStatus';
 interface StatusAdminAppProps {
   params: {
     statusId: string;
-    factionId: string;
+    factionId?: string;
   }
 };
 
