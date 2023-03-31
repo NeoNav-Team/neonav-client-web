@@ -4,6 +4,7 @@ import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnStatus, nnEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
+import { isJsonStringValid } from '@/utilites/json';
 import SubheaderGarden from './subheaderEntity';
 import ItemStatus from './itemStatus';
 import FooterNav from './footerNav';
@@ -121,15 +122,21 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
                 <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                   <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
                     {statuses && statuses.length >= 1 && statuses.map(item => {
+                      const { id, ts, from, body } = item;
+                      const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
+                      const stringTags:String[] = (body || '').match(/#\w+/g) || [];
                       return (
                         <div
                           key={`${item.id}-container`}
                         >
                           <ItemStatus
-                            id={item.id}
-                            username={item.from}
-                            date={item.ts}
-                            text={item.body}
+                            id={id}
+                            username={from}
+                            date={ts}
+                            text={body}
+                            action={type}
+                            value={value}
+                            tag={type ? tag : stringTags[0]}
                             collection="status"
                             hidden={item.class !== 'public'}
                           />

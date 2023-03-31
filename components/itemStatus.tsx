@@ -71,9 +71,9 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
           >
             <Typography>
               <span className={styles.name}>{username}</span>  <span className={styles.action}>{statusAction(action)}</span> 》
-              <span className={styles.comment}>{statusText(action)}</span> {tag && <Chip icon={<Tag />} label={tag} style={{paddingLeft:0}} />}
+              <span className={styles.comment}>{statusText(action)}</span> {tag && <Chip icon={<Tag />} component="span" label={tag} className={styles.hashtag} />}
             </Typography>
-            {collection && (<Link href={`/${collection}/${id}`}><MoreVertIcon /></Link>)}
+            {collection && (<MoreVertIcon />)}
           </Stack>
         </Box>
       </div><Stack direction="row" spacing={1} alignItems="flex-end" justifyContent="flex-end">

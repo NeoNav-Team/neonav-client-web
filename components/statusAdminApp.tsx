@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import React, { useCallback, useContext, useState, useMemo, useRef, useEffect } from 'react';
+import { isJsonStringValid } from '@/utilites/json';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnStatus } from './context/nnTypes';
@@ -23,7 +24,8 @@ import ItemStatus from './itemStatus';
 
 interface StatusAdminAppProps {
   params: {
-    id: string;
+    statusId: string;
+    factionId: string;
   }
 };
 
@@ -56,7 +58,7 @@ const flexFooter = {
 
 export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
   const { params } = props;
-  const { id } = params;
+  const { statusId, factionId } = params;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
@@ -64,17 +66,22 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
   const { 
     state,
     fetchUserStatuses = (id:string) =>{},
-    toggleStatusClass = (id:string) => {},
-    removeStatus = (id:string) => {},
+    toggleStatusClass = (id:string, factionId?:string) => {},
+    removeStatus = (id:string, factionId?:string) => {},
   }: NnProviderValues = useContext(NnContext);
-  const userId:string = state?.user?.profile?.auth?.userid || '';
+  const userId:string = factionId || state?.user?.profile?.auth?.userid || '';
   const statuses:NnStatus[] = state?.network?.collections?.statuses || [];
-  const selectedStatus = statuses.filter(status => status.id === id)[0] || null;
-  const alertMessage = useMemo(() => { 
-    return state?.network?.alert?.message || '';
+  const selectedStatus = statuses.filter(status => status.id === statusId)[0] || null;
+  const alertShow = useMemo(() => { 
+    return state?.network?.alert?.show || false;
   }, [state]);
 
+  const { body } = selectedStatus ? selectedStatus : {body: null};
+  const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
+  const stringTags:String[] = (body || '').match(/#\w+/g) || [];
+
   const [ fetched, setFetched ] = useState(false);
+  const [ refetched, setRefetched ] = useState(false);
 
   const goFetchUserStatuses = useCallback(() => {
     if (!fetched) {
@@ -88,23 +95,22 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
   }, [goFetchUserStatuses, userId]);
 
   useEffect(() => {
-    if (alertMessage && alertMessage.includes("Status")) {
-      goFetchUserStatuses();
+    if (alertShow && !refetched)  {
+      setRefetched(true);
+      fetchUserStatuses(userId);
     }
-  }, [alertMessage, goFetchUserStatuses, userId]);
+    if (!alertShow) {
+      setRefetched(false);
+    }
+  }, [alertShow, fetchUserStatuses, goFetchUserStatuses, refetched, userId]);
 
   const goRemoveStatus = () =>  {
-    removeStatus(selectedStatus?.id);
+    removeStatus(selectedStatus?.id, factionId);
     setFetched(false);
   }
 
   const goToggleStatus = () =>  {
-    toggleStatusClass(selectedStatus?.id);
-    setFetched(false);
-  }
-
-  const handleBigAction = () => {
-    toggleStatusClass(selectedStatus?.id);
+    toggleStatusClass(selectedStatus?.id, factionId);
     setFetched(false);
   }
 
@@ -130,7 +136,9 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
                         username={selectedStatus.from}
                         date={selectedStatus.ts}
                         text={selectedStatus.body}
-                        
+                        action={type}
+                        value={value}
+                        tag={tag || stringTags[0]}
                       />
                     ) : (
                       <Typography variant="h4">404 STATUS NOT FOUND</Typography>
@@ -158,13 +166,14 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
               bigHexProps={{
                 icon: selectedStatus && selectedStatus.class === 'public' ? <VisibilityIcon /> : <VisibilityOffIcon />,
                 handleAction: goToggleStatus,
+                disabled: alertShow,
               }}
               thirdHexProps={{
                 disabled: true,
               }}
               fourthHexProps={{
                 icon: <TocIcon />,
-                link: '/garden',
+                link: factionId ? `/factions/${factionId}` : '/garden',
               }}
             />
           </Box>

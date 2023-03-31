@@ -31,7 +31,7 @@ import { use100vh } from 'react-div-100vh';
 
 interface FactionProfileAppProps {
   params: {
-    id: string;
+    factionId: string;
   }
 };
 
@@ -83,7 +83,7 @@ const flexFooter = {
 
 export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Element {
   const { params } = props;
-  const { id } = params;
+  const { factionId } = params;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
@@ -91,6 +91,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     state,
     fetchFactionDetails = (accountId:string) => {},
     fetchFactionStatuses = (accountId:string) => {},
+    
     updateFactionProfile = (factionId:string, document:any, update:any) => {},
   }: NnProviderValues = useContext(NnContext);
   const profile:nnEntity = useMemo(() => {
@@ -101,7 +102,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     return statuses.filter(status => status.class === 'public');
   }, [state?.network?.collections?.statuses]);
   const userId = state?.user?.profile?.auth?.userid;
-  const accountId = id || state?.network?.selected?.account || '';
+  const accountId = factionId || state?.network?.selected?.account || '';
   const admin = profile && profile?.admin?.length && profile?.admin[0];
   const reps = profile && profile?.reps;
   const isAdmin = profile && userId === admin?.userid;
@@ -239,7 +240,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                                   const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
                                   const stringTags:String[] = (body || '').match(/#\w+/g) || [];
                                   return (
-                                    <div
+                                    <Box
                                       key={`${item.id}-container`}
                                     >
                                       <ItemStatus
@@ -250,10 +251,10 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                                         action={type}
                                         value={value}
                                         tag={type ? tag : stringTags[0]}
-                                        collection="status"
+                                        collection={`factions/${factionId}/status`}
                                         hidden={item.class !== 'public'}
                                       />
-                                    </div>
+                                    </Box>
                                   );
                                 })}
                               </Stack>

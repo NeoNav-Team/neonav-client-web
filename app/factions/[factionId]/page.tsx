@@ -3,7 +3,9 @@ import FactionProfileApp from '@/components/factionProfileApp';
 export default function FactionProfile({
   params,
 }: {
-  params: { id: string };
+  params: { 
+    factionId: string
+ };
 }) {
   return (<FactionProfileApp params={params} />);
 }

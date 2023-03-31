@@ -124,6 +124,10 @@
     opacity: 0.5;
 }
 
+.hashtag svg {
+    margin-right: -10px;
+}
+
 .comment {
     display: inline-block;
     border-left: 3px solid  var(--color-2);

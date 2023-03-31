@@ -189,7 +189,7 @@ export const fetchUserSetStatuses = (dispatch: DispatchFunc) => async () => {
   };
   executeApi('statusesSet', {token}, onSuccess, onError);
 }
-export const toggleStatusClass = (dispatch: DispatchFunc) => async (id: string) => {
+export const toggleStatusClass = (dispatch: DispatchFunc) => async (id: string, faction?:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
@@ -206,10 +206,14 @@ export const toggleStatusClass = (dispatch: DispatchFunc) => async (id: string) 
       payload: {severity: 'error', message, show: true},
     })
   };
-  executeApi('toggleStatusScope', {id, token}, onSuccess, onError);
+  if (faction){
+    executeApi('toggleFactionStatusScope', {id, faction, token}, onSuccess, onError);
+  } else {
+    executeApi('toggleStatusScope', {id, token}, onSuccess, onError);
+  }
 }
 
-export const removeStatus = (dispatch: DispatchFunc) => async (id: string) => {
+export const removeStatus = (dispatch: DispatchFunc) => async (id: string, faction?:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
@@ -226,7 +230,11 @@ export const removeStatus = (dispatch: DispatchFunc) => async (id: string) => {
       payload: {severity: 'error', message, show: true},
     })
   };
-  executeApi('statusRemove', {id, token}, onSuccess, onError);
+  if (faction) {
+    executeApi('factionStatusRemove', {id, faction, token}, onSuccess, onError); 
+  } else{
+    executeApi('statusRemove', {id, token}, onSuccess, onError);
+  }
 }
 
 export const userSearch = (dispatch: DispatchFunc) => async (query:string) => {

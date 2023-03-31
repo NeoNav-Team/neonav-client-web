@@ -173,6 +173,10 @@ export const authApiEnpoints = {
     method: "delete",
     path: "/api/user/statuses/$id"       
   },
+  factionStatusRemove: {
+    method: "delete",
+    path: "/api/factions/$faction/statuses/$id"       
+  },
   statusSetHidden: {
     method: "post",
     path: "/api/user/statuses/$id/hidden"       
@@ -184,6 +188,10 @@ export const authApiEnpoints = {
   toggleStatusScope: {
     method: "put",
     path: "/api/user/statuses/$id"       
+  },
+  toggleFactionStatusScope: {
+    method: "put",
+    path: "/api/factions/$faction/statuses/$id"       
   },
   searchUsers: {
     method: "post",
