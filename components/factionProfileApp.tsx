@@ -288,9 +288,9 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                 handleAction: editButtonAction,
               }}
               secondHexProps={{
-                disabled: true,
+                disabled: !isAdmin,
                 icon: <AllInboxIcon />,
-                link: `/factions/${accountId}/statuses`,
+                link: `/factions/${accountId}/status/inbox`,
               }}
               bigHexProps={
                 isRep ? {

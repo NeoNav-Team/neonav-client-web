@@ -12,7 +12,6 @@ import {
   Typography,
   CircularProgress
 } from '@mui/material';
-import RateReviewIcon from '@mui/icons-material/RateReview';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -144,7 +143,6 @@ export default function FactionsApp(props: FactionsAppProps):JSX.Element {
           <Box sx={flexFooter}>
             <FooterNav
               bigHexProps={{
-                icon: <RateReviewIcon />,
                 disabled: true,
               }}
             />

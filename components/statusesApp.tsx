@@ -5,26 +5,27 @@ import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnStatus, nnEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import { isJsonStringValid } from '@/utilites/json';
-import SubheaderGarden from './subheaderEntity';
 import ItemStatus from './itemStatus';
 import FooterNav from './footerNav';
 import { 
   Container,
   Box,
-  CircularProgress
+  CircularProgress,
+  Tab,
+  Tabs,
+  Divider,
+  Typography
 } from '@mui/material';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import FilterListOffIcon from '@mui/icons-material/FilterListOff';
-import RateReviewIcon from '@mui/icons-material/RateReview';
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import AllInboxIcon from '@mui/icons-material/AllInbox';
+import ListIcon from '@mui/icons-material/List';
+import OutboxIcon from '@mui/icons-material/Outbox';
+import MoveToInboxIcon from '@mui/icons-material/MoveToInbox';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 interface GardenAppProps {
-  incoming: boolean;
   params: {
-    id:string
+    factionId?:string,
+    outbound?: boolean,
   }
 };
 
@@ -59,53 +60,56 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
-  const { incoming = false, params } = props;
-  const { id } = params;
+  const { params } = props;
+  const { outbound, factionId } = params;
   const { 
     state,
-    fetchUserStatuses = (id:string) => {},
-    setUserStatus = (id:string, status: string) => {},
-    fetchContact = (id:string) => {},
+    fetchUserStatuses = (id:string, factionId?:string) => {},
+    fetchUserSetStatuses = (id?:string, factionId?:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const [ filter, setFilter ] = useState(true)
-  const statuses:NnStatus[]  = useMemo(() => {
+  const statusesPublic:NnStatus[]  = useMemo(() => {
     const statuses = state?.network?.collections?.statuses || [];
     return filter ? statuses.filter(status => status.class === 'public') : statuses;
   }, [filter, state?.network?.collections?.statuses]);
-  const entity:nnEntity  = useMemo(() => {
-    return state?.network?.entity || {};
-  }, [state]);
+  const statusesPrivate:NnStatus[]  = useMemo(() => {
+    const statuses = state?.network?.collections?.statuses || [];
+    return filter ? statuses.filter(status => status.class !== 'public') : statuses;
+  }, [filter, state?.network?.collections?.statuses]);
+  const statusesHidden:NnStatus[]  = useMemo(() => {
+    const statuses = state?.network?.collections?.statuses || [];
+    return filter ? statuses.filter(status => status.class === 'hidden') : statuses;
+  }, [filter, state?.network?.collections?.statuses]);
   const userId = state?.user?.profile?.auth?.userid || '';
-  const isAdmin = userId === entity.id;
   const [ collectionFetched, setCollectionFetched ] = useState(false);
+  const [ tabIndex, setTabIndex ] = useState(1);
+  const statusArr = [statusesPrivate, statusesPublic, statusesHidden];
 
   const goFetchStatues = useCallback(() => {
     if (userId.length >= 10 && !collectionFetched) {
-      if (incoming) {
-        fetchUserStatuses(userId);
+      if (outbound) {
+        fetchUserSetStatuses(factionId || userId);
       } else {
-        fetchUserStatuses(id || userId);
+        fetchUserStatuses(factionId || userId);
       }
-      fetchContact(id || userId);
       setCollectionFetched(true);
     }
-  }, [collectionFetched, fetchContact, fetchUserStatuses, id, incoming, userId]);
+  }, [collectionFetched, factionId, fetchUserSetStatuses, fetchUserStatuses, outbound, userId]);
 
   useEffect(() => {
-    const statusSize = statuses && statuses.length;
-    (statusSize === 0 || !collectionFetched) && goFetchStatues();
-  }, [collectionFetched, goFetchStatues, statuses]);
+    !collectionFetched && goFetchStatues();
+  }, [collectionFetched, goFetchStatues]);
   
 
-  const handleBigAction = (status:string) => {
-    const statusUserId:string = entity?.id || '';
-    setUserStatus(statusUserId, status);
+  const handleTabs =  (event: React.SyntheticEvent, newIndex: number) => {
+    setTabIndex(newIndex);
   }
 
-  const toggleFilter = () => {
-    setFilter(!filter);
+  const boxLink = () => {
+    let dir = factionId ? `/factions/${factionId}/status/` : '/status/';
+    let boxType = outbound ? 'inbox' : 'outbox';
+    return dir + boxType;
   }
-
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -115,13 +119,22 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
         data-augmented-ui="tr-rect br-clip bl-clip both"
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
-          <SubheaderGarden photo={entity.image} title={entity.name} />
+          <Box>
+            <Divider variant="middle"  color="primary">
+              <Typography variant="h6">{outbound ? 'Outbox' : 'Inbox'}</Typography>
+            </Divider>
+          </Box>
+          <Tabs value={tabIndex} onChange={handleTabs} aria-label="basic tabs example">
+            <Tab label="Private" />
+            <Tab label="Public" />
+            {outbound && (<Tab label="Hidden" />)}
+          </Tabs>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {collectionFetched ? (
-              <><SimpleScrollContainer>
+              <SimpleScrollContainer>
                 <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                   <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
-                    {statuses && statuses.length >= 1 && statuses.map(item => {
+                    {statusArr && statusArr[tabIndex].length >= 1 && statusArr[tabIndex].map(item => {
                       const { id, ts, from, body } = item;
                       const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
                       const stringTags:String[] = (body || '').match(/#\w+/g) || [];
@@ -145,7 +158,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
                     })}
                   </Stack>
                 </Box>
-              </SimpleScrollContainer></>
+              </SimpleScrollContainer>
             ) : (
               <Stack
                 direction="column"
@@ -160,26 +173,21 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
           <Box sx={flexFooter}>
             <FooterNav
               firstHexProps={{
-                icon: filter ? <FilterListIcon /> : <FilterListOffIcon />,
-                handleAction: toggleFilter,
-                disabled: !isAdmin,
-              }}
-              secondHexProps={{
-                icon: <AllInboxIcon />,
-                link: '/status/inbox'
-              }}
-              bigHexProps={{
-                icon: <RateReviewIcon />,
-                handleAction: handleBigAction,
-                dialog: 'What would you like to share?',
-                useInput: true,
-              }}
-              thirdHexProps={{
                 disabled: true,
               }}
+              secondHexProps={{
+                disabled: true,
+              }}
+              bigHexProps={{
+                disabled: true,
+              }}
+              thirdHexProps={{
+                icon: outbound ? <OutboxIcon /> : <MoveToInboxIcon />,
+                link: boxLink(),
+              }}
               fourthHexProps={{
-                icon: <PersonSearchIcon />,
-                link: '/garden/search'
+                icon: <ListIcon />,
+                link: factionId ? `factions/${factionId}` : '/garden'
               }}
             />
           </Box>

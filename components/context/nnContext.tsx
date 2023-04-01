@@ -101,6 +101,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setUserStatuses':
     clonedState.network.collections.statuses = payload;
     break;
+  case 'setUserHiddenStatuses':
+    clonedState.network.collections.hiddenStatuses = payload;
+    break;
   case 'setFactions':
     clonedState.network.collections.factions = payload;
     break;

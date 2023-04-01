@@ -139,8 +139,8 @@ export type NnNetwork = {
         contacts?: NnContact[],
         entityUsers?: NnContact[],
         factions?: NnFaction[],
-        statuses: any[],
-        privateStatuses: any[],
+        statuses: NnStatus[],
+        hiddenStatuses: NnStatus[],
         scannedEntities?: NnContact[] | NnFaction[],
     },
     entity: nnEntity;
@@ -170,6 +170,7 @@ export type ActionTypes =
   'setUserContacts' | 
   'setChatMessages' |
   'setUserStatuses' |
+  'setUserHiddenStatuses' | 
   'setMessageHistory' |
   'removeStatus' |
   'setSelected' |
@@ -230,6 +231,9 @@ export type NnProviderDispatch = {
     addUserToFaction: (_factionId:string, _userId:string) => void;
     adminUserToFaction: (_factionId:string, _userId:string) => void;
     setFactionUserStatus: (_factionId:string, _body:string, _userId?:string) => void;
+    fetchUserSetStatuses: (_userId?:string, _factionId?:string) => void;
+    fetchUserHiddenStatuses: (_userId?:string, _factionId?:string) => void;
+    fetchUserHiddenSetStatuses: (_userId?:string, _factionId?:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
     leaveFaction: () => void;
@@ -249,8 +253,8 @@ export type NnProviderDispatch = {
     fetchUserStatuses: (_userId:string) => void;
     setUserStatus: (_userId:string, _body:string) => void;
     removeStatus: (_statusId:string, _factionId?:string) => void;
-    setUserHiddenStatus: (_userId:string, _body:string) => void;
-    getUserSetStatuses: (_userId:string) => void;
+    setUserHiddenStatus: (_userId:string, _body:string, _factionId?:string) => void;
+    getUserSetStatuses: (_userId:string,  _factionId?:string) => void;
     toggleStatusClass: (_userId:string, _factionId?:string) => void;
     userSearch: (_search:string) => void;
     toggleChannelScope: (_channelId:string) => void;
