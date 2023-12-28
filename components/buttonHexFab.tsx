@@ -1,14 +1,12 @@
-import { cloneElement, useRef, useState } from 'react';
+import { cloneElement, useState } from 'react';
 import {
   Box,
   Fab,
   Link,
   CircularProgress,
 } from '@mui/material';
-import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import styles from '../styles/buttonHexFab.module.css';
 import SimpleDialog from './simpleDialog';
-import { Opacity } from '@mui/icons-material';
 
 
 type BtnSizes = 'small' | 'medium' | 'large';

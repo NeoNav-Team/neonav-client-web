@@ -96,7 +96,7 @@ export type NnFaction = {
 }
 
 
-/* Entity is currently a catch-all but realistically shoudld be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
+/* Entity is currently a catch-all but realistically should be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
 export type nnEntity = {
     firstname?: string;
     lastname?: string;

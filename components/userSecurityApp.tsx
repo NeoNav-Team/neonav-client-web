@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, nnEntity, } from './context/nnTypes';
+import { NnProfileAuth, NnProviderValues, nnEntity, } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import FooterNav from './footerNav';
 import {
@@ -26,6 +26,14 @@ type Form = {
 }
 type FormKey =
   'password';
+
+const defaultAuth = {
+  userid: '',
+  email: '',
+  emailverified: false,
+  lastlogin: '',
+  lastip: '',
+}
 
 const defaultForm = {
   password: '',
@@ -72,11 +80,12 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     fetchUserProfile = () => {},
     updateUserProfile = (document: any, update: any) => {},
   }: NnProviderValues = useContext(NnContext);
-  const Profile: nnEntity = useMemo(() => {
-    return state?.network?.entity?.auth || {};
+  const AuthProfile: NnProfileAuth = useMemo(() => {
+    console.log(state?.network?.entity?.auth);
+    return state?.network?.entity?.auth || defaultAuth;
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
-  const isAdmin = accountId === Profile?.auth?.userid;
+  const isAdmin = accountId === AuthProfile?.userid;
   const [SecurityFetched, setSecurityFetched] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState<Form>(defaultForm);
@@ -89,23 +98,23 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     }
   }, [SecurityFetched, fetchUserProfile]);
 
-  const updateDefaultForm = (Profile: nnEntity) => {
+  const updateDefaultForm = (AuthProfile: NnProfileAuth) => {
     let updatedDefaultForm: Form = defaultForm;
     Object.keys(updatedDefaultForm).map(function (key) {
-      if ((Profile as any)[key]) (updatedDefaultForm as any)[key] = (Profile as any)[key]
+      if ((AuthProfile as any)[key]) (updatedDefaultForm as any)[key] = (AuthProfile as any)[key]
     });
     setForm(updatedDefaultForm);
   }
 
   useEffect(() => {
     goFetchSecurity();
-  }, [goFetchSecurity, Profile]);
+  }, [goFetchSecurity, AuthProfile]);
 
   useEffect(() => {
-    if (Object.keys(Profile).length >= 3) {
-      updateDefaultForm(Profile);
+    if (Object.keys(AuthProfile).length >= 3) {
+      updateDefaultForm(AuthProfile);
     }
-  }, [Profile]);
+  }, [AuthProfile]);
 
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event?.target;
@@ -139,14 +148,14 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
         <Box sx={{ ...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT }}>
           <Box sx={{ ...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {SecurityFetched ? (
-              Profile && Object.keys(Profile).length !== 0 ? (
+              AuthProfile && Object.keys(AuthProfile).length !== 0 ? (
                 <SimpleScrollContainer>
                   <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                     <Stack spacing={0} sx={{ display: 'flex' }}>
                       <Divider variant="middle" color="primary"><Typography variant="h6">Account Details</Typography></Divider>
                       <TextField
                         name="userid"
-                        value={Profile?.auth?.userid}
+                        value={AuthProfile?.userid}
                         label="User ID"
                         variant="outlined"
                         style={input}
@@ -156,7 +165,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                       />
                       <TextField
                         name="email"
-                        value={Profile?.auth?.email}
+                        value={AuthProfile?.email}
                         label="Email"
                         variant="outlined"
                         style={input}
@@ -166,7 +175,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                       />
                       <TextField
                         name="verified"
-                        value={Profile?.auth?.emailverified}
+                        value={AuthProfile?.emailverified}
                         label="Verified"
                         variant="outlined"
                         style={input}
@@ -177,7 +186,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                       <Divider variant="middle" color="primary"><Typography variant="h6">Security Details</Typography></Divider>
                       <TextField
                         name="lastLogin"
-                        value={Profile?.auth?.lastlogin}
+                        value={AuthProfile?.lastlogin}
                         label="Last Login"
                         variant="outlined"
                         style={input}
@@ -187,7 +196,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                       />
                       <TextField
                         name="lastIp"
-                        value={Profile?.auth?.lastip}
+                        value={AuthProfile?.lastip}
                         label="Last Known IP"
                         variant="outlined"
                         style={input}
