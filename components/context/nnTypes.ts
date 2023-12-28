@@ -35,7 +35,6 @@ export type NnProfileMeta = {
 }
 
 export type NnUserProfile = {
-    auth: NnProfileAuth,
     meta: NnProfileMeta,
 }
 
@@ -119,6 +118,7 @@ export type nnEntity = {
     reps?: any;
     members?: any;
     admin?: any;
+    auth?: NnProfileAuth,
 }
 
 export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];

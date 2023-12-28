@@ -11,7 +11,7 @@
     margin-top: -50%;
     transition: all 0.25s ease-out;
     opacity: 0.66;
-    --aug-all-width: 88%;
+    --aug-all-width: 100%;
     --reticle-color: var(--color-3);
     --aug-border-all: 1px;
     --reticle-size: calc(var(--aug-all-width) * 0.25);
@@ -37,7 +37,7 @@
     margin-top: -50%;
     transition: all 0.25s ease-out;
     opacity: 0.5;
-    --aug-all-width: 88%;
+    --aug-all-width: 100%;
     --aug-border-all: 1px;
     --reticle-size: var(--aug-all-width);
     --aug-border-bg: radial-gradient(

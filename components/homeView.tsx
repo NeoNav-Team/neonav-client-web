@@ -312,10 +312,10 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                     alignItems="center"
                     minHeight={fixedHeight}
                   >
-                    <Link href="/account">
+                    <Link href="/security">
                       <IconFrame
                         icon={<AdminPanelSettingsIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
-                        title="Account"
+                        title="Security"
                       />
                     </Link>
                   </Box>

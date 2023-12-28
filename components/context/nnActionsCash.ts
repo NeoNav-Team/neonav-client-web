@@ -12,7 +12,7 @@ export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount
   const onSuccess = (response:APIResponse) => {
     dispatch({
       type: 'setAlert',
-      payload: {severity: 'success', message: 'Payments Sucessful', show: true},
+      payload: {severity: 'success', message: 'Payments Successful', show: true},
     })
   };
   const onError = (err:netcheckAPIResData) => {
@@ -30,7 +30,7 @@ export const sendFactionPayment = (dispatch: DispatchFunc) => (faction: string, 
   const onSuccess = (response:APIResponse) => {
     dispatch({
       type: 'setAlert',
-      payload: {severity: 'success', message: 'Payments Sucessful', show: true},
+      payload: {severity: 'success', message: 'Payments Successful', show: true},
     })
   };
   const onError = (err:netcheckAPIResData) => {
@@ -48,7 +48,7 @@ export const requestPayment = (dispatch: DispatchFunc) => (id:string, amount:str
   const onSuccess = (response:APIResponse) => {
     dispatch({
       type: 'setAlert',
-      payload: {severity: 'success', message: 'Requests Sucessful', show: true},
+      payload: {severity: 'success', message: 'Requests Successful', show: true},
     })
   };
   const onError = (err:netcheckAPIResData) => {
