@@ -24,7 +24,6 @@ export const nnSchema:NnStore = {
       entityUsers: [],
       factions: [],
       statuses: [],
-      hiddenStatuses: [],
       scannedEntities: [],
     },
     entity: {}

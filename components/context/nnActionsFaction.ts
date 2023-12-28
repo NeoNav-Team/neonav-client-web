@@ -261,12 +261,10 @@ export const setFactionUserStatus = (dispatch: DispatchFunc) => async (faction: 
       payload: {severity: 'error', message, show: true},
     })
   };
+  console.log('factionSetStatus', faction, id, body, token);
   executeApi('factionSetStatus', {faction, id, body, token}, onSuccess, onError);
 }
-export const setUserHiddenStatus = (dispatch: DispatchFunc) => async () => {
 
-
-}
 export const fetchFactionUserSetStatuses = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {

@@ -91,7 +91,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     state,
     fetchFactionDetails = (accountId:string) => {},
     fetchFactionStatuses = (accountId:string) => {},
-    
+    setUserStatus = (accountId:string, body:string) => {},
     updateFactionProfile = (factionId:string, document:any, update:any) => {},
   }: NnProviderValues = useContext(NnContext);
   const profile:nnEntity = useMemo(() => {
@@ -185,8 +185,8 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     setEditMode(!editMode);
   }
 
-  const writeButtonAction = (value:string) => {
-    console.log('value', value);
+  const writeButtonAction = (status:string) => {
+    setUserStatus(accountId, status);
   }
 
   return (

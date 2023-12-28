@@ -18,6 +18,7 @@ import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import AllInboxIcon from '@mui/icons-material/AllInbox';
+import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -65,6 +66,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
     state,
     fetchUserStatuses = (id:string) => {},
     setUserStatus = (id:string, status: string) => {},
+    setUserHiddenStatus = (id:string, status: string) => {},
     fetchContact = (id:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const [ filter, setFilter ] = useState(true)
@@ -100,6 +102,11 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   const handleBigAction = (status:string) => {
     const statusUserId:string = entity?.id || '';
     setUserStatus(statusUserId, status);
+  }
+
+  const handleLittleAction = (status:string) => {
+    const statusUserId:string = entity?.id || '';
+    setUserHiddenStatus(statusUserId, status);
   }
 
   const toggleFilter = () => {
@@ -175,7 +182,10 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
                 useInput: true,
               }}
               thirdHexProps={{
-                disabled: true,
+                icon: <PsychologyAltIcon />,
+                handleAction: handleLittleAction,
+                dialog: 'Write a secret log entry for this user?',
+                useInput: true,
               }}
               fourthHexProps={{
                 icon: <PersonSearchIcon />,

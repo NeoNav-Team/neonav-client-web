@@ -183,16 +183,15 @@ export const setUserHiddenStatus = (dispatch: DispatchFunc) => async (id:string,
     })
   };
   if (faction){
-    executeApi('setFactionHiddenStatuses', {token, id, body, faction}, onSuccess, onError);
+    executeApi('factionHiddenStatusSet', {token, id, body, faction}, onSuccess, onError);
   } else {
-    executeApi('setHiddenStatuses', {id, body, token}, onSuccess, onError);
+    executeApi('hiddenStatusSet', {id, body, token}, onSuccess, onError);
   }
 }
-export const fetchUserSetStatuses = (dispatch: DispatchFunc) => async (id?:string, faction?:string) => {
+export const fetchUserSetStatuses = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
-    console.log('fetchUserSetStatuses', data);
     clearLocalStorage('statuses');
     dispatch({
       type: 'setUserStatuses',
@@ -206,11 +205,7 @@ export const fetchUserSetStatuses = (dispatch: DispatchFunc) => async (id?:strin
       payload: {severity: 'error', message, show: true},
     })
   };
-  if (faction){
-    executeApi('factionStatusesSet', {faction, token}, onSuccess, onError);
-  } else {
-    executeApi('statusesSet', {token}, onSuccess, onError);
-  }
+  executeApi('statusesSet', {id, token}, onSuccess, onError);
 }
 
 export const toggleStatusClass = (dispatch: DispatchFunc) => async (id: string, faction?:string) => {

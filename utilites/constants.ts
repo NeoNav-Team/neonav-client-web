@@ -169,9 +169,17 @@ export const authApiEnpoints = {
     method: "post",
     path: "/api/user/statuses/$id"       
   },
+  hiddenStatusSet: {
+    method: "post",
+    path: "/api/user/statuses/$id/hidden"       
+  },
+  factionHiddenStatusSet: {
+    method: "post",
+    path: "/api/factions/$faction/statuses/$id/hidden"       
+  },
   statusesSet: {
     method: "get",
-    path: "/api/user/setstatuses"       
+    path: "/api/user/setstatuses/$id"       
   },
   statusRemove: {
     method: "delete",

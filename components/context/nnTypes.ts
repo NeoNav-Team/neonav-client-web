@@ -140,7 +140,6 @@ export type NnNetwork = {
         entityUsers?: NnContact[],
         factions?: NnFaction[],
         statuses: NnStatus[],
-        hiddenStatuses: NnStatus[],
         scannedEntities?: NnContact[] | NnFaction[],
     },
     entity: nnEntity;
@@ -231,9 +230,7 @@ export type NnProviderDispatch = {
     addUserToFaction: (_factionId:string, _userId:string) => void;
     adminUserToFaction: (_factionId:string, _userId:string) => void;
     setFactionUserStatus: (_factionId:string, _body:string, _userId?:string) => void;
-    fetchUserSetStatuses: (_userId?:string, _factionId?:string) => void;
-    fetchUserHiddenStatuses: (_userId?:string, _factionId?:string) => void;
-    fetchUserHiddenSetStatuses: (_userId?:string, _factionId?:string) => void;
+    fetchUserSetStatuses: (_userId:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
     leaveFaction: () => void;

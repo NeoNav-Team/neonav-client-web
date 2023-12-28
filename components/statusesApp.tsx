@@ -64,8 +64,8 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   const { outbound, factionId } = params;
   const { 
     state,
-    fetchUserStatuses = (id:string, factionId?:string) => {},
-    fetchUserSetStatuses = (id?:string, factionId?:string) => {},
+    fetchUserStatuses = (id:string) => {},
+    fetchUserSetStatuses = (id:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const [ filter, setFilter ] = useState(true)
   const statusesPublic:NnStatus[]  = useMemo(() => {
@@ -86,11 +86,11 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
   const statusArr = [statusesPrivate, statusesPublic, statusesHidden];
 
   const goFetchStatues = useCallback(() => {
-    if (userId.length >= 10 && !collectionFetched) {
+    if (userId.length >= 3 && !collectionFetched) {
       if (outbound) {
-        fetchUserSetStatuses(factionId || userId);
+        fetchUserSetStatuses(factionId || userId || '');
       } else {
-        fetchUserStatuses(factionId || userId);
+        fetchUserStatuses(factionId || userId || '');
       }
       setCollectionFetched(true);
     }
@@ -187,7 +187,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
               }}
               fourthHexProps={{
                 icon: <ListIcon />,
-                link: factionId ? `factions/${factionId}` : '/garden'
+                link: factionId ? `/factions/${factionId}` : '/garden'
               }}
             />
           </Box>

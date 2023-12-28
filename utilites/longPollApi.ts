@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { apiUrl, authApiEnpoints } from '../utilites/constants';
 
-const WAIT_TIME = 30000;
+const WAIT_TIME = 300000;
 
 const newAbortSignal = (timeoutMs:number) => {
   const abortController = new AbortController();
@@ -82,7 +82,6 @@ const longPollApi = async (endpoint:string, data:any, callback: any, errBack: an
     // Call longPollResponseMessages() again to get the next message
     const since = longPollResponse?.data[0];
     let newData = {since, token};
-    console.log('since', since);
     await longPollApi(endpoint, newData, callback, errBack);
   }
 }

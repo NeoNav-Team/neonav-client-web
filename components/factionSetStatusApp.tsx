@@ -33,16 +33,13 @@ import ChatIcon from '@mui/icons-material/Chat';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import TagIcon from '@mui/icons-material/Tag';
-import MailLockIcon from '@mui/icons-material/MailLock';
-import InboxIcon from '@mui/icons-material/Inbox';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
-import { Tag } from '@mui/icons-material';
 
 interface FactionSetStatusAppProps {
   params: {
-    id: string;
+    factionId: string;
   }
 };
 
@@ -90,12 +87,13 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { params } = props;
-  const { id } = params;
+  const { factionId } = params;
   const { 
     state,
     fetchFactionDetails = (id:string) => {},
     fetchFactionStatuses = (id:string) => {},
     setFactionUserStatus = (factionId:string, status: string, userId?:string) => {},
+    setUserHiddenStatus = (userId:string, status: string, factionId?:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const profile:nnEntity  = useMemo(() => {
     return state?.network?.entity || {};
@@ -104,7 +102,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
     return state?.network?.collections?.contacts || [];
   }, [state]);
   const userId = state?.user?.profile?.auth?.userid;
-  const accountId = id || state?.network?.selected?.account || '';
+  const accountId = factionId || state?.network?.selected?.account || '';
   const admin = profile && profile?.admin?.length && profile?.admin[0];
   const reps = profile && profile?.reps;
   const isAdmin = profile && userId === admin?.userid;
@@ -143,7 +141,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
   const statusFromForm = () => {
     let statusMsgStr = '';
     if (type === 'message') {
-      statusMsgStr = `${message}${tag.length >= 1 && ` #${tag}`}`
+      statusMsgStr = `${message}${tag.length >= 1 ? ` #${tag}` : ''}`
     } else {
       let statusMsgObj:MissionStatusForm = { type };
       if (type === 'score') { statusMsgObj.value = score }
@@ -151,7 +149,6 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
       if (tag.length >= 1) { statusMsgObj.tag = tag }
       statusMsgStr = JSON.stringify(statusMsgObj);
     }
-    console.log('statusMsgStr', statusMsgStr);
     return statusMsgStr;
   }
 
@@ -181,7 +178,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
       if(!hidden) {
         limit(() => {setFactionUserStatus(accountId, statusStringObj, userId)});
       } else {
-        limit(() => {setFactionUserStatus(accountId, statusStringObj, userId)}); //TODO: set hidden
+        limit(() => {setUserHiddenStatus(userId, statusStringObj, accountId)});
       }
       return () => {};
     });
