@@ -117,9 +117,10 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                       />
                       <TextField
                         name="verified"
-                        value={AuthProfile?.emailverified}
+                        value={AuthProfile?.emailverified ? 'Email has been verified.' : 'NOT verified, please check your email.'}
                         label="Verified"
                         variant="outlined"
+                        error={!AuthProfile?.emailverified}
                         style={input}
                         InputProps={{
                           readOnly: true,
