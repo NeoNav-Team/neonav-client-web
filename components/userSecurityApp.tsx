@@ -22,7 +22,6 @@ import { use100vh } from 'react-div-100vh';
 interface UserSecurityAppProps { };
 
 const passwordChangeUrl = 'https://auth.neonav.net/changepassword'
-
 const defaultAuth = {
   userid: '',
   email: '',
@@ -60,13 +59,10 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
   const {
     state,
     fetchUserProfile = () => { },
-    updateUserProfile = (document: any, update: any) => { },
   }: NnProviderValues = useContext(NnContext);
   const AuthProfile: NnProfileAuth = useMemo(() => {
-    console.log(state?.network?.entity?.auth);
     return state?.network?.entity?.auth || defaultAuth;
   }, [state]);
-  const accountId = state?.network?.selected?.account || '';
   const [SecurityFetched, setSecurityFetched] = useState(false);
 
   const goFetchSecurity = useCallback(() => {
