@@ -3,29 +3,25 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProfileAuth, NnProviderValues, nnEntity, } from './context/nnTypes';
+import { NnProfileAuth, NnProviderValues, } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
-import FooterNav from './footerNav';
 import {
   Container,
   Box,
-  Typography,
-  Divider,
+  Button,
   CircularProgress,
+  Divider,
+  Link,
+  Typography,
   TextField,
 } from '@mui/material';
-import BorderColorIcon from '@mui/icons-material/BorderColor';
-import SaveIcon from '@mui/icons-material/Save';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 interface UserSecurityAppProps { };
 
-type Form = {
-  password?: string;
-}
-type FormKey =
-  'password';
+const passwordChangeUrl = 'https://auth.neonav.net/changepassword'
 
 const defaultAuth = {
   userid: '',
@@ -34,11 +30,6 @@ const defaultAuth = {
   lastlogin: '',
   lastip: '',
 }
-
-const defaultForm = {
-  password: '',
-};
-
 const flexContainer = {
   height: '100%',
   display: 'flex',
@@ -48,7 +39,6 @@ const flexContainer = {
   alignContent: 'space-around',
   alignItems: 'stretch',
 };
-
 const flexBody = {
   order: 0,
   flex: '1',
@@ -58,14 +48,6 @@ const flexBody = {
   minHeight: '50vh',
   overflow: 'hidden',
 };
-
-const flexFooter = {
-  order: 0,
-  flex: '0 1 24px',
-  alignSelf: 'flex-end',
-  width: '100%',
-};
-
 const input = {
   width: '100%',
   margin: '10px 0'
@@ -77,19 +59,15 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const {
     state,
-    fetchUserProfile = () => {},
-    updateUserProfile = (document: any, update: any) => {},
+    fetchUserProfile = () => { },
+    updateUserProfile = (document: any, update: any) => { },
   }: NnProviderValues = useContext(NnContext);
   const AuthProfile: NnProfileAuth = useMemo(() => {
     console.log(state?.network?.entity?.auth);
     return state?.network?.entity?.auth || defaultAuth;
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
-  const isAdmin = accountId === AuthProfile?.userid;
   const [SecurityFetched, setSecurityFetched] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState<Form>(defaultForm);
-  const { password } = form;
 
   const goFetchSecurity = useCallback(() => {
     if (!SecurityFetched) {
@@ -98,45 +76,9 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     }
   }, [SecurityFetched, fetchUserProfile]);
 
-  const updateDefaultForm = (AuthProfile: NnProfileAuth) => {
-    let updatedDefaultForm: Form = defaultForm;
-    Object.keys(updatedDefaultForm).map(function (key) {
-      if ((AuthProfile as any)[key]) (updatedDefaultForm as any)[key] = (AuthProfile as any)[key]
-    });
-    setForm(updatedDefaultForm);
-  }
-
   useEffect(() => {
     goFetchSecurity();
   }, [goFetchSecurity, AuthProfile]);
-
-  useEffect(() => {
-    if (Object.keys(AuthProfile).length >= 3) {
-      updateDefaultForm(AuthProfile);
-    }
-  }, [AuthProfile]);
-
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event?.target;
-    setForm({ ...form, [name]: value });
-  }
-
-  const saveSecurityChanges = () => {
-    const doc = {
-      _id: state?.network?.entity?._id,
-      _rev: state?.network?.entity?._rev,
-    }
-    updateUserProfile(doc, form);
-  }
-
-  const bigButtonAction = () => {
-    if (editMode) {
-      saveSecurityChanges();
-    } else {
-      goFetchSecurity(); //get latest before editing
-    }
-    setEditMode(!editMode);
-  }
 
   return (
     <Container disableGutters style={{ height: '100%' }}>
@@ -147,7 +89,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
       >
         <Box sx={{ ...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT }}>
           <Box sx={{ ...flexBody, maxHeight: SCROLL_HEIGHT }}>
-            {SecurityFetched ? (
+            {SecurityFetched && (
               AuthProfile && Object.keys(AuthProfile).length !== 0 ? (
                 <SimpleScrollContainer>
                   <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
@@ -205,41 +147,29 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                         }}
                       />
                       <Divider variant="middle" color="primary"><Typography variant="h6">Change Password</Typography></Divider>
-                      <TextField
-                        name="password"
-                        value={password}
-                        onChange={changeHandler}
-                        label="Password"
-                        variant="outlined"
-                        style={input}
-                        InputProps={{
-                          readOnly: editMode,
-                        }}
-                      />
+                      <Link href={passwordChangeUrl}>
+                        <Button
+                          variant="contained"
+                          component="label"
+                          endIcon={<ExitToAppIcon />}
+                          style={input}
+                        >
+                          Leave to Auth Portal
+                        </Button>
+                      </Link>
                     </Stack>
                   </Box>
                 </SimpleScrollContainer>
               ) : (
-                <Typography variant='h2'> 404 Security Not Found</Typography>
-              )) : (
-              <Stack
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-                sx={{ minHeight: '100%' }}
-              >
-                <CircularProgress color="secondary" />
-              </Stack>
-            )}
-          </Box>
-          <Box sx={flexFooter}>
-            <FooterNav
-              bigHexProps={{
-                icon: editMode ? <SaveIcon /> : <BorderColorIcon />,
-                disabled: isAdmin,
-                handleAction: bigButtonAction,
-              }}
-            />
+                <Stack
+                  direction="column"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{ minHeight: '100%' }}
+                >
+                  <CircularProgress color="secondary" />
+                </Stack>
+              ))}
           </Box>
         </Box>
       </div>
