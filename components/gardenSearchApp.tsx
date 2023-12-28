@@ -14,7 +14,7 @@ import LocalFloristIcon from '@mui/icons-material/LocalFlorist'
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
-import { clearLocalStorage } from '@/utilites/localStorage';
+import { clearLocalStorage } from '@/utilities/localStorage';
 
 const MAX_USERS = 25;
 

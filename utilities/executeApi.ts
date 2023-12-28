@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { apiUrl, authApiEnpoints } from '../utilites/constants';
+import { apiUrl, authApiEnpoints } from '../utilities/constants';
 
 const executeAPI = (endpoint:string, data:any, callback: any, errBack: any):Promise<any> => {
   const axiosDefaults:any = axios.defaults;

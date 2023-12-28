@@ -1,14 +1,14 @@
-import executeApi from '@/utilites/executeApi';
-import longPollApi from '@/utilites/longPollApi';
+import executeApi from '@/utilities/executeApi';
+import longPollApi from '@/utilities/longPollApi';
 import { 
   APIResponse,
   DispatchFunc,
   netcheckAPIResData,
   NnChatMessage,
 } from "./nnTypes";
-import { getCookieToken } from "@/utilites/cookieContext";
-import { globalChannel } from '@/utilites/constants';
-import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilites/localStorage';
+import { getCookieToken } from "@/utilities/cookieContext";
+import { globalChannel } from '@/utilities/constants';
+import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilities/localStorage';
 
 export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();

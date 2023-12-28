@@ -4,7 +4,7 @@ import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnStatus, nnEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
-import { isJsonStringValid } from '@/utilites/json';
+import { isJsonStringValid } from '@/utilities/json';
 import ItemStatus from './itemStatus';
 import FooterNav from './footerNav';
 import { 

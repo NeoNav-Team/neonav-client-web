@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
-import { isJsonStringValid } from '@/utilites/json';
+import { isJsonStringValid } from '@/utilities/json';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, nnEntity, NnContact, NnStatus } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';

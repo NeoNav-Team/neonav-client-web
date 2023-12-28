@@ -1,11 +1,11 @@
-import executeApi from '@/utilites/executeApi';
+import executeApi from '@/utilities/executeApi';
 import { 
   APIResponse,
   DispatchFunc,
   netcheckAPIResData,
 } from "./nnTypes";
-import { getCookieToken } from "@/utilites/cookieContext";
-import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
+import { getCookieToken } from "@/utilities/cookieContext";
+import { storedRecently, getLocalStorage, storeFetched } from '@/utilities/localStorage';
 
 export const sendPayment = (dispatch: DispatchFunc) => (recipient:string, amount:string) => {
   const token = getCookieToken();

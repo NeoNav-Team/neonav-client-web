@@ -10,7 +10,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Tag from '@mui/icons-material/Tag';
 import styles from '../styles/item.module.css';
-import { isoDateToDaily, isoDateToMonth } from '@/utilites/fomat';
+import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
 import { ReactNode } from 'react';
 
 interface itemStatusProps {

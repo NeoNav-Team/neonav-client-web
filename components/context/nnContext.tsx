@@ -60,7 +60,7 @@ import {
   fetchFactionStatuses,
 } from './nnActionsFaction';
 import { nnSchema } from "./nnSchema";
-import { getCookieContext, getCookieToken, setCookieContext } from "@/utilites/cookieContext";
+import { getCookieContext, getCookieToken, setCookieContext } from "@/utilities/cookieContext";
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 

@@ -1,12 +1,12 @@
-import executeApi from '@/utilites/executeApi';
+import executeApi from '@/utilities/executeApi';
 import { 
   APIResponse,
   DispatchFunc,
   netcheckAPIResData,
 } from "./nnTypes";
-import { getCookieToken } from "@/utilites/cookieContext";
-import { clearLocalStorage } from '@/utilites/localStorage';
-// import { storedRecently, getLocalStorage, storeFetched } from '@/utilites/localStorage';
+import { getCookieToken } from "@/utilities/cookieContext";
+import { clearLocalStorage } from '@/utilities/localStorage';
+// import { storedRecently, getLocalStorage, storeFetched } from '@/utilities/localStorage';
 
 export const fetchAllFactions = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();

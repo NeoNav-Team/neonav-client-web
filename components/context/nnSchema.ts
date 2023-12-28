@@ -1,5 +1,5 @@
 import { NnStore } from "./nnTypes";
-import { globalChannel } from "@/utilites/constants";
+import { globalChannel } from "@/utilities/constants";
 
 const GLOBAL_CHANNEL = globalChannel;
 

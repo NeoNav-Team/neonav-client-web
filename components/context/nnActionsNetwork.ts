@@ -1,4 +1,4 @@
-import executeApi from '@/utilites/executeApi';
+import executeApi from '@/utilities/executeApi';
 import { 
   APIResponse,
   DispatchFunc,

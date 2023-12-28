@@ -2,7 +2,7 @@
 'use client';
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import styles from '../styles/card.module.css';
-import { clearLocalStorage } from '@/utilites/localStorage';
+import { clearLocalStorage } from '@/utilities/localStorage';
 import { Context as NnContext } from './context/nnContext';
 import { NnChannel, nnEntity, NnProviderValues } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';

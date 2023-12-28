@@ -11,7 +11,7 @@ import '../styles/globals.css';
 import '../styles/augmented-ui.min.css';
 import type { AppProps } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
-import { theme } from '../utilites/theme';
+import { theme } from '../utilities/theme';
 import { Provider  as NnPoivder } from '../components/context/nnContext';
 import HeaderContainer from '@/components/headerContainer';
 import Div100vh from 'react-div-100vh';

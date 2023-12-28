@@ -17,7 +17,7 @@ import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
-import { defaultImg } from '@/utilites/defaultImg';
+import { defaultImg } from '@/utilities/defaultImg';
 
 
 interface ContactsAppProps {

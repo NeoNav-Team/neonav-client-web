@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
-import { restrictedChannels, globalChannel } from '../utilites/constants';
+import { restrictedChannels, globalChannel } from '../utilities/constants';
 import styles from '../styles/generic.module.css';
 import { Container, Box, Stack, Typography} from '@mui/material';
 import SpeakerNotesOffIcon from '@mui/icons-material/SpeakerNotesOff';
 import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
-import { orderbyDate } from '@/utilites/fomat';
+import { orderbyDate } from '@/utilities/fomat';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';

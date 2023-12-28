@@ -1,7 +1,7 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { restrictedChannels } from '../utilites/constants';
-import { globalChannel } from '../utilites/constants';
+import { restrictedChannels } from '../utilities/constants';
+import { globalChannel } from '../utilities/constants';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnChannel } from './context/nnTypes';

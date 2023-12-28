@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import React, { useCallback, useContext, useState, useMemo, useRef, useEffect } from 'react';
-import { isJsonStringValid } from '@/utilites/json';
+import { isJsonStringValid } from '@/utilities/json';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnStatus } from './context/nnTypes';

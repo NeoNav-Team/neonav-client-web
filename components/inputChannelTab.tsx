@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
-import { restrictedChannels, globalChannel } from '../utilites/constants';
+import { restrictedChannels, globalChannel } from '../utilities/constants';
 import { Box, Tab, Tabs } from '@mui/material';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';

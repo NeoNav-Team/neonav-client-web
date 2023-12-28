@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { apiUrl, authApiEnpoints } from '../utilites/constants';
+import { apiUrl, authApiEnpoints } from '../utilities/constants';
 
 const WAIT_TIME = 300000;
 

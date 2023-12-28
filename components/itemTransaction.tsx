@@ -5,7 +5,7 @@ import {
   Typography
 } from '@mui/material';
 import styles from '../styles/item.module.css';
-import { isoDateToDaily, isoDateToMonth } from '@/utilites/fomat';
+import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
 
 interface itemTransactionProps {
     date: string;
