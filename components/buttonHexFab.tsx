@@ -1,11 +1,10 @@
-import { cloneElement, useRef, useState } from 'react';
+import { cloneElement, useState } from 'react';
 import {
   Box,
   Fab,
   Link,
   CircularProgress,
 } from '@mui/material';
-import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import styles from '../styles/buttonHexFab.module.css';
 import SimpleDialog from './simpleDialog';
 
@@ -66,12 +65,13 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
     <>
       <Fab color="secondary"
         aria-label="scan"
+        style={{ opacity: icon ? 1 : 0.3 }}
         sx={getsize(size)}
-        disabled={disabled}
+        disabled={disabled || icon ? false : true}
         onClick={() => clickHandler()}
       >
         {loading ? <CircularProgress/> : (
-          icon ? clonedIconWithProps : (<DoNotDisturbIcon sx={iconStyles} />)
+          icon ? clonedIconWithProps : null
         )}
       </Fab>
       <SimpleDialog handleAction={dialogCloseAction} handleClose={handleClose} open={open} useInput={useInput} dialog={dialog} />
@@ -79,7 +79,7 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
   )};
 
   return (
-    <Box className={styles.footerItem} data-visible={icon ? true : false}>
+    <Box className={styles.footerItem}>
       {link ?  (
         <Link href={link}>
           <HexButton />

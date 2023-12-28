@@ -35,7 +35,6 @@ export type NnProfileMeta = {
 }
 
 export type NnUserProfile = {
-    auth: NnProfileAuth,
     meta: NnProfileMeta,
 }
 
@@ -97,7 +96,7 @@ export type NnFaction = {
 }
 
 
-/* Entity is currently a catch-all but realistically shoudld be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
+/* Entity is currently a catch-all but realistically should be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
 export type nnEntity = {
     firstname?: string;
     lastname?: string;
@@ -119,6 +118,7 @@ export type nnEntity = {
     reps?: any;
     members?: any;
     admin?: any;
+    auth?: NnProfileAuth,
 }
 
 export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];
