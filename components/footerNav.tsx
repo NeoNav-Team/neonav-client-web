@@ -40,19 +40,19 @@ export default function FooterNav(props:FooterNavProps):JSX.Element {
             spacing={1}
           >
             <Box>
-              {firstHexProps && (<ButtonHexFab {...firstHexProps} />)}
+              <ButtonHexFab {...firstHexProps} />
             </Box>
             <Box>
-              {secondHexProps && (<ButtonHexFab {...secondHexProps} size={secondHexProps?.size || 'medium'}  />)}
+              <ButtonHexFab {...secondHexProps} size={secondHexProps?.size || 'medium'}  />
             </Box>
             <Box>
-              {bigHexProps && (<ButtonHexFab {...bigHexProps} size={bigHexProps?.size || 'large'} />)}
+              <ButtonHexFab {...bigHexProps} size={bigHexProps?.size || 'large'} />
             </Box>
             <Box>
-              {thirdHexProps && (<ButtonHexFab {...thirdHexProps} size={thirdHexProps?.size || 'medium'}  />)}
+              <ButtonHexFab {...thirdHexProps} size={thirdHexProps?.size || 'medium'}  />
             </Box>
             <Box>
-              {fourthHexProps && (<ButtonHexFab {...fourthHexProps} />)}
+              <ButtonHexFab {...fourthHexProps} />
             </Box>
           </Stack>
         )}
