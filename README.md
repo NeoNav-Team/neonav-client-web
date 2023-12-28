@@ -1,7 +1,14 @@
 # NEONAV • CLIENT • WEB
 ## Getting Started
 
-First, run the development server:
+First, install vendor dependencies and do a build of the application
+
+```bash
+npm install
+npm run build
+```
+
+For local development, run the development server:
 
 ```bash
 npm run dev
@@ -15,4 +22,4 @@ If *sdev*, [https://local.neonav.net:3000](https://local.neonav.net:3000) with y
 
 ### Configuration
 
-Environemtn values that can ber passed in via a `.env` file include `NODE_ENV`, `CERT_PATH`, `LOCAL_DOMAIN`, `LOCAL_PORT`
+Environment values that can be passed in via a `.env` file include `NODE_ENV`, `CERT_PATH`, `LOCAL_DOMAIN`, `LOCAL_PORT`
