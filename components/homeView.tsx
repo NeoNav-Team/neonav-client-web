@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'
 import {
   Box,
   Container,
@@ -9,6 +10,7 @@ import {
   Typography
 } from '@mui/material';
 import MyQRCode from './myQRCode';
+import QrCodeReader from './qrCodeReader';
 import styles from '../styles/generic.module.css';
 import Diversity1Icon from '@mui/icons-material/Diversity1';
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -38,15 +40,21 @@ interface HomeViewProps { }
 const fixedHeight = '16vh';
 
 export default function HomeView(props: HomeViewProps): JSX.Element {
-  //TODO: refact this to dynamically take an array of "app" data -- icon, label, link
+  //TODO: refactor this to dynamically take an array of "app" data -- icon, label, link
 
   const [openModel, setOpenModel] = useState(false);
   const [submenu, setSubmenu] = useState('groupSettings');
+  const router = useRouter();
   const handleModelOpen = (submenu: string) => {
     setSubmenu(submenu);
     setOpenModel(true);
   }
   const handleModelClose = () => setOpenModel(false);
+  const handleIDScan = (result:string) => {
+    if (result.length >= 5) {
+      router.push(`/contacts/${result}`);
+    }
+  }
 
   const modelStyle = {
     position: 'absolute' as 'absolute',
@@ -314,7 +322,7 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
                     justifyContent="center"
                     alignItems="center"
                     minHeight={fixedHeight}
-                    onClick={() => handleModelOpen('myQRCode')}
+                    onClick={() => handleModelOpen('qrCodeScan')}
                   >
                     <IconFrame
                       icon={<QrCodeScannerIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
@@ -392,6 +400,14 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
               data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
             >
               <MyQRCode size={420} />
+            </div>
+          )}
+          {submenu === 'qrCodeScan' && (
+            <div
+              className={styles.qrScanPane}
+              data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
+            >
+              <QrCodeReader successHandler={result => handleIDScan(result)} />
             </div>
           )}
         </Box>
