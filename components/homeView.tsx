@@ -29,7 +29,6 @@ import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import Map from './svgr/map';
-import Notes from './svgr/notes';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import Notifcations from './svgr/notifications';
 import Help from './svgr/help';
@@ -52,7 +51,7 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
   const handleModelClose = () => setOpenModel(false);
   const handleIDScan = (result:string) => {
     if (result.length >= 5) {
-      router.push(`/contacts/${result}`);
+      router.push(`/contacts/${result}#scan`);
     }
   }
 

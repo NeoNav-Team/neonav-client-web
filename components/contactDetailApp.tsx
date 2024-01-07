@@ -85,6 +85,10 @@ const flavorText = {
 export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
   const { params } = props;
   const { id } = params;
+  const getHash = () =>
+    typeof window !== 'undefined'
+      ? decodeURIComponent(window.location.hash.replace("#", ""))
+      : undefined;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
@@ -92,12 +96,14 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     state,
     fetchContact = (id:string) =>{},
     unfriend = (id:string) => {},
+    addRecentScan = (entity:any) => {},
   }: NnProviderValues = useContext(NnContext);
   const userId:string = id || '';
   const entity:nnEntity  = useMemo(() => {
     return state?.network?.entity || {};
   }, [state]);
   const [ fetched, setFetched ] = useState(false);
+  const [ scanned, setScanned ] = useState(false);
 
   const goFetchUser = useCallback(() => {
     if (!fetched) {
@@ -106,11 +112,20 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     }
   }, [fetched, fetchContact, userId]);
 
+  const goSetRecentScan = useCallback(() => {
+    addRecentScan(entity);
+  }, [addRecentScan, entity]);
+
   useEffect(() => {
+    const hash = getHash();
     if (typeof entity?.id === 'undefined' || entity?.id !== id) {
       goFetchUser();
     }
-  }, [entity, goFetchUser, id]);
+    if (typeof entity?.id !== 'undefined' && hash === 'scan' && !scanned) {
+      goSetRecentScan();
+      setScanned(true);
+    }
+  }, [entity, goFetchUser, goSetRecentScan, id, scanned]);
 
   const goUnfriend = () =>  {
     unfriend(userId);

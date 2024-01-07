@@ -104,7 +104,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       label: 'Scanned',
       value: 'scanned',
       icon: <QrCodeIcon />,
-      users: [],
+      users: state?.network?.collections?.scannedEntities || [],
     },
     { 
       label: 'Faction',

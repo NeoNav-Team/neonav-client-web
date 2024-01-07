@@ -36,6 +36,7 @@ export type NnProfileMeta = {
 
 export type NnUserProfile = {
     meta: NnProfileMeta,
+    auth?: NnProfileAuth,
 }
 
 export type NnWalletTransaction = {
@@ -170,6 +171,7 @@ export type ActionTypes =
   'setChatMessages' |
   'setUserStatuses' |
   'setUserHiddenStatuses' | 
+  'setRecentlyScanned' |
   'setMessageHistory' |
   'removeStatus' |
   'setSelected' |
@@ -251,6 +253,7 @@ export type NnProviderDispatch = {
     setUserStatus: (_userId:string, _body:string) => void;
     removeStatus: (_statusId:string, _factionId?:string) => void;
     setUserHiddenStatus: (_userId:string, _body:string, _factionId?:string) => void;
+    addRecentScan: (_user:nnEntity) => void;
     getUserSetStatuses: (_userId:string,  _factionId?:string) => void;
     toggleStatusClass: (_userId:string, _factionId?:string) => void;
     userSearch: (_search:string) => void;
