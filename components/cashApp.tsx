@@ -4,9 +4,10 @@ import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues } from '../components/context/nnTypes';
+import { nnEntity, NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputBalance from './inputBalance';
+import QrCodeReader from './qrCodeReader';
 import FooterNav from './footerNav';
 import { 
   Container,
@@ -14,6 +15,7 @@ import {
   FormControl,
   InputLabel,
   InputAdornment,
+  Modal,
   OutlinedInput,
   Stack
 } from '@mui/material';
@@ -63,6 +65,23 @@ const flexFooter = {
   alignSelf: 'flex-end',
   width: '100%',
 };
+const modelStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '100%',
+  maxWidth: '800px',
+  boxShadow: 24,
+};
+const modelTitleStyle = {
+  fontFamily: 'Jura',
+  fontSize: '18px',
+  letterSpacing: '0.1rem',
+  padding: '10px 16px 0',
+  filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)',
+}
+
 
 export default function CashApp(props: CashAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
@@ -74,19 +93,26 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   ];
   const { 
     state,
+    addRecentScan = (entity:any) => {},
     fetchUserWallets = () => {},
+    fetchContact = (id:string) =>{},
     requestPayment = (user:string, amount:string) => {},
     sendPayment = (user:string, amount:string) => {},
     sendFactionPayment = (faction: string, user:string, amount:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const [ fetched, setFetched ] = useState(false);
   const [ loading, setLoading ] = useState(false);
+  const [ scanning, setScanning ] = useState(false);
+  const [openModel, setOpenModel] = useState(false);
   const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
   const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
   const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]); // TODO: refactor to payload form object
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
   const wallets = useMemo(() => { 
     return state?.user?.wallets || [];
+  }, [state]);
+  const scannedEntity:nnEntity = useMemo(() => {
+    return state?.network?.entity || {};
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
   const selected = wallets?.map(function(x) {return x.id; }).indexOf(accountId) || 0;
@@ -104,7 +130,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       label: 'Scanned',
       value: 'scanned',
       icon: <QrCodeIcon />,
-      users: [],
+      users: state?.network?.collections?.scannedEntities || [],
     },
     { 
       label: 'Faction',
@@ -113,6 +139,26 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       users: state?.user?.factions || [],
     },
   ]
+
+  const goFetchUser = useCallback((result:string) => {
+    if (!loading) {
+      fetchContact(result);
+      setLoading(true);
+    }
+  }, [loading, fetchContact]);
+
+  const handleModelOpen = (submenu: string) => {
+    setOpenModel(true);
+  }
+
+  const handleModelClose = () => setOpenModel(false);
+
+  const handleIDScan = (result:string) => {
+    handleModelClose();
+    setScanning(true);
+    setLoading(true);
+    goFetchUser(result);
+  }
 
   const goFetchUserWallets = useCallback(() => {
     if (!fetched) {
@@ -124,21 +170,21 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const handleRequestToggle = ( nextTransaction: string) => {
     setProcessTypeValue(nextTransaction);
   }
+
   const handleTransactionAmount = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const newValue = parseInt(event.currentTarget.value, 10);
     setTransactionValue(newValue as unknown as number);
     scrubErr('amount');
   }
+
   const handleFocusClear = () => {
     setTransactionValue('');
   }
+
   const handleBlurReZero = () => {
     transactionValue === '' && setTransactionValue(0);
   }
-  const handleRecipient = (recipientArr: Array<string>) => {
-    setRecpientsValue(recipientArr);
-    scrubErr('recipients');
-  }
+
   const handleSubmit = () => {
     //check for errors and submit
     if (loading) {
@@ -148,19 +194,32 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     }
   }
   
-  const scrubErr = (errStr:string) => {
+  const scrubErr = useCallback((errStr:string) => {
     const newErrFields = errFields;
     const scrubdex = errFields.indexOf(errStr);
     newErrFields.splice(scrubdex, 1);
     setErrFields(newErrFields);
-  }
+  }, [errFields])
+
   const hasErr = (errStr:string) => {
     return errFields.indexOf(errStr) !== -1;
   }
+
   const resetCashForm = () => {
     setRecpientsValue([]);
     setTransactionValue(0);
   }
+
+  const handleRecipient = useCallback((recipientArr: Array<string>) => {
+    setRecpientsValue(recipientArr);
+    scrubErr('recipients');
+  }, [scrubErr])
+  
+  const goSetRecentScan = useCallback(() => {
+    const newScanId = scannedEntity?.id || '';
+    addRecentScan(scannedEntity);
+    handleRecipient([newScanId]);
+  }, [addRecentScan, handleRecipient, scannedEntity]);
 
   const sendPayload = () => {
     //validate payload
@@ -220,6 +279,16 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
   }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected]);
 
+  useEffect(() => {
+    const scannedEntities:any[] = state?.network?.collections?.scannedEntities || [];
+    const hasEntity = scannedEntity && typeof scannedEntity?.id !== 'undefined';
+    const newEntity = hasEntity && !scannedEntities.includes(scannedEntity);
+    if (newEntity && scanning) {
+      goSetRecentScan();
+      setScanning(false);
+      setLoading(false);
+    }
+  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.scannedEntities]);
 
 
   return (
@@ -281,7 +350,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 icon: <CurrencyExchangeIcon />,
                 handleAction: handleSubmit,
                 loading: loading,
-                disabled: loading,
+                disabled: loading || openModel,
               }}
               thirdHexProps={{
                 icon: <QueryStatsIcon />,
@@ -289,12 +358,26 @@ export default function CashApp(props: CashAppProps):JSX.Element {
               }}
               secondHexProps={{
                 icon: <QrCodeScannerIcon />,
-                disabled: true,
+                handleAction: handleModelOpen,
+                disabled: openModel || loading,
               }}
             />
           </Box>
         </Box>
       </div>
+      <Modal
+        open={openModel}
+        onClose={handleModelClose}
+      >
+        <Box sx={modelStyle}>
+          <div
+            className={styles.qrScanPane}
+            data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
+          >
+            <QrCodeReader successHandler={result => handleIDScan(result)} />
+          </div>
+        </Box>
+      </Modal>
     </Container>
   )
 }

@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
+import { useRouter } from 'next/navigation'
+import {
   Box,
   Container,
   Grid,
@@ -9,6 +10,7 @@ import {
   Typography
 } from '@mui/material';
 import MyQRCode from './myQRCode';
+import QrCodeReader from './qrCodeReader';
 import styles from '../styles/generic.module.css';
 import Diversity1Icon from '@mui/icons-material/Diversity1';
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -16,6 +18,7 @@ import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import CastleIcon from '@mui/icons-material/Castle';
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import IconFrame from './iconFrame';
 import Kitty from './svgr/kitty';
 import Cash from './svgr/cash';
@@ -23,27 +26,34 @@ import TanChat from './svgr/tanchat';
 import NeoSites from './svgr/neosites';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
 import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import Map from './svgr/map';
-import Notes from './svgr/notes';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import Notifcations from './svgr/notifications';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
 
-interface HomeViewProps {}
+interface HomeViewProps { }
 
 const fixedHeight = '16vh';
 
-export default function HomeView(props:HomeViewProps):JSX.Element {
-  //TODO: refact this to dynamically take an array of "app" data -- icon, label, link
+export default function HomeView(props: HomeViewProps): JSX.Element {
+  //TODO: refactor this to dynamically take an array of "app" data -- icon, label, link
 
   const [openModel, setOpenModel] = useState(false);
   const [submenu, setSubmenu] = useState('groupSettings');
-  const handleModelOpen = (submenu:string) => {
+  const router = useRouter();
+  const handleModelOpen = (submenu: string) => {
     setSubmenu(submenu);
     setOpenModel(true);
   }
   const handleModelClose = () => setOpenModel(false);
+  const handleIDScan = (result:string) => {
+    if (result.length >= 5) {
+      router.push(`/contacts/${result}#scan`);
+    }
+  }
 
   const modelStyle = {
     position: 'absolute' as 'absolute',
@@ -61,9 +71,9 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
     padding: '10px 16px 0',
     filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)',
   }
-      
+
   return (
-    <Container sx={{marginTop: '64px', minHeight: 'calc(100vh - 128px)'}}>
+    <Container sx={{ marginTop: '64px', minHeight: 'calc(100vh - 128px)' }}>
       <Grid container spacing={1}>
         <Grid container item spacing={3}
         >
@@ -75,7 +85,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/chat">
-                <IconFrame icon={<TanChat fontSize="inherit" />} title="Tan / Chat"/>
+                <IconFrame icon={<TanChat fontSize="inherit" />} title="Tan / Chat" />
               </Link>
             </Box>
           </Grid>
@@ -87,7 +97,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/sites">
-                <IconFrame icon={<NeoSites fontSize="inherit" />} title="NeoSites"/>
+                <IconFrame icon={<NeoSites fontSize="inherit" />} title="NeoSites" />
               </Link>
             </Box>
           </Grid>
@@ -99,7 +109,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/cash">
-                <IconFrame icon={<Cash fontSize="inherit" />} title="Credits"/>
+                <IconFrame icon={<Cash fontSize="inherit" />} title="Credits" />
               </Link>
             </Box>
           </Grid>
@@ -111,11 +121,11 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               justifyContent="center"
               alignItems="center"
               minHeight={fixedHeight}
-              onClick={() => handleModelOpen('groupSettings')}
+              onClick={() => handleModelOpen('discoverSettings')}
             >
-              <IconFrame 
-                icon={<Diversity1Icon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
-                title="HR Portal"
+              <IconFrame
+                icon={<TravelExploreIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                title="Discover"
               />
             </Box>
           </Grid>
@@ -127,8 +137,8 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/garden">
-                <IconFrame 
-                  icon={<LocalFloristIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                <IconFrame
+                  icon={<LocalFloristIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
                   title="Jaden / Garden"
                 />
               </Link>
@@ -142,7 +152,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/factions">
-                <IconFrame icon={<CastleIcon fontSize="inherit" />} title="Factions"/>
+                <IconFrame icon={<CastleIcon fontSize="inherit" />} title="Factions" />
               </Link>
             </Box>
           </Grid>
@@ -154,11 +164,11 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               justifyContent="center"
               alignItems="center"
               minHeight={fixedHeight}
-              onClick={() => handleModelOpen('myQRCode')}
+              onClick={() => handleModelOpen('groupSettings')}
             >
-              <IconFrame 
-                icon={<QrCodeIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
-                title="My QRCode"
+              <IconFrame
+                icon={<Diversity1Icon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                title="HR Portal"
               />
             </Box>
           </Grid>
@@ -170,7 +180,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/notifications">
-                <IconFrame icon={<Notifcations fontSize="inherit" />} title="Notifcations"/>
+                <IconFrame icon={<Notifcations fontSize="inherit" />} title="Notifications" />
               </Link>
             </Box>
           </Grid>
@@ -182,7 +192,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/help">
-                <IconFrame icon={<Help fontSize="inherit" />} title="Help"/>
+                <IconFrame icon={<Help fontSize="inherit" />} title="Help" />
               </Link>
             </Box>
           </Grid>
@@ -196,7 +206,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
               onClick={() => handleModelOpen('userSettings')}
             >
-              <IconFrame icon={<UserSettings fontSize="inherit" />} title="Settings"/>
+              <IconFrame icon={<UserSettings fontSize="inherit" />} title="Settings" />
             </Box>
           </Grid>
           <Grid item xs={4}>
@@ -207,7 +217,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/map">
-                <IconFrame icon={<Map fontSize="inherit" />} title="Map"/>
+                <IconFrame icon={<Map fontSize="inherit" />} title="Map" />
               </Link>
             </Box>
           </Grid>
@@ -219,7 +229,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/">
-                <IconFrame icon={<Kitty fontSize="inherit" />} title="Kitty"/>
+                <IconFrame icon={<Kitty fontSize="inherit" />} title="Kitty" />
               </Link>
             </Box>
           </Grid>
@@ -246,8 +256,8 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                   >
                     <Link href="/channels">
                       <IconFrame
-                        icon={<RoomPreferencesIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
-                        title="Channels"/>
+                        icon={<RoomPreferencesIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                        title="Channels" />
                     </Link>
                   </Box>
                 </Grid>
@@ -260,7 +270,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                   >
                     <Link href="/contacts">
                       <IconFrame
-                        icon={<ManageAccountsIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        icon={<ManageAccountsIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
                         title="Contacts"
                       />
                     </Link>
@@ -275,10 +285,61 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                   >
                     <Link href="/factions/admin">
                       <IconFrame
-                        icon={<EngineeringIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        icon={<EngineeringIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
                         title="Factions"
                       />
                     </Link>
+                  </Box>
+                </Grid>
+              </Grid>
+            </div>
+          )}
+          {submenu === 'discoverSettings' && (
+            <div
+              className={styles.submenuPane}
+              data-augmented-ui="tl-clip tr-clip-x  bl-clip br-clip  both"
+            >
+              <Typography sx={modelTitleStyle}>User Settings</Typography>
+              <Grid container item spacing={3}>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/garden/search">
+                      <IconFrame
+                        icon={<PersonSearchIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                        title="Search People" />
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                    onClick={() => handleModelOpen('qrCodeScan')}
+                  >
+                    <IconFrame
+                      icon={<QrCodeScannerIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                      title="QR Code Scanner" />
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                    onClick={() => handleModelOpen('myQRCode')}
+                  >
+                    <IconFrame
+                      icon={<QrCodeIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                      title="My QR Code"
+                    />
                   </Box>
                 </Grid>
               </Grid>
@@ -300,8 +361,8 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                   >
                     <Link href="/profile">
                       <IconFrame
-                        icon={<ContactPageIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
-                        title="Profile"/>
+                        icon={<ContactPageIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                        title="Profile" />
                     </Link>
                   </Box>
                 </Grid>
@@ -314,7 +375,7 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
                   >
                     <Link href="/security">
                       <IconFrame
-                        icon={<AdminPanelSettingsIcon sx={{filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)'}} fontSize="inherit" />}
+                        icon={<AdminPanelSettingsIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
                         title="Security"
                       />
                     </Link>
@@ -338,6 +399,14 @@ export default function HomeView(props:HomeViewProps):JSX.Element {
               data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
             >
               <MyQRCode size={420} />
+            </div>
+          )}
+          {submenu === 'qrCodeScan' && (
+            <div
+              className={styles.qrScanPane}
+              data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
+            >
+              <QrCodeReader successHandler={result => handleIDScan(result)} />
             </div>
           )}
         </Box>

@@ -13,6 +13,7 @@ import {
   setSelected,
 } from './nnActionsNetwork';
 import {
+  addRecentScan,
   fetchContact,
   fetchUserProfile,
   fetchUserContacts,
@@ -68,6 +69,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   const {payload, type = null} = action;
   let newState = null;
   let clonedState = JSON.parse(JSON.stringify(state));
+  console.log('payload', payload);
   switch (type) {
   case 'addMessage': 
     break;
@@ -97,6 +99,13 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     break;
   case 'setUserContacts':
     clonedState.network.collections.contacts = payload;
+    break;
+  case 'setRecentlyScanned':
+    console.log('setRecentlyScanned', payload);
+    const scannedEntities = clonedState.network.collections.scannedEntities;
+    if (!scannedEntities.includes(payload)) {
+      scannedEntities.unshift(payload);
+    }
     break;
   case 'setUserStatuses':
     clonedState.network.collections.statuses = payload;
@@ -175,6 +184,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
 export const { Context, Provider } = DataContextCreator(
   nnReducer,
   { 
+    addRecentScan,
     adminUserToChannel,
     closeAlert,
     createNewChannel,
