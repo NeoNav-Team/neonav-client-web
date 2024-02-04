@@ -11,6 +11,10 @@ import {
   closeAlert,
   fetchNetworkStatus,
   setSelected,
+  fetchUnreadCount,
+  setUnreadCount,
+  clearUnreadCountByType,
+  clearAllUnreadCounts,
 } from './nnActionsNetwork';
 import {
   addRecentScan,
@@ -61,7 +65,11 @@ import {
   fetchFactionStatuses,
 } from './nnActionsFaction';
 import { nnSchema } from "./nnSchema";
-import { getCookieContext, getCookieToken, setCookieContext } from "@/utilities/cookieContext";
+import { 
+  getCookieContext,
+  getCookieToken,
+  setCookieContext,
+} from "@/utilities/cookieContext";
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
@@ -101,7 +109,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     clonedState.network.collections.contacts = payload;
     break;
   case 'setRecentlyScanned':
-    console.log('setRecentlyScanned', payload);
     const scannedEntities = clonedState.network.collections.scannedEntities;
     if (!scannedEntities.includes(payload)) {
       scannedEntities.unshift(payload);
@@ -128,6 +135,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setSelected':
     clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
     break;
+  case 'setUnreadCount':
+    clonedState.network.selected.unread = payload;
+    break;
   }
   newState = {...state, ...clonedState};
   const cookieState = JSON.parse(JSON.stringify(newState));
@@ -145,7 +155,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     const cookieJWTData = getCookieToken();
     const cookieDataArr = cookieJWTData.split('.');
     const cookieDataObj =  JSON.parse(window.atob(cookieDataArr[1]));
-    //creates empt default context with just the userID
+    //creates empty default context with just the userID
     const jwtContext =  {
       network: {
         selected:{

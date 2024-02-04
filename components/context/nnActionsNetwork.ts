@@ -1,9 +1,9 @@
 import executeApi from '@/utilities/executeApi';
 import { 
   APIResponse,
-  DispatchFunc,
+  DispatchFunc
 } from "./nnTypes";
-  
+
 export const closeAlert = (dispatch: DispatchFunc) => async () => {
   dispatch({
     type: 'setAlert',

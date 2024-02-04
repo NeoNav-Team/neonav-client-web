@@ -1,8 +1,12 @@
 
-type ProviderValues = {
+export type LooseObject = {
+    [key: string]: any
+}
+  
+export type ProviderValues = {
     state: NnStore,
     [key: string]: Object | Function,
-};
+}
 
 export type NnStore = {
     network?: NnNetwork,
@@ -133,6 +137,7 @@ export type NnNetwork = {
         account?: string,
         channel?: string,
         contact?: string,
+        unread?: LooseObject,
     },
     collections: {
         messages?: NnChatMessage[],
@@ -177,6 +182,10 @@ export type ActionTypes =
   'setSelected' |
   'updateMessageHistory' |
   'removeUserFromChannel' | 
+  'fetchUnreadCount' |
+  'setUnreadCount' |
+  'clearUnreadCountByType' |
+  'clearAllUnreadCounts' |
   'initContext';
 
 export interface Action {
