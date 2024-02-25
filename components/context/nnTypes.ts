@@ -236,6 +236,7 @@ export type NnProviderDispatch = {
     fetchFactionDetails: (_factionId:string) => void;
     fetchFactionStatuses: (_factionId:string) => void;
     fetchUserProfile: () => void;
+    fetchUnreadCount: () => void;
     updateUserProfile: (_document:any, _update:any) => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
     addUserToFaction: (_factionId:string, _userId:string) => void;

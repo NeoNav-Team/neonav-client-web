@@ -35,7 +35,7 @@ export const fetchUnreadCount = (dispatch: DispatchFunc) => async () => {
   const unread = sortUnread(unreadArr);
   dispatch({
     type: 'setUnreadCount',
-    payload: {...unread},
+    payload: unread,
   })
 };
 

@@ -11,10 +11,6 @@ import {
   closeAlert,
   fetchNetworkStatus,
   setSelected,
-  fetchUnreadCount,
-  setUnreadCount,
-  clearUnreadCountByType,
-  clearAllUnreadCounts,
 } from './nnActionsNetwork';
 import {
   addRecentScan,
@@ -46,6 +42,7 @@ import {
   fetchChannelHistory,
   fetchChannelDetails,
   fetchChannelUsers,
+  fetchUnreadCount,
   longPollMessages,
   sendChannelMessage,
   removeUserFromChannel,
@@ -143,7 +140,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   const cookieState = JSON.parse(JSON.stringify(newState));
   delete cookieState.entity;
   setCookieContext(cookieState);
-  console.log('newState', type, newState);
   return newState;
 };
 
@@ -213,6 +209,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelUsers,
     fetchFactionDetails,
     fetchFactionStatuses,
+    fetchUnreadCount,
     fetchAllFactions,
     updateFactionProfile,
     removeUserFromFaction,
