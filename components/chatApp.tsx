@@ -88,6 +88,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [state?.network?.collections?.messages]);
   const [ initFetched, setInitFetched ] = useState<boolean>(false);
   const [ initSelected, setInitSelected ] = useState<boolean>(false);
+  const [ lastUnread, setLastUnread ] = useState<string>('');
   const [ msg, setMsg ] = useState<string>('');
   const channelFound = state?.user?.channels?.filter(channel => channel.id === selectedChannel).length === 1;
 
@@ -138,12 +139,12 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     }
   }, [messages]);
 
-
   useEffect(() => {
-    if (initSelected) {
+    if (lastUnread !== selectedChannel) {
       clearUnreadCountByType(selectedChannel);
+      setLastUnread(selectedChannel)
     }
-  }, [clearUnreadCountByType, unread, selectedChannel, initSelected]);
+  }, [clearUnreadCountByType, lastUnread, selectedChannel, setLastUnread]);
 
   return (
     <Container disableGutters style={{height: '100%'}}>
