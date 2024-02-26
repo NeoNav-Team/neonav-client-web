@@ -269,6 +269,8 @@ export type NnProviderDispatch = {
     userSearch: (_search:string) => void;
     toggleChannelScope: (_channelId:string) => void;
     unfriend: (_exFriendId:string) => void;
+    setUnreadCount: (_unread:LooseObject) => void;
+    clearUnreadCountByType: (_channelId:string) => void;
 }
 
 export type NnProviderValues = ProviderValues & Partial<NnProviderDispatch>;

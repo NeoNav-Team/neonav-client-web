@@ -12,8 +12,7 @@ import {
   getCookieToken,
   setCookieUnread,
   getCookieUnread,
-  clearCookieUnread,
-  clearCookieUnreadAll,
+  filterCookieUnread,
 } from '@/utilities/cookieContext';
 import { globalChannel } from '@/utilities/constants';
 import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilities/localStorage';
@@ -50,20 +49,13 @@ export const setUnreadCount = (dispatch: DispatchFunc) => async (unreadString:st
 };
 
 export const clearUnreadCountByType = (dispatch: DispatchFunc) => async (unreadString:string) => {
-  clearCookieUnread(unreadString);
+  filterCookieUnread(unreadString);
   const unreadArr:string[] = getCookieUnread();
   const unread = sortUnread(unreadArr);
+  unread[unreadString] = 0;
   dispatch({
     type: 'setUnreadCount',
     payload: {...unread},
-  })
-};
-
-export const clearAllUnreadCounts = (dispatch: DispatchFunc) => async () => {
-  clearCookieUnreadAll();
-  dispatch({
-    type: 'setUnreadCount',
-    payload:{},
   })
 };
 

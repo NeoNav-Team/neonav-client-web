@@ -39,15 +39,15 @@ export const setCookieUnread = (newUnread:string) => {
   Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
 }
 
-export const clearCookieUnread = (clearedUnread:string) => {
+export const filterCookieUnread = (newUnread:string) => {
   const unreadArr = getCookieUnread();
-  const filteredArr = unreadArr.filter(unread => unread !== clearedUnread);
-  const unreadString = filteredArr.join(',');
-  Cookies.set('nnUnread', unreadString, { domain: '.neonav.net' });
-  return filteredArr;
+  unreadArr.filter((unread:string) => { return unread !== newUnread});
+  const unreadString = unreadArr.join(',');
+  const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
+  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
 }
 
-export const clearCookieUnreadAll = () => {
+export const clearCookieUnread = () => {
   Cookies.set('nnUnread', '', { domain: '.neonav.net' });
   return [];
 }

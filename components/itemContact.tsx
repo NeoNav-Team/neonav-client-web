@@ -1,12 +1,14 @@
 
 import { 
   Avatar,
+  Badge,
   Box,
   Stack,
   Typography
 } from '@mui/material';
 import Link from 'next/link';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ChatIcon from '@mui/icons-material/Chat';
+import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import styles from '../styles/item.module.css';
 
 interface itemContactProps {
@@ -15,10 +17,18 @@ interface itemContactProps {
     subtitle?: string;
     collection?: string;
     thumbnail?: string;
+    unread?: number;
   }
   
 export default function ItemContact(props:itemContactProps):JSX.Element {
-  const {id = '', username = '', collection = 'contacts', subtitle, thumbnail } = props;
+  const {
+    id = '',
+    username = '',
+    collection = 'contacts',
+    unread = null,
+    subtitle,
+    thumbnail 
+  } = props;
   
   return (
     <Box style={{padding: '4px 0', width: '100%'}}>
@@ -41,14 +51,26 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Stack direction="row" spacing={1} alignItems="center" style={{maxWidth: '90%'}}>
+                <Stack direction="row" spacing={1} alignItems="center" style={{maxWidth: '80%'}}>
                   <Avatar src={thumbnail} sx={{width: 24, height: 24, fontSize: 12, backgroundColor:'var(--color-3)'}}>{username[0]}</Avatar>
                   <Typography variant='h6' sx={{whiteSpace:'nowrap', overflow:'hidden', textOverflow: 'ellipsis'}}>
                     <span className={styles.name}>{username}</span>
                     <span className={styles.id}> | {id}</span>
                   </Typography>
                 </Stack>
-                <MoreVertIcon />
+                <RoomPreferencesIcon />
+                <Badge
+                  badgeContent={unread}
+                  color="secondary"
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                >
+                  <Link href={`/chat/${id}`}>
+                    <ChatIcon />
+                  </Link>
+                </Badge> 
               </Stack>
             </Box>
           </div>

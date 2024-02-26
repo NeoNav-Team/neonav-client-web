@@ -9,7 +9,7 @@ import InputChannelTab from './inputChannelTab';
 import ItemMessage from './itemMessage';
 import { orderbyDate } from '@/utilities/fomat';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnChatMessage, NnProviderValues } from '../components/context/nnTypes';
+import { NnChatMessage, NnProviderValues, LooseObject } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputMessage from './inputMessage';
 import { use100vh } from 'react-div-100vh';
@@ -70,11 +70,15 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     fetchChannelHistory = (channelId:string) => {},
     setSelected = (indexType:string, channelId:string) => {},
     sendChannelMessage = (channelId:string, text: string) => {},
+    clearUnreadCountByType = (channelId:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = useMemo(() => { 
     const channel = idFromParams || state.network?.selected?.channel || GLOBAL_CHAT;
     return notify ? NOTIFCATIONS : channel;
   }, [idFromParams, notify, state.network?.selected?.channel]);
+  const unread:LooseObject = useMemo(() => {
+    return state?.network?.selected?.unread || {};
+  }, [state]);
   const messages:NnChatMessage[] = useMemo(() => {
     const chatArr = state?.network?.collections?.messages || [];
     const orderChatArr = orderbyDate(chatArr, 'ts');
@@ -87,13 +91,19 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   const [ msg, setMsg ] = useState<string>('');
   const channelFound = state?.user?.channels?.filter(channel => channel.id === selectedChannel).length === 1;
 
+
   const initChat = useCallback(() => {
     if (!initFetched) {
       fetchUserChannels();
       fetchChannelHistory(selectedChannel);
       setInitFetched(true);
     }
-  }, [fetchChannelHistory, fetchUserChannels, initFetched, selectedChannel])
+  }, [
+    fetchChannelHistory,
+    fetchUserChannels,
+    initFetched,
+    selectedChannel,
+  ])
 
   const channelSelection = (selectedChannel:string) => {
     fetchChannelHistory(selectedChannel);
@@ -109,7 +119,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     sendChannelMessage(selectedChannel, msg);
     setMsg('');
   }
-  
+
   useEffect(() => {
     initChat();
   }, [initChat]);
@@ -122,11 +132,18 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [idFromParams, initSelected, setSelected]);
 
   useEffect(() => {
-    const scoller = document.getElementById('simpleScoll');
-    if (scoller){
-      scoller.scrollTop = scoller.scrollHeight;
+    const scroller = document.getElementById('simpleScoll');
+    if (scroller){
+      scroller.scrollTop = scroller.scrollHeight;
     }
   }, [messages]);
+
+
+  useEffect(() => {
+    if (initSelected) {
+      clearUnreadCountByType(selectedChannel);
+    }
+  }, [clearUnreadCountByType, unread, selectedChannel, initSelected]);
 
   return (
     <Container disableGutters style={{height: '100%'}}>
