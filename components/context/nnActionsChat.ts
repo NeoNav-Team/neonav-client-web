@@ -161,7 +161,6 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since:string)
     // add the message to the local storage 
     if (id !== null && channel !== null) {
       const messages = getLocalStorage(channel);
-      console.log('messages', messages);
       const selectedChannel = messages && !isEmpty(messages) ? messages[0].channel : globalChannel;
       if (!messages.some((item:NnChatMessage) => item.id === id)) {
         messages.push(message);
