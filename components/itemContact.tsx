@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 
 import { 
   Avatar,
@@ -9,6 +10,9 @@ import {
 import Link from 'next/link';
 import ChatIcon from '@mui/icons-material/Chat';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
+import ThreePIcon from '@mui/icons-material/ThreeP';
+import BadgeIcon from '@mui/icons-material/Badge';
+import Groups3Icon from '@mui/icons-material/Groups3';
 import styles from '../styles/item.module.css';
 
 interface itemContactProps {
@@ -29,6 +33,24 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
     subtitle,
     thumbnail 
   } = props;
+  
+  const personIcon = (collectionType:string) => {
+    let icon = <ThreePIcon />;
+    switch (collectionType) {
+      case  'contacts':
+        icon = <BadgeIcon />;
+        break;
+      case  'factions':
+        icon = <Groups3Icon />;
+        break;
+      case  'channels/admin':
+        icon = <RoomPreferencesIcon />;
+        break;
+      default:
+        break;
+    }
+    return icon;
+  }
   
   return (
     <Box style={{padding: '4px 0', width: '100%'}}>
@@ -58,7 +80,8 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
                     <span className={styles.id}> | {id}</span>
                   </Typography>
                 </Stack>
-                <RoomPreferencesIcon />
+                <Stack direction="row" spacing={1} alignItems="right" style={{maxWidth: '20%'}}>
+                {personIcon(collection)}
                 <Badge
                   badgeContent={unread}
                   color="secondary"
@@ -67,10 +90,13 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
                     horizontal: 'left',
                   }}
                 >
-                  <Link href={`/chat/${id}`}>
-                    <ChatIcon />
-                  </Link>
+                  {id.length !== 10 && (
+                    <Link href={`/chat/${id}`}>
+                      <ChatIcon />
+                    </Link>
+                  )}
                 </Badge> 
+                </Stack>
               </Stack>
             </Box>
           </div>
