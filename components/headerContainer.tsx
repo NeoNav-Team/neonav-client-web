@@ -1,7 +1,8 @@
 'use client';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useMemo } from 'react';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues } from '../components/context/nnTypes';
+import { restrictedChannels, globalChannel } from '../utilities/constants';
+import { NnProviderValues, LooseObject } from '../components/context/nnTypes';
 import Link from 'next/link';
 import { 
   AppBar,
@@ -32,18 +33,23 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     fetchUserContacts = () => {},
     fetchUserFactions = () => {},
     fetchUserChannels = () => {},
+    fetchUnreadCount = () => {},
     longPollMessages = (since:string) => {},
   }: NnProviderValues = useContext(NnContext);  
-  const [ initialized, setInitialized ] = useState(false)
+  const [ initialized, setInitialized ] = useState(false);
+  const unread:LooseObject = useMemo(() => {
+    return state?.network?.selected?.unread || {};
+  }, [state]);
 
   useEffect(() => {
-    //get inital values on page load
+    //get initial values on page load
     if(!initialized) { 
       initContext();
       fetchNetworkStatus();
       fetchUserContacts();
       fetchUserFactions();
       fetchUserChannels();
+      fetchUnreadCount();
       setInitialized(true);
       longPollMessages('now');
     }
@@ -52,9 +58,21 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     fetchUserContacts,
     fetchUserFactions,
     fetchUserChannels,
+    fetchUnreadCount,
     initContext,
     longPollMessages,
     initialized]);
+
+  const totalUnread = (unread:LooseObject) => {
+    let totalUnread = 0;
+    Object.keys(unread).map(channel => {
+      if (channel !== globalChannel && restrictedChannels.indexOf(channel) === -1) {
+        totalUnread = totalUnread + unread[channel];
+      }
+    });
+    return totalUnread;
+  }
+
 
   return (
 
@@ -87,18 +105,22 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
             </Box>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'flex', md: 'flex' } }}>
-              <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                <Badge badgeContent={1} color="secondary">
-                  <ChatIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                size="large"
-              >
-                <Badge badgeContent={1} color="secondary">
-                  <NotificationsIcon fill="#fff" />
-                </Badge>
-              </IconButton>
+              <Link href="/channels">
+                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                  <Badge badgeContent={totalUnread(unread)} color="secondary">
+                    <ChatIcon />
+                  </Badge>
+                </IconButton>
+              </Link>
+              <Link href="/notifications">
+                <IconButton
+                  size="large"
+                >
+                  <Badge badgeContent={unread[restrictedChannels[0]]} color="secondary">
+                    <NotificationsIcon fill="#fff" />
+                  </Badge>
+                </IconButton>
+              </Link>
               <SelectFaction />
             </Box>
             <Box>

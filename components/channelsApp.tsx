@@ -4,7 +4,7 @@ import { restrictedChannels } from '../utilities/constants';
 import { globalChannel } from '../utilities/constants';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, NnChannel } from './context/nnTypes';
+import { NnProviderValues, NnChannel, LooseObject } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemContact from './itemContact';
 import FooterNav from './footerNav';
@@ -62,6 +62,9 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
   const channels:NnChannel[]  = useMemo(() => {
     return state?.user?.channels || [];
   }, [state]);
+  const unread:LooseObject = useMemo(() => {
+    return state?.network?.selected?.unread || {};
+  }, [state]);
   const accountId = state?.network?.selected?.account || '';
   const sortedChannels = channels.sort((a, b) => a.name.localeCompare(b.name));
   const userCreatedChannels = sortedChannels.filter(channel => forbiddenChannels.indexOf(channel.id) === -1);
@@ -111,6 +114,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                           <ItemContact
                             key={`${item.id}`}
                             id={item.id || ''}
+                            unread={unread[item.id] || 0}
                             username={item.name}
                             collection="channels/admin"
                           />
@@ -130,6 +134,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                           <ItemContact
                             key={`${item.id}`}
                             id={item.id || ''}
+                            unread={unread[item.id] || 0}
                             username={item.name}
                             collection="channels/admin"
                           />

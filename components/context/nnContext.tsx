@@ -37,11 +37,13 @@ import {
 import {
   adminUserToChannel,
   createNewChannel,
+  clearUnreadCountByType,
   joinUserToChannel,
   fetchUserChannels,
   fetchChannelHistory,
   fetchChannelDetails,
   fetchChannelUsers,
+  fetchUnreadCount,
   longPollMessages,
   sendChannelMessage,
   removeUserFromChannel,
@@ -61,7 +63,11 @@ import {
   fetchFactionStatuses,
 } from './nnActionsFaction';
 import { nnSchema } from "./nnSchema";
-import { getCookieContext, getCookieToken, setCookieContext } from "@/utilities/cookieContext";
+import { 
+  getCookieContext,
+  getCookieToken,
+  setCookieContext,
+} from "@/utilities/cookieContext";
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
@@ -101,7 +107,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     clonedState.network.collections.contacts = payload;
     break;
   case 'setRecentlyScanned':
-    console.log('setRecentlyScanned', payload);
     const scannedEntities = clonedState.network.collections.scannedEntities;
     if (!scannedEntities.includes(payload)) {
       scannedEntities.unshift(payload);
@@ -128,12 +133,14 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setSelected':
     clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
     break;
+  case 'setUnreadCount':
+    clonedState.network.selected.unread = payload;
+    break;
   }
   newState = {...state, ...clonedState};
   const cookieState = JSON.parse(JSON.stringify(newState));
   delete cookieState.entity;
   setCookieContext(cookieState);
-  console.log('newState', type, newState);
   return newState;
 };
 
@@ -145,7 +152,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     const cookieJWTData = getCookieToken();
     const cookieDataArr = cookieJWTData.split('.');
     const cookieDataObj =  JSON.parse(window.atob(cookieDataArr[1]));
-    //creates empt default context with just the userID
+    //creates empty default context with just the userID
     const jwtContext =  {
       network: {
         selected:{
@@ -185,49 +192,51 @@ export const { Context, Provider } = DataContextCreator(
   nnReducer,
   { 
     addRecentScan,
+    addRepToFaction,
+    addUserToFaction,
     adminUserToChannel,
+    clearUnreadCountByType,
     closeAlert,
     createNewChannel,
-    fetchNetworkStatus,
-    fetchContact,
-    fetchUserWallets,
-    fetchUserWalletHistory,
-    fetchUserContacts,
-    fetchUserChannels,
-    fetchUserFactions,
-    fetchUserStatuses,
-    fetchUserSetStatuses,
-    fetchUserProfile,
-    fetchChannelHistory,
+    fetchAllFactions,
     fetchChannelDetails,
+    fetchChannelHistory,
     fetchChannelUsers,
+    fetchContact,
     fetchFactionDetails,
     fetchFactionStatuses,
-    fetchAllFactions,
-    updateFactionProfile,
-    removeUserFromFaction,
-    addUserToFaction,
-    addRepToFaction,
-    joinFaction,
-    removeRepToFaction,
-    setFactionUserStatus,
+    fetchNetworkStatus,
+    fetchUnreadCount,
+    fetchUserChannels,
+    fetchUserContacts,
+    fetchUserFactions,
+    fetchUserProfile,
+    fetchUserSetStatuses,
+    fetchUserStatuses,
+    fetchUserWalletHistory,
+    fetchUserWallets,
     initContext,
+    joinFaction,
     joinUserToChannel,
     longPollMessages,
+    removeRepToFaction,
+    removeStatus,
     removeUserFromChannel,
+    removeUserFromFaction,
     requestPayment,
     sendChannelMessage,
-    sendPayment,
     sendFactionPayment,
+    sendPayment,
+    setFactionUserStatus,
     setSelected,
-    setUserStatus,
-    removeStatus,
     setUserHiddenStatus,
+    setUserStatus,
+    toggleChannelScope,
     toggleStatusClass,
+    unfriend,
+    updateFactionProfile,
     updateUserProfile,
     userSearch,
-    toggleChannelScope,
-    unfriend,
   },
   defaultNnContext,
 );

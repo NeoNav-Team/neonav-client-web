@@ -16,6 +16,7 @@ export const nnSchema:NnStore = {
       account: '',
       contact: '',
       channel: GLOBAL_CHANNEL,
+      unread: [],
     },
     collections: {
       messages: [],
@@ -26,7 +27,7 @@ export const nnSchema:NnStore = {
       statuses: [],
       scannedEntities: [],
     },
-    entity: {}
+    entity: {},
   },
   user: {
     profile: {

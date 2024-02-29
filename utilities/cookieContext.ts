@@ -1,6 +1,8 @@
 import { NnStore } from "@/components/context/nnTypes";
 import Cookies from "js-cookie";
 
+const MAX_UNREAD_COUNTED = 1000;
+
 export const setCookieContext = (state:NnStore) => {
   const stringState = JSON.stringify(state);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
@@ -17,4 +19,35 @@ export const getCookieContext = () => {
 
 export const getCookieToken = () => {
   return Cookies.get('accessToken') || '';
+}
+
+export const getCookieUnread = () => {
+  const encodedStringState = Cookies.get('nnUnread') || '';
+  const unreadString = encodedStringState.length >= 3 ? decodeURIComponent(escape(window.atob(encodedStringState))) : '';
+  const unreadArr = unreadString.length >= 6 ? unreadString.split(',') : [];
+  return unreadArr;
+}
+
+export const setCookieUnread = (newUnread:string) => {
+  const unreadArr = getCookieUnread();
+  if (unreadArr.length >= MAX_UNREAD_COUNTED) { //limiting count since spam
+    unreadArr.shift();
+  }
+  unreadArr.push(newUnread);
+  const unreadString = unreadArr.join(',');
+  const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
+  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
+}
+
+export const filterCookieUnread = (newUnread:string) => {
+  const unreadArr = getCookieUnread();
+  unreadArr.filter((unread:string) => { return unread !== newUnread});
+  const unreadString = unreadArr.join(',');
+  const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
+  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
+}
+
+export const clearCookieUnread = () => {
+  Cookies.set('nnUnread', '', { domain: '.neonav.net' });
+  return [];
 }

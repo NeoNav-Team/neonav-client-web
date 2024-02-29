@@ -1,14 +1,65 @@
 import executeApi from '@/utilities/executeApi';
 import longPollApi from '@/utilities/longPollApi';
+import isEmpty from '@/utilities/isEmpty';
 import { 
   APIResponse,
   DispatchFunc,
   netcheckAPIResData,
   NnChatMessage,
-} from "./nnTypes";
-import { getCookieToken } from "@/utilities/cookieContext";
+  LooseObject
+} from './nnTypes';
+import {
+  getCookieToken,
+  setCookieUnread,
+  getCookieUnread,
+  filterCookieUnread,
+} from '@/utilities/cookieContext';
 import { globalChannel } from '@/utilities/constants';
 import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilities/localStorage';
+
+
+
+// doing this by cookie since we don't have API
+
+export const sortUnread = (unreadArr:string[]) => {
+  var unreadPayload: LooseObject = {};
+  unreadArr.map((unread:string) => {
+    unreadPayload[unread] = unread.length >= 6 && unreadPayload[unread] ? unreadPayload[unread] + 1 : 1;
+  })
+  return unreadPayload;
+}
+  
+export const fetchUnreadCount = (dispatch: DispatchFunc) => async () => {
+  const unreadArr:string[] = getCookieUnread();
+  const unread = sortUnread(unreadArr);
+  dispatch({
+    type: 'setUnreadCount',
+    payload: unread,
+  })
+};
+
+export const setUnreadCount = (dispatch: DispatchFunc) => async (unreadString:string) => {
+  setCookieUnread(unreadString);
+  const unreadArr:string[] = getCookieUnread();
+  const unread = sortUnread(unreadArr);
+  dispatch({
+    type: 'setUnreadCount',
+    payload: {...unread},
+  })
+};
+
+export const clearUnreadCountByType = (dispatch: DispatchFunc) => async (unreadString:string) => {
+  filterCookieUnread(unreadString);
+  const unreadArr:string[] = getCookieUnread();
+  const unread = sortUnread(unreadArr);
+  unread[unreadString] = 0;
+  dispatch({
+    type: 'setUnreadCount',
+    payload: {...unread},
+  })
+};
+
+// Normal channel functions
 
 export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
@@ -83,7 +134,7 @@ export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string)
     dispatch({
       type: 'setMessageHistory',
       payload: data,
-    })
+    });
   } else {
     executeApi('chatHistory', {token, id}, onSuccess, onError);
   }
@@ -110,7 +161,7 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since:string)
     // add the message to the local storage 
     if (id !== null && channel !== null) {
       const messages = getLocalStorage(channel);
-      const selectedChannel = messages ? messages[0].channel : globalChannel;
+      const selectedChannel = messages && !isEmpty(messages) ? messages[0].channel : globalChannel;
       if (!messages.some((item:NnChatMessage) => item.id === id)) {
         messages.push(message);
         storeFetched(channel, messages);
@@ -121,6 +172,13 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since:string)
           })
         }
       }
+      setCookieUnread(channel);
+      const unreadArr:string[] = getCookieUnread();
+      const unread = sortUnread(unreadArr);
+      dispatch({
+        type: 'setUnreadCount',
+        payload: {...unread},
+      })
     }
   };
   const onError = (err:netcheckAPIResData) => {

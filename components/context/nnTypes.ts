@@ -1,8 +1,12 @@
 
-type ProviderValues = {
+export type LooseObject = {
+    [key: string]: any
+}
+  
+export type ProviderValues = {
     state: NnStore,
     [key: string]: Object | Function,
-};
+}
 
 export type NnStore = {
     network?: NnNetwork,
@@ -133,6 +137,7 @@ export type NnNetwork = {
         account?: string,
         channel?: string,
         contact?: string,
+        unread?: LooseObject,
     },
     collections: {
         messages?: NnChatMessage[],
@@ -177,6 +182,10 @@ export type ActionTypes =
   'setSelected' |
   'updateMessageHistory' |
   'removeUserFromChannel' | 
+  'fetchUnreadCount' |
+  'setUnreadCount' |
+  'clearUnreadCountByType' |
+  'clearAllUnreadCounts' |
   'initContext';
 
 export interface Action {
@@ -227,6 +236,7 @@ export type NnProviderDispatch = {
     fetchFactionDetails: (_factionId:string) => void;
     fetchFactionStatuses: (_factionId:string) => void;
     fetchUserProfile: () => void;
+    fetchUnreadCount: () => void;
     updateUserProfile: (_document:any, _update:any) => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
     addUserToFaction: (_factionId:string, _userId:string) => void;
@@ -259,6 +269,8 @@ export type NnProviderDispatch = {
     userSearch: (_search:string) => void;
     toggleChannelScope: (_channelId:string) => void;
     unfriend: (_exFriendId:string) => void;
+    setUnreadCount: (_unread:LooseObject) => void;
+    clearUnreadCountByType: (_channelId:string) => void;
 }
 
 export type NnProviderValues = ProviderValues & Partial<NnProviderDispatch>;

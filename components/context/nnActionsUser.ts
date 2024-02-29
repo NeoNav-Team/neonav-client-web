@@ -9,9 +9,7 @@ import { clearLocalStorage } from '@/utilities/localStorage';
 import { storedRecently, getLocalStorage, storeFetched } from '@/utilities/localStorage';
 
 export const addRecentScan = (dispatch: DispatchFunc) => async (body:any) => {
-  const token = getCookieToken();
   const data = body;
-  console.log('data', data);
   dispatch({
     type: 'setRecentlyScanned',
     payload: data,
