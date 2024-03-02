@@ -91,6 +91,9 @@ export type NnChatMessage = {
     fromid?: string,
     from?: string,
     text?: string,
+    confirm?: string,
+    decline?: string,
+    buttons?: any,
 }
 
 export type NnFaction = {
@@ -245,15 +248,15 @@ export type NnProviderDispatch = {
     fetchUserSetStatuses: (_userId:string) => void;
     fetchUserWalletHistory: () => void;
     initContext: () => void;
-    leaveFaction: () => void;
+    leaveFaction: (_factionId:string) => void;
     updateFactionProfile: (_factionId:string, _document:any, _update:any) => void;
     inviteUserToFaction: () => void;
     addRepToFaction: (_factionId:string, _userId:string) => void;
     removeRepToFaction: (_factionId:string, _userId:string) => void;
-    joinFaction: () => void;
+    joinFaction: (_factionId:string) => void;
     joinUserToChannel: (_channelId:string) => void;
     longPollMessages: (_since:string) => void;
-    removeUserFromChannel: (_channelId:string,_userId:string) => void;
+    removeUserFromChannel: (_channelId:string,_userId?:string) => void;
     requestPayment: (_userId:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
     sendFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;
