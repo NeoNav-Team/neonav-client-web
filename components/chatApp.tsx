@@ -74,7 +74,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     joinFaction = (factionId:string) => {},
     leaveFaction = (factionId:string) => {},
     joinUserToChannel = (channelId:string) => {},
-    removeUserFromChannel = (channelId:string) => {},
+    removeUserFromChannel = (channelId:string, userId?:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = useMemo(() => { 
     const channel = idFromParams || state.network?.selected?.channel || GLOBAL_CHAT;

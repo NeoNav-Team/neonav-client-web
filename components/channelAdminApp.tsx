@@ -84,7 +84,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
     state,
     fetchChannelDetails = (id:string) =>{},
     fetchChannelUsers = (id:string) =>{},
-    removeUserFromChannel = (channel:string, id:string) => {},
+    removeUserFromChannel = (channel:string, userId?:string) => {},
     toggleChannelScope = (id:string) =>{},
     adminUserToChannel = (channel:string, id:string) => {},
   }: NnProviderValues = useContext(NnContext);
