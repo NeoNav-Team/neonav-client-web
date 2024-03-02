@@ -71,6 +71,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     setSelected = (indexType:string, channelId:string) => {},
     sendChannelMessage = (channelId:string, text: string) => {},
     clearUnreadCountByType = (channelId:string) => {},
+    joinFaction = (factionId:string) => {},
+    leaveFaction = (factionId:string) => {},
+    joinUserToChannel = (channelId:string) => {},
+    removeUserFromChannel = (channelId:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = useMemo(() => { 
     const channel = idFromParams || state.network?.selected?.channel || GLOBAL_CHAT;
@@ -121,6 +125,33 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     setMsg('');
   }
 
+  const goDialogAction = (actionArgs: string[]) => {
+    const entity = actionArgs[0];
+    const entityId = actionArgs[1];
+    const action = actionArgs[2];
+    switch (entity) {
+    case 'faction':
+      if(action === 'confirm') {
+        joinFaction(entityId);
+      }
+      if(action === 'decline') {
+        leaveFaction(entityId);
+      }
+      break;
+    case 'channel':
+      if(action === 'confirm') {
+        joinUserToChannel(entityId);
+      }
+      if(action === 'decline') {
+        removeUserFromChannel(entityId);
+      }
+      break;
+    
+    default:
+      break;
+    }
+  }
+
   useEffect(() => {
     initChat();
   }, [initChat]);
@@ -134,10 +165,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   useEffect(() => {
     const scroller = document.getElementById('simpleScoll');
-    if (scroller){
+    if (scroller && !notify){
       scroller.scrollTop = scroller.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, notify]);
 
   useEffect(() => {
     if (lastUnread !== selectedChannel) {
@@ -186,7 +217,13 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                       date={item.ts}
                       text={item.text}
                       username={item.from}
-                      id={item.fromid} />
+                      id={item.fromid}
+                      dialogCallback={goDialogAction}
+                      buttons={{
+                        confirm: item.confirm,
+                        decline: item.decline,
+                      }}
+                    />
                   ))}
                 </Stack>
               </Box>

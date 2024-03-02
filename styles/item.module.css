@@ -43,6 +43,13 @@
     --aug-border-all: 1px;
     --aug-border-bg: radial-gradient(var(--color-1), var(--color-2)) 100% 100% / 100% 100%;
 }
+.dialogBoxLine {
+    padding: 2px 20px 2px 5px;
+    --aug-inlay-all: 4px;
+    --aug-inlay-bg: radial-gradient(ellipse at top, var(--color-0), rgba(122, 4, 235, 0))  50% 50% / 100% 100%;
+    --aug-border-all: 1px;
+    --aug-border-bg: radial-gradient(var(--color-0), var(--color-2)) 100% 100% / 100% 100%;
+}
 
 .dateText {
     font-family: 'Jura';
@@ -131,6 +138,10 @@
 .comment {
     display: inline-block;
     border-left: 3px solid  var(--color-2);
+}
+
+.dialogBBtnContainer {
+    margin: 0 4px;
 }
 
 @media screen and (max-width: 800px) {
