@@ -11,6 +11,7 @@ export const nnSchema:NnStore = {
       message: '',
       show: false,
     },
+    announcement: {},
     selected: {
       transactions: '',
       account: '',

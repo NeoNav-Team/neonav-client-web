@@ -133,6 +133,7 @@ export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[]
 
 export type NnNetwork = {
     alert: NnAlert,
+    announcement: NnChatMessage,
     location?: string,
     lastFetched?: string,
     selected: {
@@ -168,6 +169,7 @@ export type ActionTypes =
   'addMessage' | 
   'setNetwork' | 
   'setAlert' |
+  'setAnnouncement' |
   'setEntity' | 
   'setEntityUserlist' | 
   'setUserChannels' |
@@ -225,6 +227,7 @@ export interface APIResponse {
 export type NnProviderDispatch = {
     adminUserToChannel: (_channelId:string,_userId:string)=> void;
     closeAlert: () => void;
+    closeAnnouncement: () => void;
     createNewChannel: (_channelName:string) => void;
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;

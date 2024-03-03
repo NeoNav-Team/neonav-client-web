@@ -21,6 +21,7 @@ import styles from '../styles/generic.module.css';
 import Logo from './svgr/logo';
 import SelectFaction from './selectFaction';
 import Alerts from './alerts';
+import Announcement from './announcement';
 
 interface PageContainerProps {}
 
@@ -77,6 +78,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
   return (
 
     <AppBar color='secondary'>
+      <Announcement />
       <Alerts />
       <div
         className={styles.indigoPane}
