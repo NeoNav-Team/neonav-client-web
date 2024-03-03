@@ -14,10 +14,10 @@ import {
   getCookieUnread,
   filterCookieUnread,
 } from '@/utilities/cookieContext';
-import { globalChannel } from '@/utilities/constants';
+import { globalChannel, restrictedChannels } from '@/utilities/constants';
 import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilities/localStorage';
 
-
+const alertChannel = restrictedChannels[1];
 
 // doing this by cookie since we don't have API
 
@@ -168,6 +168,12 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since:string)
         if(channel == selectedChannel) {
           dispatch({
             type: 'updateMessageHistory',
+            payload: message,
+          })
+        }
+        if(channel == alertChannel) {
+          dispatch({
+            type: 'setAnnouncement',
             payload: message,
           })
         }

@@ -9,6 +9,7 @@ import {
 } from './nnTypes';
 import {
   closeAlert,
+  closeAnnouncement,
   fetchNetworkStatus,
   setSelected,
 } from './nnActionsNetwork';
@@ -81,6 +82,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     break;
   case 'setAlert':
     clonedState.network.alert = {...clonedState.network.alert, ...payload}
+    break;
+  case 'setAnnouncement':
+    clonedState.network.announcement = payload;
     break;
   case 'initContext':
     clonedState = {...clonedState, ...payload};
@@ -197,6 +201,7 @@ export const { Context, Provider } = DataContextCreator(
     adminUserToChannel,
     clearUnreadCountByType,
     closeAlert,
+    closeAnnouncement,
     createNewChannel,
     fetchAllFactions,
     fetchChannelDetails,

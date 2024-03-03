@@ -10,6 +10,13 @@ export const closeAlert = (dispatch: DispatchFunc) => async () => {
     payload: {show: false},
   })
 };
+
+export const closeAnnouncement = (dispatch: DispatchFunc) => async () => {
+  dispatch({
+    type: 'setAnnouncement',
+    payload: {},
+  })
+};
   
 export const setSelected = (dispatch: DispatchFunc) => async (indexType:string, index:string) => {
   dispatch({

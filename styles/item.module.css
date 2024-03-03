@@ -144,6 +144,19 @@
     margin: 0 4px;
 }
 
+.announcementBox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    min-height: 35%;
+    padding: 2%;
+    background-color: rgba(0,0,0, 0.9);
+    border: 1px solid var(--color-2);
+    box-shadow: 24;
+  };
+
 @media screen and (max-width: 800px) {
     .idText {
         font-size: 0.75rem;
