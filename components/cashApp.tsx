@@ -26,6 +26,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import PinIcon from '@mui/icons-material/Pin';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import InputUser from './inputUser';
 import { use100vh } from 'react-div-100vh';
@@ -104,6 +105,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const [ loading, setLoading ] = useState(false);
   const [ scanning, setScanning ] = useState(false);
   const [openModel, setOpenModel] = useState(false);
+  const [bsId, setBsID] = useState('');
   const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
   const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
   const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]); // TODO: refactor to payload form object
@@ -119,7 +121,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const wallet = wallets[selected];
   const balance = wallet ? wallet?.balance : null;
 
-  const usergroups = [
+  const userGroups = [
     { 
       label: 'Contacts',
       value: 'contact',
@@ -137,6 +139,12 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       value: 'faction',
       icon: <SupervisedUserCircleIcon />,
       users: state?.user?.factions || [],
+    },
+    { 
+      label: 'Number',
+      value: 'number',
+      icon: <PinIcon />,
+      users: [],
     },
   ]
 
@@ -336,7 +344,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                   <InputUser
                     changeHandler={handleRecipient}
                     value={recpientsValue}
-                    contactGroups={usergroups}
+                    contactGroups={userGroups}
                     selectLimit={20}
                     error={hasErr('recipients')}
                   />
@@ -358,6 +366,11 @@ export default function CashApp(props: CashAppProps):JSX.Element {
               }}
               secondHexProps={{
                 icon: <QrCodeScannerIcon />,
+                handleAction: handleModelOpen,
+                disabled: openModel || loading,
+              }}
+              firstHexProps={{
+                icon: <PinIcon />,
                 handleAction: handleModelOpen,
                 disabled: openModel || loading,
               }}

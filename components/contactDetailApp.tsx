@@ -96,6 +96,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     state,
     fetchContact = (id:string) =>{},
     unfriend = (id:string) => {},
+    //add friend here
     addRecentScan = (entity:any) => {},
   }: NnProviderValues = useContext(NnContext);
   const userId:string = id || '';

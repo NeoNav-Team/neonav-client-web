@@ -66,6 +66,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
   contactGroups.map((group) => {
     allKnownUsers = [...allKnownUsers, ...group.users ];
   })
+  const isBsID = contactGroups[selectedIndex].label === "number";
 
   const handleChange = (event: SelectChangeEvent<typeof userName>) => {
     const {
