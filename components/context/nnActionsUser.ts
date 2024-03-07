@@ -88,7 +88,6 @@ export const befriend = (dispatch: DispatchFunc) => async (id:string) => {
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
     clearLocalStorage('lastFetch_contacts');
-    fetchUserContacts(dispatch);
     dispatch({
       type: 'setAlert',
       payload: {severity: 'success', message:'Friendship created!', show: true},
@@ -112,7 +111,6 @@ export const unfriend = (dispatch: DispatchFunc) => async (id:string) => {
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
     clearLocalStorage('lastFetch_contacts');
-    fetchUserContacts(dispatch);
     dispatch({
       type: 'setAlert',
       payload: {severity: 'success', message:'Bye, Felicia.', show: true},
