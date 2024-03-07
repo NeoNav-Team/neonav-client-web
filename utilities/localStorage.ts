@@ -1,6 +1,6 @@
 import isBrowser from './isBrowser';
 
-const LAST_FETCHED_LIMIT = 5; // minutes to leave in local storage before doing a new call
+const LAST_FETCHED_LIMIT = 3; // minutes to leave in local storage before doing a new call
 
 export const getLocalStorage = (key: string) => {
   const payload = localStorage.getItem(key) || '{}';

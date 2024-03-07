@@ -123,6 +123,12 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   }, [goFetchProfile, profile]);
 
   useEffect(() => {
+    if (profileFetched && Object.keys(profile).length === 0) {
+      setEditMode(true);
+    }
+  }, [setEditMode, profileFetched, profile]);
+
+  useEffect(() => {
     if (Object.keys(profile).length >= 3) {
       updateDefaultForm(profile);
     }
@@ -184,7 +190,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {profileFetched ? (
-              profile && Object.keys(profile).length !== 0 ?(
+              profile && !isAdmin && Object.keys(profile).length !== 0 ? (
                 <SimpleScrollContainer>
                   <Box sx={{minWidth: '100%', minHeight: '100%'}}>
                     <Stack spacing={0} sx={{ display: 'flex' }}>
@@ -260,7 +266,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
                   </Box>
                 </SimpleScrollContainer>
               ) : (
-                <Typography variant='h2'> 404 Profile Not Found</Typography>
+                <Typography variant='h2'>404 Profile Not Found</Typography>
               )) : (
               <Stack
                 direction="column"

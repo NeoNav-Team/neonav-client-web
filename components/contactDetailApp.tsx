@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { nnEntity, NnProviderValues } from './context/nnTypes';
+import { NnAlert, NnContact, nnEntity, NnProviderValues } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import FooterNav from './footerNav';
 import { 
@@ -13,6 +13,7 @@ import {
   LinearProgress,
 } from '@mui/material';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
@@ -94,23 +95,51 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { 
     state,
+    befriend = (id:string) => {},
     fetchContact = (id:string) =>{},
     unfriend = (id:string) => {},
     addRecentScan = (entity:any) => {},
+    fetchUserContacts = () => {},
   }: NnProviderValues = useContext(NnContext);
-  const userId:string = id || '';
-  const entity:nnEntity  = useMemo(() => {
+  const entityId:string = id || '';
+  const contacts:NnContact[] = useMemo(() => {
+    return state?.network?.collections?.contacts || [];
+  }, [state]);
+  const entity:nnEntity = useMemo(() => {
     return state?.network?.entity || {};
+  }, [state]);
+  const alert:NnAlert = useMemo(() => {
+    return state?.network?.alert || {show: false};
   }, [state]);
   const [ fetched, setFetched ] = useState(false);
   const [ scanned, setScanned ] = useState(false);
+  const [ updated, setUpdated ] = useState(false);
+
+  const homieCheck = () => {
+    let myHomie = false;
+    contacts.map(contact => {
+      if (contact.id == entityId || contact.userid == entityId) {
+        myHomie = true;
+      }
+    });
+    return myHomie;
+  }
+  const isFriend = homieCheck();
+
+  const goUnfriend = () =>  {
+    unfriend(entityId);
+  }
+
+  const goBefriend = () =>  {
+    befriend(entityId);
+  }
 
   const goFetchUser = useCallback(() => {
     if (!fetched) {
-      fetchContact(userId);
+      fetchContact(entityId);
       setFetched(true);
     }
-  }, [fetched, fetchContact, userId]);
+  }, [fetched, fetchContact, entityId]);
 
   const goSetRecentScan = useCallback(() => {
     addRecentScan(entity);
@@ -127,10 +156,19 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     }
   }, [entity, goFetchUser, goSetRecentScan, id, scanned]);
 
-  const goUnfriend = () =>  {
-    unfriend(userId);
-    setFetched(false);
-  }
+
+  useEffect(() => {
+    if (
+      alert?.show === true 
+      && updated == false
+    ) {
+      fetchUserContacts();
+      setUpdated(true);
+    }
+    if (updated && alert?.show === false) {
+      setUpdated(false);
+    }
+  }, [alert, fetchUserContacts, updated]);
 
   const name = (firstname: string, lastname: string) => {
     let name = 'N/A';
@@ -175,7 +213,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                       alignItems="center"
                       sx={{ minHeight: '100%'}}
                     >
-                      <Typography variant='h5'>{userId}</Typography>
+                      <Typography variant='h5'>{entityId}</Typography>
                       <Typography variant='h4'>{entity?.name}</Typography>
                     </Stack>
                   </div>
@@ -202,19 +240,31 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
           </Box>
           <Box sx={flexFooter}>
             <FooterNav
-              firstHexProps={{
-                icon: <PersonRemoveIcon />,
-                handleAction: goUnfriend,
-              }}
+              firstHexProps={isFriend ? 
+                {
+                  icon: <PersonRemoveIcon />,
+                  handleAction: goUnfriend,
+                }
+                :
+                {
+                  disabled: true,
+                }
+              }
               secondHexProps={{
                 disabled: true,
               }}
-              bigHexProps={{
-                disabled: true,
-              }}
+              bigHexProps={isFriend ? 
+                {
+                  disabled: true,
+                }
+                :
+                {
+                  icon: <PersonAddIcon />,
+                  handleAction: goBefriend,
+                }}
               thirdHexProps={{
                 icon: <LocalFloristIcon />,
-                link: `/garden/${userId}`,
+                link: `/garden/${entityId}`,
               }}
               fourthHexProps={{
                 icon: <TocIcon />,

@@ -15,6 +15,7 @@ import {
 } from './nnActionsNetwork';
 import {
   addRecentScan,
+  befriend,
   fetchContact,
   fetchUserProfile,
   fetchUserContacts,
@@ -199,6 +200,7 @@ export const { Context, Provider } = DataContextCreator(
     addRepToFaction,
     addUserToFaction,
     adminUserToChannel,
+    befriend,
     clearUnreadCountByType,
     closeAlert,
     closeAnnouncement,
