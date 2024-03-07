@@ -226,6 +226,7 @@ export interface APIResponse {
 
 export type NnProviderDispatch = {
     adminUserToChannel: (_channelId:string,_userId:string)=> void;
+    befriend: (_newFriendId:string) => void;
     closeAlert: () => void;
     closeAnnouncement: () => void;
     createNewChannel: (_channelName:string) => void;

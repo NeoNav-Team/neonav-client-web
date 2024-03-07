@@ -83,11 +83,36 @@ export const fetchContact = (dispatch: DispatchFunc) => async (id:string) => {
   executeApi('identify', {requestId, token}, onSuccess, onError);
 }
 
+export const befriend = (dispatch: DispatchFunc) => async (id:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    clearLocalStorage('lastFetch_contacts');
+    fetchUserContacts(dispatch);
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message:'Friendship created!', show: true},
+    })
+    return data;
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Could not befriend this person.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  };
+  executeApi('befriend', {id, token}, onSuccess, onError);
+}
+
+
 export const unfriend = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
     clearLocalStorage('lastFetch_contacts');
+    fetchUserContacts(dispatch);
     dispatch({
       type: 'setAlert',
       payload: {severity: 'success', message:'Bye, Felicia.', show: true},
