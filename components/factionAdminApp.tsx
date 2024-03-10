@@ -176,18 +176,18 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const handleBigAction = () => {
     const selectedId = usersValue[0];
     switch (requestValue) {
-    case 'addRep':
-      addRepToFaction(entity?.id || '', selectedId);
-      break;
-    case 'removeRep':
-      removeRepToFaction(entity?.id || '', selectedId);
-      break;
-    case 'add':
-      addUserToFaction(entity?.id || '', selectedId);
-      break;
-    case 'remove':
-      removeUserFromFaction(entity?.id || '', selectedId);
-      break;
+      case 'addRep':
+        addRepToFaction(entity?.id || '', selectedId);
+        break;
+      case 'removeRep':
+        removeRepToFaction(entity?.id || '', selectedId);
+        break;
+      case 'add':
+        addUserToFaction(entity?.id || '', selectedId);
+        break;
+      case 'remove':
+        removeUserFromFaction(entity?.id || '', selectedId);
+        break;
     }
   }
 

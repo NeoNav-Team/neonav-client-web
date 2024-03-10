@@ -247,20 +247,27 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const processTransactionQueue = () => {
     const transactionQueue = recpientsValue;
     const limit = pLimit(1);
-    const promises:Function[] = transactionQueue.map( userId => {
+    const promises: Function[] = transactionQueue.map((userId) => {
       switch (processTypeValue) {
-      case 'pay':
-        if(selected === 0) {
-          limit(() =>{ sendPayment(userId, transactionValue as string)});
-        } else {
-          limit(() =>{ sendFactionPayment(accountId, userId, transactionValue as string)});
-        }
-        break;
-      case 'request':
-        if (userId.charAt(0) !== ('c' || 'C')) { //TODO: request money from factions...?
-          limit(() =>{ requestPayment(userId, transactionValue as string)});
-        }
-        break;
+        case "pay":
+          if (selected === 0) {
+            limit(() => {
+              sendPayment(userId, transactionValue as string);
+            });
+          } else {
+            limit(() => {
+              sendFactionPayment(accountId, userId, transactionValue as string);
+            });
+          }
+          break;
+        case "request":
+          if (userId.charAt(0) !== ("c" || "C")) {
+            //TODO: request money from factions...?
+            limit(() => {
+              requestPayment(userId, transactionValue as string);
+            });
+          }
+          break;
       }
       return () => {};
     });

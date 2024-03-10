@@ -79,68 +79,68 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   let clonedState = JSON.parse(JSON.stringify(state));
   console.log('payload', payload);
   switch (type) {
-  case 'addMessage': 
-    break;
-  case 'setAlert':
-    clonedState.network.alert = {...clonedState.network.alert, ...payload}
-    break;
-  case 'setAnnouncement':
-    clonedState.network.announcement = payload;
-    break;
-  case 'initContext':
-    clonedState = {...clonedState, ...payload};
-    break;
-  case 'setUserChannels':
-    clonedState.user.channels = payload;
-    break;
-  case 'setUserFactions':
-    clonedState.user.factions = payload;
-    break;
-  case 'setUserWallets':
-    clonedState.user.wallets = payload;
-    break;
-  case 'setWalletTransactions':
-    clonedState.network.collections.transactions = payload;
-    break;
-  case 'setEntity':
-    clonedState.network.entity = payload;
-    break;
-  case 'setEntityUserlist':
-    clonedState.network.collections.entityUsers = payload;
-    break;
-  case 'setUserContacts':
-    clonedState.network.collections.contacts = payload;
-    break;
-  case 'setRecentlyScanned':
-    const scannedEntities = clonedState.network.collections.scannedEntities;
-    if (!scannedEntities.includes(payload)) {
-      scannedEntities.unshift(payload);
-    }
-    break;
-  case 'setUserStatuses':
-    clonedState.network.collections.statuses = payload;
-    break;
-  case 'setUserHiddenStatuses':
-    clonedState.network.collections.hiddenStatuses = payload;
-    break;
-  case 'setFactions':
-    clonedState.network.collections.factions = payload;
-    break;
-  case 'setMessageHistory':
-    clonedState.network.collections.messages = payload;
-    break;
-  case 'updateMessageHistory':
-    clonedState.network.collections.messages.unshift(payload);
-    break;
-  case 'setNetwork':
-    clonedState.network.location = payload;
-    break;
-  case 'setSelected':
-    clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
-    break;
-  case 'setUnreadCount':
-    clonedState.network.selected.unread = payload;
-    break;
+    case 'addMessage': 
+      break;
+    case 'setAlert':
+      clonedState.network.alert = {...clonedState.network.alert, ...payload}
+      break;
+    case 'setAnnouncement':
+      clonedState.network.announcement = payload;
+      break;
+    case 'initContext':
+      clonedState = {...clonedState, ...payload};
+      break;
+    case 'setUserChannels':
+      clonedState.user.channels = payload;
+      break;
+    case 'setUserFactions':
+      clonedState.user.factions = payload;
+      break;
+    case 'setUserWallets':
+      clonedState.user.wallets = payload;
+      break;
+    case 'setWalletTransactions':
+      clonedState.network.collections.transactions = payload;
+      break;
+    case 'setEntity':
+      clonedState.network.entity = payload;
+      break;
+    case 'setEntityUserlist':
+      clonedState.network.collections.entityUsers = payload;
+      break;
+    case 'setUserContacts':
+      clonedState.network.collections.contacts = payload;
+      break;
+    case 'setRecentlyScanned':
+      const scannedEntities = clonedState.network.collections.scannedEntities;
+      if (!scannedEntities.includes(payload)) {
+        scannedEntities.unshift(payload);
+      }
+      break;
+    case 'setUserStatuses':
+      clonedState.network.collections.statuses = payload;
+      break;
+    case 'setUserHiddenStatuses':
+      clonedState.network.collections.hiddenStatuses = payload;
+      break;
+    case 'setFactions':
+      clonedState.network.collections.factions = payload;
+      break;
+    case 'setMessageHistory':
+      clonedState.network.collections.messages = payload;
+      break;
+    case 'updateMessageHistory':
+      clonedState.network.collections.messages.unshift(payload);
+      break;
+    case 'setNetwork':
+      clonedState.network.location = payload;
+      break;
+    case 'setSelected':
+      clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
+      break;
+    case 'setUnreadCount':
+      clonedState.network.selected.unread = payload;
+      break;
   }
   newState = {...state, ...clonedState};
   const cookieState = JSON.parse(JSON.stringify(newState));
