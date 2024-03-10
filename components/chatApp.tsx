@@ -130,25 +130,25 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     const entityId = actionArgs[1];
     const action = actionArgs[2];
     switch (entity) {
-    case 'faction':
-      if(action === 'confirm') {
-        joinFaction(entityId);
-      }
-      if(action === 'decline') {
-        leaveFaction(entityId);
-      }
-      break;
-    case 'channel':
-      if(action === 'confirm') {
-        joinUserToChannel(entityId);
-      }
-      if(action === 'decline') {
-        removeUserFromChannel(entityId);
-      }
-      break;
-    
-    default:
-      break;
+      case 'faction':
+        if(action === 'confirm') {
+          joinFaction(entityId);
+        }
+        if(action === 'decline') {
+          leaveFaction(entityId);
+        }
+        break;
+      case 'channel':
+        if(action === 'confirm') {
+          joinUserToChannel(entityId);
+        }
+        if(action === 'decline') {
+          removeUserFromChannel(entityId);
+        }
+        break;
+      
+      default:
+        break;
     }
   }
 
