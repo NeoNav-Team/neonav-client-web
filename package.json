@@ -13,6 +13,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@emotion/unitless": "^0.8.1",
     "@fontsource/jura": "^4.5.13",
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.11.0",
@@ -45,5 +46,8 @@
     "@types/cordova-plugin-qrscanner": "^1.0.34",
     "@types/js-cookie": "^3.0.2",
     "@types/styled-components": "^5.1.26"
+  },
+  "volta": {
+    "node": "16.20.2"
   }
 }
