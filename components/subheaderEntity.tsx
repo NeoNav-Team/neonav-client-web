@@ -5,6 +5,7 @@ import { NnProviderValues } from "./context/nnTypes";
 import { Context as NnContext } from "./context/nnContext";
 import { useContext } from "react";
 import Link from "next/link";
+import { defaultImg } from "@/utilities/defaultImg";
 
 interface subheaderEntityProps {
   id?: string;
@@ -41,7 +42,7 @@ export default function SubheaderEntity(
             spacing={2}
           >
             <Avatar
-              src={photo}
+              src={photo ?? defaultImg}
               variant="rounded"
               sx={{
                 width: { xs: 60, md: 100, xl: 150 },
