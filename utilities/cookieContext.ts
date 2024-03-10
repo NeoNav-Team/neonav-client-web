@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 const MAX_UNREAD_COUNTED = 1000;
 
 export const setCookieContext = (state:NnStore) => {
+  console.log('setCookieContext', state);
   const stringState = JSON.stringify(state);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
   Cookies.remove('nnContext', { domain: '.neonav.net' }); 

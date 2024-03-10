@@ -10,6 +10,7 @@ import { storedRecently, getLocalStorage, storeFetched } from '@/utilities/local
 
 export const addRecentScan = (dispatch: DispatchFunc) => async (body:any) => {
   const data = body;
+  console.log('addRecentScan data', data);
   dispatch({
     type: 'setRecentlyScanned',
     payload: data,
