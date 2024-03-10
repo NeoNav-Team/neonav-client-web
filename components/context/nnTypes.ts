@@ -182,7 +182,7 @@ export type ActionTypes =
   'setChatMessages' |
   'setUserStatuses' |
   'setUserHiddenStatuses' | 
-  'setRecentlyScanned' |
+  'updateRecentlyScanned' |
   'setMessageHistory' |
   'removeStatus' |
   'setSelected' |

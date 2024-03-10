@@ -111,12 +111,13 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setUserContacts':
     clonedState.network.collections.contacts = payload;
     break;
-  case 'setRecentlyScanned':
+  case 'updateRecentlyScanned':
     let clipboardEntities = clonedState.network.collections.clipboardEntities;
     if (!clipboardEntities.includes(payload)) {
       clipboardEntities.push(payload);
     }
     break;
+  // TODO: refactor to setCollection and updateCollection
   case 'setUserStatuses':
     clonedState.network.collections.statuses = payload;
     break;
@@ -169,7 +170,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
               id: cookieDataObj.id,
               collection: [],
             }
-          ]
+          ],
         }
       },
       user: {
