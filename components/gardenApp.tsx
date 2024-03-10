@@ -128,6 +128,9 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
               <><SimpleScrollContainer>
                 <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                   <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
+                    {statuses && statuses.length === 0 &&(
+                      <Box>No statuses for entity {entity.id}</Box>
+                    )}
                     {statuses && statuses.length >= 1 && statuses.map(item => {
                       const { id, ts, from, body } = item;
                       const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
