@@ -122,7 +122,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
         data-augmented-ui="tr-rect br-clip bl-clip both"
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
-          <SubheaderGarden photo={entity.image} title={entity.name} />
+          <SubheaderGarden photo={entity.image} title={entity.name} id={entity.id}/>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {collectionFetched ? (
               <><SimpleScrollContainer>
