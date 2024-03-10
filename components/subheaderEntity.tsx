@@ -45,8 +45,9 @@ export default function SubheaderEntity(
               {title}
             </Typography>
           </Stack>
-          {id && (
+          {false && (
             <Link href={`/contacts/${id}`}>
+              Placeholder: you can add an icon here.
               <PersonAdd />
             </Link>
           )}
