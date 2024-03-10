@@ -112,9 +112,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     clonedState.network.collections.contacts = payload;
     break;
   case 'setRecentlyScanned':
-    const scannedEntities = clonedState.network.collections.scannedEntities;
-    if (!scannedEntities.includes(payload)) {
-      scannedEntities.unshift(payload);
+    const clipboardEntities = clonedState.network.collections.clipboardEntities;
+    if (!clipboardEntities.includes(payload)) {
+      clipboardEntities.unshift(payload);
     }
     break;
   case 'setUserStatuses':

@@ -130,7 +130,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       label: 'Scanned',
       value: 'scanned',
       icon: <QrCodeIcon />,
-      users: state?.network?.collections?.scannedEntities || [],
+      users: state?.network?.collections?.clipboardEntities || [],
     },
     { 
       label: 'Faction',
@@ -280,15 +280,15 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected]);
 
   useEffect(() => {
-    const scannedEntities:any[] = state?.network?.collections?.scannedEntities || [];
+    const clipboardEntities:any[] = state?.network?.collections?.clipboardEntities || [];
     const hasEntity = scannedEntity && typeof scannedEntity?.id !== 'undefined';
-    const newEntity = hasEntity && !scannedEntities.includes(scannedEntity);
+    const newEntity = hasEntity && !clipboardEntities.includes(scannedEntity);
     if (newEntity && scanning) {
       goSetRecentScan();
       setScanning(false);
       setLoading(false);
     }
-  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.scannedEntities]);
+  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.clipboardEntities]);
 
 
   return (

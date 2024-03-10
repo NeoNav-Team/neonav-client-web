@@ -106,6 +106,7 @@ export type NnFaction = {
 
 /* Entity is currently a catch-all but realistically should be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
 export type nnEntity = {
+    thumbnail?: string | undefined
     firstname?: string;
     lastname?: string;
     occupation?: string;
@@ -150,7 +151,7 @@ export type NnNetwork = {
         entityUsers?: NnContact[],
         factions?: NnFaction[],
         statuses: NnStatus[],
-        scannedEntities?: NnContact[] | NnFaction[],
+        clipboardEntities?: NnContact[] | NnFaction[],
     },
     entity: nnEntity;
 }

@@ -1,14 +1,17 @@
 'use client';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect,  useState } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, NnContact } from './context/nnTypes';
+import { NnProviderValues, NnContact, nnEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemContact from './itemContact';
 import FooterNav from './footerNav';
 import { 
   Container,
   Box,
+  Card,
+  CardContent,
+  Typography
 } from '@mui/material';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -16,7 +19,15 @@ import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 
-interface ContactsAppProps {};
+const emptyMsg:{[key: string]: string } ={
+  'loading': 'LOADING...',
+  'contacts': 'Go make some friends!',
+  'clipboard': 'Your clipboard is empty.',
+}
+
+interface ContactsAppProps {
+  collection: string;
+};
 
 const flexContainer = {
   height: '100%',
@@ -26,13 +37,6 @@ const flexContainer = {
   justifyContent: 'center',
   alignContent: 'space-around',
   alignItems: 'stretch',
-};
-  
-const flexHeader = {
-  order: 0,
-  flex: '0 1 64px',
-  alignSelf: 'flex-start',
-  width: '100%',
 };
 
 const flexBody = {
@@ -56,17 +60,34 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
+  const { collection = 'contacts' } = props;
   const { 
     state,
     fetchUserContacts = () =>{},
   }: NnProviderValues = useContext(NnContext);
-  const contacts = state?.network?.collections?.contacts || [];
-  const sortedContacts = contacts.sort((a, b) => a.username.localeCompare(b.username))
+  const collections = (collectionType:string) => {
+    let selectedCollection:nnEntity[] = [];
+    switch (collectionType) {
+    case 'contacts':
+      selectedCollection = state?.network?.collections?.contacts || [];
+      break;
+    case 'clipboard':
+      selectedCollection = state?.network?.collections?.clipboardEntities || [];
+      break;
+    }
+    return selectedCollection;
+  }
+  const contacts:nnEntity[] = collections(collection);
+  const sortedContacts:nnEntity[] = contacts.sort((a,b) => {
+    const aName = a.username || a.name || '';
+    const bName = b.username || b.name || '';
+    return aName.localeCompare(bName) || 0;
+  })
 
   const [ contactsFetched, setContactsFetched ] = useState(false);
 
   const goFetchContacts = useCallback(() => {
-    if (!contactsFetched && '') {
+    if (!contactsFetched) {
       fetchUserContacts();
       setContactsFetched(true);
     }
@@ -77,8 +98,16 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
     setContactsFetched(false);
   }
 
-  const isNewLetter = (a:NnContact, b:NnContact) => {
-    return a?.username.toLowerCase().charAt(0) !== b?.username.toLowerCase().charAt(0)
+  useEffect(() => {
+    if(sortedContacts.length <= 0 ) {
+      goFetchContacts();
+    }
+  }, [goFetchContacts, sortedContacts]);
+
+  const isNewLetter = (a:nnEntity, b:nnEntity) => {
+    const aName = a?.username || a?.name || '';
+    const bName = b?.username || b?.name || '';
+    return aName.toLowerCase().charAt(0) !== bName.toLowerCase().charAt(0)
   }
 
   return (
@@ -94,23 +123,41 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
               <Box sx={{minWidth: '100%', minHeight: '100%'}}>
                 <Stack spacing={0} sx={{ display: 'flex' }}>
                   {sortedContacts && sortedContacts.map((item, index) => {
+                    const displayname = item.username || item.name || item.userid  || item.id || '[NULL]';
                     return (
                       <div
                         key={`${item.id}-container`}
                       >
-                        {isNewLetter(sortedContacts[index], sortedContacts[index - 1]) ? <ItemContact
-                          subtitle={item.username.charAt(0).toUpperCase()}
-                          key={`${item.username.charAt(0).toUpperCase()}-list`}
-                        />  : null}
+                        {collection === 'clipboard' && (<ItemContact
+                          subtitle={'CLIPBOARD ENTITIES'}
+                          key={`CLIPBOARD_ENTITIES-list`}
+                        />)}
+                        {collection === 'contacts' && 
+                        isNewLetter(sortedContacts[index], sortedContacts[index - 1]) ? <ItemContact
+                            subtitle={displayname.charAt(0).toUpperCase()}
+                            key={`${displayname.charAt(0).toUpperCase()}-list`}
+                          />  : null}
                         <ItemContact
                           key={`${item.id}`}
                           id={item.id || ''}
-                          username={item.username}
+                          username={displayname}
                           thumbnail={item.thumbnail}
                         />
                       </div> 
                     )
                   })}
+                  {sortedContacts.length <= 0 && (
+                    <Card sx={{minWidth: '100%', minHeight: '100%', marginTop: '10%'}}>
+                      <CardContent>
+                        <Typography
+                          variant="h5"
+                          component="h2" 
+                          sx={{minWidth: '100%', minHeight: '100%', textAlign: 'center'}}>
+                          {contactsFetched ? emptyMsg[collection] : emptyMsg['loading']}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  )} 
                 </Stack>
               </Box>
             </SimpleScrollContainer>
