@@ -32,7 +32,9 @@ import { use100vh } from 'react-div-100vh';
 import ToggleButtons from './toggleButtons';
 
 
-interface CashAppProps {};
+interface CashAppProps {
+  id?: string;
+};
 
 const flexContainer = {
   height: '100%',
@@ -106,7 +108,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const [openModel, setOpenModel] = useState(false);
   const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
   const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
-  const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]); // TODO: refactor to payload form object
+  const [ recpientsValue, setRecpientsValue ] = useState<string[]>(props.id ? [props.id] : []); // TODO: refactor to payload form object
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
   const wallets = useMemo(() => { 
     return state?.user?.wallets || [];
