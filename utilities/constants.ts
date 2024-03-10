@@ -1,81 +1,84 @@
 // 0 is is notifcations, 1 is annoucements
-export const restrictedChannels = ['d6993467030d7398f0415badd9186aa0', '22c6fec7b63257ca0d7b743946090fa9']
-export const globalChannel = '22c6fec7b63257ca0d7b74394605813e';
+export const restrictedChannels = [
+  "d6993467030d7398f0415badd9186aa0",
+  "22c6fec7b63257ca0d7b743946090fa9",
+];
+export const globalChannel = "22c6fec7b63257ca0d7b74394605813e";
 
 export const apiUrl = {
-  protocol: 'https',
-  hostname: process.env.API_DOMAIN || 'devapi.neonav.net',
-  port: ''
+  protocol: "https",
+  hostname: process.env.API_DOMAIN || "devapi.neonav.net",
+  port: "",
 };
 
 export const authApiEnpoints = {
   login: {
     method: "post",
-    path: "/api/auth"
+    path: "/api/auth",
   },
   verifyUser: {
     method: "get",
-    path: "/api/auth/user"
+    path: "/api/auth/user",
   },
   tokenUpdate: {
     method: "patch",
-    path: "/api/auth/user"
+    path: "/api/auth/user",
   },
   netCheck: {
     method: "get",
-    path: "/api/auth/netcheck"       
+    path: "/api/auth/netcheck",
   },
   profile: {
     method: "get",
-    path: "/api/user"       
+    path: "/api/user",
   },
   profileUpdate: {
     method: "put",
-    path: "/api/user"       
+    path: "/api/user",
   },
   befriend: {
     method: "post",
-    path: "/api/user/friends/$id"       
+    path: "/api/user/friends/$id",
   },
   unfriend: {
     method: "delete",
-    path: "/api/user/friends/$id"       
+    path: "/api/user/friends/$id",
   },
   identify: {
     method: "post",
-    path: "/api/user/id"       
+    path: "/api/user/id",
   },
   wallet: {
     method: "get",
-    path: "/api/user/wallet"  
+    path: "/api/user/wallet",
   },
   wallets: {
     method: "get",
-    path: "/api/user/walletlist"  
+    path: "/api/user/walletlist",
   },
   walletHistory: {
     method: "get",
-    path: "/api/user/walletHistory"  
+    path: "/api/user/walletHistory",
   },
   pay: {
     method: "put",
-    path: "/api/user/wallet"  
+    path: "/api/user/wallet",
   },
   factionPay: {
     method: "put",
-    path: "/api/factions/$faction/wallet"  
+    path: "/api/factions/$faction/wallet",
   },
   request: {
     method: "put",
-    path: "/api/user/$id/walletrequest"
+    path: "/api/user/$id/walletrequest",
   },
   contacts: {
     method: "get",
-    path: "/api/user/friends"       
+    path: "/api/user/friends",
   },
   channels: {
     method: "get",
-    path: "/api/chat/channels"     
+    path: "/api/chat/channels",
   },
   channelUsers: {
     method: "get",
@@ -103,23 +106,23 @@ export const authApiEnpoints = {
   },
   chatHistory: {
     method: "get",
-    path: "/api/chat/channels/$id/history"     
+    path: "/api/chat/channels/$id/history",
   },
   message: {
     method: "post",
-    path: "/api/chat/channels/$id"   
+    path: "/api/chat/channels/$id",
   },
   pollMessages: {
     method: "get",
-    path: "/api/chat/channels/all/?since=$since"   
+    path: "/api/chat/channels/all/?since=$since",
   },
   factionsList: {
     method: "get",
-    path: "/api/factions/all"       
+    path: "/api/factions/all",
   },
   factions: {
     method: "get",
-    path: "/api/factions"       
+    path: "/api/factions",
   },
   factionProfile: {
     method: "get",
@@ -155,50 +158,50 @@ export const authApiEnpoints = {
   },
   factionStatuses: {
     method: "get",
-    path: "/api/factions/$faction/statuses/$id"      
+    path: "/api/factions/$faction/statuses/$id",
   },
   factionSetStatus: {
     method: "post",
-    path: "/api/factions/$faction/statuses/$id"      
+    path: "/api/factions/$faction/statuses/$id",
   },
   statuses: {
     method: "get",
-    path: "/api/user/statuses/$id"       
+    path: "/api/user/statuses/$id",
   },
   statusSet: {
     method: "post",
-    path: "/api/user/statuses/$id"       
+    path: "/api/user/statuses/$id",
   },
   hiddenStatusSet: {
     method: "post",
-    path: "/api/user/statuses/$id/hidden"       
+    path: "/api/user/statuses/$id/hidden",
   },
   factionHiddenStatusSet: {
     method: "post",
-    path: "/api/factions/$faction/statuses/$id/hidden"       
+    path: "/api/factions/$faction/statuses/$id/hidden",
   },
   statusesSet: {
     method: "get",
-    path: "/api/user/setstatuses/$id"       
+    path: "/api/user/setstatuses",
   },
   statusRemove: {
     method: "delete",
-    path: "/api/user/statuses/$id"       
+    path: "/api/user/statuses/$id",
   },
   factionStatusRemove: {
     method: "delete",
-    path: "/api/factions/$faction/statuses/$id"       
+    path: "/api/factions/$faction/statuses/$id",
   },
   toggleStatusScope: {
     method: "put",
-    path: "/api/user/statuses/$id"       
+    path: "/api/user/statuses/$id",
   },
   toggleFactionStatusScope: {
     method: "put",
-    path: "/api/factions/$faction/statuses/$id"       
+    path: "/api/factions/$faction/statuses/$id",
   },
   searchUsers: {
     method: "post",
-    path: "/api/user/search"
-  }
+    path: "/api/user/search",
+  },
 };
