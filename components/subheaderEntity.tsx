@@ -1,9 +1,6 @@
 import { Box, Typography, Avatar, Stack } from "@mui/material";
 import styles from "../styles/item.module.css";
 import { PersonAdd } from "@mui/icons-material";
-import { NnProviderValues } from "./context/nnTypes";
-import { Context as NnContext } from "./context/nnContext";
-import { useContext } from "react";
 import Link from "next/link";
 import { defaultImg } from "@/utilities/defaultImg";
 
@@ -18,14 +15,6 @@ export default function SubheaderEntity(
   props: subheaderEntityProps
 ): JSX.Element {
   const { photo, cover, title, id } = props;
-  const {
-    state,
-    befriend = (id: string) => {},
-    fetchContact = (id: string) => {},
-    unfriend = (id: string) => {},
-    addRecentScan = (entity: any) => {},
-    fetchUserContacts = () => {},
-  }: NnProviderValues = useContext(NnContext);
 
   return (
     <div className={styles.subtitleLine} data-augmented-ui="tr-clip both">
