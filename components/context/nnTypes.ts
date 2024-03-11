@@ -182,11 +182,12 @@ export type ActionTypes =
   'setChatMessages' |
   'setUserStatuses' |
   'setUserHiddenStatuses' | 
-  'updateRecentlyScanned' |
   'setMessageHistory' |
+  'setClipboardEntities' |
   'removeStatus' |
   'setSelected' |
   'updateMessageHistory' |
+  'updateClipboardEntities' |
   'removeUserFromChannel' | 
   'fetchUnreadCount' |
   'setUnreadCount' |
@@ -238,6 +239,7 @@ export type NnProviderDispatch = {
     fetchUserChannels: () => void;
     fetchUserFactions: () => void;
     fetchAllFactions: () => void;
+    fetchClipboardEntities: () => void;
     fetchChannelHistory: (_channelId:string) => void;
     fetchChannelDetails: (_channelId:string) => void;
     fetchChannelUsers: (_channelId:string) => void;

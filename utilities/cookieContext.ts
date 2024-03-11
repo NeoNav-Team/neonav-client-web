@@ -1,7 +1,8 @@
-import { NnStore } from "@/components/context/nnTypes";
+import { NnStore, nnEntity } from "@/components/context/nnTypes";
 import Cookies from "js-cookie";
 
 const MAX_UNREAD_COUNTED = 1000;
+const MAX_CLIPBOARD_ITEMS = 50;
 
 export const setCookieContext = (state:NnStore) => {
   console.log('setCookieContext', state);
@@ -52,3 +53,23 @@ export const clearCookieUnread = () => {
   Cookies.set('nnUnread', '', { domain: '.neonav.net' });
   return [];
 }
+
+//TODO: update functions to use same set of set / update collection functions
+
+export const getCookieClipboard = () => {
+  const encodedStringState = Cookies.get('nnClipboard') || '';
+  const clipboardString = encodedStringState.length >= 3 ? decodeURIComponent(escape(window.atob(encodedStringState))) : '';
+  const clipboardEntitiesArr = clipboardString.length >= 6 ? JSON.parse(clipboardString) : [];
+  return clipboardEntitiesArr;
+}
+
+export const setCookieClipboard = (clipboardEntity:nnEntity[]) => {
+  const clipboardArr = getCookieClipboard();
+  if (clipboardArr.length >= MAX_CLIPBOARD_ITEMS) {
+    clipboardArr.shift();
+  }
+  clipboardArr.push(clipboardEntity);
+  const unreadString = JSON.stringify(clipboardArr);
+  const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
+  Cookies.set('nnClipboard', encodedStringState, { domain: '.neonav.net' });
+};

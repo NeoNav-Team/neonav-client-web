@@ -4,16 +4,15 @@ import {
   DispatchFunc,
   netcheckAPIResData,
 } from "./nnTypes";
-import { getCookieToken } from '@/utilities/cookieContext';
+import { getCookieToken, setCookieClipboard } from '@/utilities/cookieContext';
 import { clearLocalStorage } from '@/utilities/localStorage';
 import { storedRecently, getLocalStorage, storeFetched } from '@/utilities/localStorage';
 
 export const addRecentScan = (dispatch: DispatchFunc) => async (body:any) => {
-  const data = body;
-  console.log('addRecentScan data', data);
+  setCookieClipboard(body);
   dispatch({
-    type: 'updateRecentlyScanned',
-    payload: data,
+    type: 'updateClipboardEntities',
+    payload: body,
   });
 };
 

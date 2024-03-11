@@ -10,6 +10,7 @@ import {
 import {
   closeAlert,
   closeAnnouncement,
+  fetchClipboardEntities,
   fetchNetworkStatus,
   setSelected,
 } from './nnActionsNetwork';
@@ -111,10 +112,14 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setUserContacts':
     clonedState.network.collections.contacts = payload;
     break;
-  case 'updateRecentlyScanned':
+    break;
+  case 'setClipboardEntities':
+    clonedState.network.collections.clipboardEntities = payload;
+    break;
+  case 'updateClipboardEntities':
     let clipboardEntities = clonedState.network.collections.clipboardEntities;
     if (!clipboardEntities.includes(payload)) {
-      clipboardEntities.push(payload);
+      clipboardEntities.unshift(payload);
     }
     break;
   // TODO: refactor to setCollection and updateCollection
@@ -146,6 +151,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   newState = {...state, ...clonedState};
   const cookieState = JSON.parse(JSON.stringify(newState));
   delete cookieState.entity;
+  console.log('cookieState', cookieState);
   setCookieContext(cookieState);
   return newState;
 };
@@ -211,6 +217,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelHistory,
     fetchChannelUsers,
     fetchContact,
+    fetchClipboardEntities,
     fetchFactionDetails,
     fetchFactionStatuses,
     fetchNetworkStatus,

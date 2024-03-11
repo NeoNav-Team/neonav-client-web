@@ -30,6 +30,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
   const {
     state, 
     initContext = () => {},
+    fetchClipboardEntities = () => {},
     fetchNetworkStatus = () => {},
     fetchUserContacts = () => {},
     fetchUserFactions = () => {},
@@ -46,6 +47,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     //get initial values on page load
     if(!initialized) { 
       initContext();
+      fetchClipboardEntities();
       fetchNetworkStatus();
       fetchUserContacts();
       fetchUserFactions();
@@ -57,6 +59,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
   }, [
     fetchNetworkStatus,
     fetchUserContacts,
+    fetchClipboardEntities,
     fetchUserFactions,
     fetchUserChannels,
     fetchUnreadCount,
