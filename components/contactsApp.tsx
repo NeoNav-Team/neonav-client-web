@@ -1,9 +1,16 @@
 'use client';
-import React, { useCallback, useContext, useEffect,  useState } from 'react';
+import React, { 
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnContact, nnEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
+import QrCodeReader from './qrCodeReader';
 import ItemContact from './itemContact';
 import FooterNav from './footerNav';
 import { 
@@ -11,10 +18,11 @@ import {
   Box,
   Card,
   CardContent,
+  Modal,
   Typography
 } from '@mui/material';
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -55,6 +63,15 @@ const flexFooter = {
   alignSelf: 'flex-end',
   width: '100%',
 };
+const modelStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '100%',
+  maxWidth: '800px',
+  boxShadow: 24,
+};
 
 export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
@@ -63,6 +80,8 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   const { collection = 'contacts' } = props;
   const { 
     state,
+    addRecentScan = (entity:any) => {},
+    fetchContact = (id:string) =>{},
     fetchUserContacts = () =>{},
   }: NnProviderValues = useContext(NnContext);
   const collections = (collectionType:string) => {
@@ -83,8 +102,14 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
     const bName = b.username || b.name || '';
     return aName.localeCompare(bName) || 0;
   })
-
+  const scannedEntity:nnEntity = useMemo(() => {
+    return state?.network?.entity || {};
+  }, [state]);
   const [ contactsFetched, setContactsFetched ] = useState(false);
+  const [ loading, setLoading ] = useState(false);
+  const [ scanning, setScanning ] = useState(false);
+  const [ openModel, setOpenModel ] = useState(false);
+  const [ lastEntity, setLastEntity ] = useState({});
 
   const goFetchContacts = useCallback(() => {
     if (!contactsFetched) {
@@ -92,17 +117,60 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
       setContactsFetched(true);
     }
   }, [contactsFetched, fetchUserContacts]);
+    
+  const goSetRecentScan = useCallback(() => {
+    const newScanId = scannedEntity?.id || '';
+    addRecentScan(scannedEntity);
+    if (collection === 'contacts' ){
+      handleContactAdd(newScanId);
+    }
+  }, [addRecentScan, collection, scannedEntity]);
 
-  const scanForContact = () =>  {
-    console.log('scanning');
-    setContactsFetched(false);
+  const handleContactAdd = (scannedId: string) => {};
+
+  const handleModelOpen = (submenu: string) => {
+    setOpenModel(true);
   }
+
+  const handleModelClose = () => setOpenModel(false);
+
+  const handleIDScan = (result:string) => {
+    handleModelClose();
+    setScanning(true);
+    setLoading(true);
+    goFetchUser(result);
+  }
+
+  const goFetchUser = useCallback((result:string) => {
+    if (!loading) {
+      fetchContact(result);
+      setLoading(true);
+    }
+  }, [loading, fetchContact]);
 
   useEffect(() => {
     if(sortedContacts.length <= 0 ) {
       goFetchContacts();
     }
   }, [goFetchContacts, sortedContacts]);
+
+  useEffect(() => {
+    const clipboardEntities:any[] = state?.network?.collections?.clipboardEntities || [];
+    const hasEntity = scannedEntity && typeof scannedEntity?.id !== 'undefined';
+    const newEntity = hasEntity && !clipboardEntities.some(item => item.id == scannedEntity.id);
+    if (newEntity && scanning) {
+      goSetRecentScan();
+      setScanning(false);
+      setLoading(false);
+    }
+  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.clipboardEntities]);
+
+  useEffect(() => {
+    if (lastEntity !== scannedEntity) {
+      setLastEntity(scannedEntity);
+      setLoading(false);
+    }
+  }, [scannedEntity, lastEntity]);
 
   const isNewLetter = (a:nnEntity, b:nnEntity) => {
     const aName = a?.username || a?.name || '';
@@ -122,16 +190,16 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
             <SimpleScrollContainer>
               <Box sx={{minWidth: '100%', minHeight: '100%'}}>
                 <Stack spacing={0} sx={{ display: 'flex' }}>
+                  {collection === 'clipboard' && (<ItemContact
+                    subtitle={'CLIPBOARD ENTITIES'}
+                    key={`CLIPBOARD_ENTITIES-list`}
+                  />)}
                   {sortedContacts && sortedContacts.map((item, index) => {
                     const displayname = item.username || item.name || item.userid  || item.id || '[NULL]';
                     return (
                       <div
                         key={`${item.id}-container`}
                       >
-                        {collection === 'clipboard' && (<ItemContact
-                          subtitle={'CLIPBOARD ENTITIES'}
-                          key={`CLIPBOARD_ENTITIES-list`}
-                        />)}
                         {collection === 'contacts' && 
                         isNewLetter(sortedContacts[index], sortedContacts[index - 1]) ? <ItemContact
                             subtitle={displayname.charAt(0).toUpperCase()}
@@ -164,19 +232,35 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
           </Box>
           <Box sx={flexFooter}>
             <FooterNav
-              bigHexProps={{
-                icon: <PersonSearchIcon />,
-                disabled: true,
+              firstHexProps={{
+                icon: <DriveFileRenameOutlineIcon />,
+                handleAction: handleIDScan,
+                dialog: 'User ID',
+                useInput: true,
+                disabled: loading,
               }}
-              thirdHexProps={{
+              secondHexProps={{
                 icon: <QrCodeScannerIcon />,
-                disabled: true,
-                handleAction: () => scanForContact,
+                handleAction: handleModelOpen,
+                disabled: loading,
               }}
             />
           </Box>
         </Box>
       </div>
+      <Modal
+        open={openModel}
+        onClose={handleModelClose}
+      >
+        <Box sx={modelStyle}>
+          <div
+            className={styles.qrScanPane}
+            data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
+          >
+            <QrCodeReader successHandler={result => handleIDScan(result)} />
+          </div>
+        </Box>
+      </Modal>
     </Container>
   )
 }

@@ -112,7 +112,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   case 'setUserContacts':
     clonedState.network.collections.contacts = payload;
     break;
-    break;
   case 'setClipboardEntities':
     clonedState.network.collections.clipboardEntities = payload;
     break;
@@ -121,6 +120,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     if (!clipboardEntities.includes(payload)) {
       clipboardEntities.unshift(payload);
     }
+    clonedState.network.collections.clipboardEntities = clipboardEntities;
     break;
   // TODO: refactor to setCollection and updateCollection
   case 'setUserStatuses':

@@ -9,6 +9,7 @@ import { clearLocalStorage } from '@/utilities/localStorage';
 import { storedRecently, getLocalStorage, storeFetched } from '@/utilities/localStorage';
 
 export const addRecentScan = (dispatch: DispatchFunc) => async (body:any) => {
+  console.log('addRecentScan', body);
   setCookieClipboard(body);
   dispatch({
     type: 'updateClipboardEntities',

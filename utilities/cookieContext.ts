@@ -65,9 +65,6 @@ export const getCookieClipboard = (): nnEntity[] => {
 
 export const setCookieClipboard = (clipboardEntity:nnEntity) => {
   const clipboardArr = getCookieClipboard();
-  if (clipboardArr.length >= MAX_CLIPBOARD_ITEMS) {
-    clipboardArr.shift();
-  }
   clipboardArr.push(clipboardEntity);
   const unreadString = JSON.stringify(clipboardArr);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
