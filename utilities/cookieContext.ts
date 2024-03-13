@@ -56,14 +56,14 @@ export const clearCookieUnread = () => {
 
 //TODO: update functions to use same set of set / update collection functions
 
-export const getCookieClipboard = () => {
+export const getCookieClipboard = (): nnEntity[] => {
   const encodedStringState = Cookies.get('nnClipboard') || '';
   const clipboardString = encodedStringState.length >= 3 ? decodeURIComponent(escape(window.atob(encodedStringState))) : '';
   const clipboardEntitiesArr = clipboardString.length >= 6 ? JSON.parse(clipboardString) : [];
   return clipboardEntitiesArr;
 }
 
-export const setCookieClipboard = (clipboardEntity:nnEntity[]) => {
+export const setCookieClipboard = (clipboardEntity:nnEntity) => {
   const clipboardArr = getCookieClipboard();
   if (clipboardArr.length >= MAX_CLIPBOARD_ITEMS) {
     clipboardArr.shift();
