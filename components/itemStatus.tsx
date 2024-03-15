@@ -31,15 +31,15 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
   const statusAction  = (type:string) => {
     let verb = 'comments';
     switch(type) {
-    case 'score':
-      verb = 'distributes'
-      break;
-    case 'tally':
-      verb = 'recognises'
-      break;
-    case 'rank':
-      verb = 'ranks'
-      break;
+      case 'score':
+        verb = 'distributes'
+        break;
+      case 'tally':
+        verb = 'recognises'
+        break;
+      case 'rank':
+        verb = 'ranks'
+        break;
     }
     return verb;
   }
@@ -47,15 +47,15 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
   const statusText = (type:string) => {
     let msg = text;
     switch(type) {
-    case 'score':
-      msg = `[${value}] points for`
-      break;
-    case 'tally':
-      msg = 'your efforts in'
-      break;
-    case 'rank':
-      msg = `[Class ${value}] in`
-      break;
+      case 'score':
+        msg = `[${value}] points for`
+        break;
+      case 'tally':
+        msg = 'your efforts in'
+        break;
+      case 'rank':
+        msg = `[Class ${value}] in`
+        break;
     }
     return msg;
   }

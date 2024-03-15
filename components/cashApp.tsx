@@ -33,7 +33,9 @@ import { use100vh } from 'react-div-100vh';
 import ToggleButtons from './toggleButtons';
 
 
-interface CashAppProps {};
+interface CashAppProps {
+  id?: string;
+};
 
 const flexContainer = {
   height: '100%',
@@ -100,7 +102,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const [ lastEntity, setLastEntity ] = useState({});
   const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
   const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
-  const [ recpientsValue, setRecpientsValue ] = useState<string[]>([]); // TODO: refactor to payload form object
+  const [ recpientsValue, setRecpientsValue ] = useState<string[]>(props.id ? [props.id] : []); // TODO: refactor to payload form object
   const [ errFields, setErrFields ] = useState<(string | number)[]>([]);
   const wallets = useMemo(() => { 
     return state?.user?.wallets || [];
@@ -242,20 +244,27 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const processTransactionQueue = () => {
     const transactionQueue = recpientsValue;
     const limit = pLimit(1);
-    const promises:Function[] = transactionQueue.map( userId => {
+    const promises: Function[] = transactionQueue.map((userId) => {
       switch (processTypeValue) {
-      case 'pay':
-        if(selected === 0) {
-          limit(() =>{ sendPayment(userId, transactionValue as string)});
-        } else {
-          limit(() =>{ sendFactionPayment(accountId, userId, transactionValue as string)});
-        }
-        break;
-      case 'request':
-        if (userId.charAt(0) !== ('c' || 'C')) { //TODO: request money from factions...?
-          limit(() =>{ requestPayment(userId, transactionValue as string)});
-        }
-        break;
+        case "pay":
+          if (selected === 0) {
+            limit(() => {
+              sendPayment(userId, transactionValue as string);
+            });
+          } else {
+            limit(() => {
+              sendFactionPayment(accountId, userId, transactionValue as string);
+            });
+          }
+          break;
+        case "request":
+          if (userId.charAt(0) !== ("c" || "C")) {
+            //TODO: request money from factions...?
+            limit(() => {
+              requestPayment(userId, transactionValue as string);
+            });
+          }
+          break;
       }
       return () => {};
     });

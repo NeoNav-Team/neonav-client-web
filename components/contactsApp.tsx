@@ -88,12 +88,12 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   const collections = (collectionType:string) => {
     let selectedCollection:nnEntity[] = [];
     switch (collectionType) {
-    case 'contacts':
-      selectedCollection = state?.network?.collections?.contacts || [];
-      break;
-    case 'clipboard':
-      selectedCollection = state?.network?.collections?.clipboardEntities || [];
-      break;
+      case 'contacts':
+        selectedCollection = state?.network?.collections?.contacts || [];
+        break;
+      case 'clipboard':
+        selectedCollection = state?.network?.collections?.clipboardEntities || [];
+        break;
     }
     return selectedCollection;
   }
@@ -145,11 +145,10 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   }, [loading, fetchContact]);
 
   useEffect(() => {
-    if(sortedContacts.length <= 0 && !loading) {
-      setContactsFetched(false);
+    if(sortedContacts.length <= 0 && !contactsFetched) {
       goFetchContacts();
     }
-  }, [goFetchContacts, loading, sortedContacts]);
+  }, [contactsFetched, goFetchContacts, loading, sortedContacts]);
 
   useEffect(() => {
     const clipboardEntities:any[] = state?.network?.collections?.clipboardEntities || [];

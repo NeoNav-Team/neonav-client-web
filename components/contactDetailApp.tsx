@@ -19,6 +19,7 @@ import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 import { defaultImg } from '@/utilities/defaultImg';
+import { CurrencyExchange } from '@mui/icons-material';
 
 
 interface ContactsAppProps {
@@ -250,7 +251,8 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 }
               }
               secondHexProps={{
-                disabled: true,
+                icon: <CurrencyExchange />,
+                link: `/cash/${entityId}`,
               }}
               bigHexProps={isFriend ? 
                 {
