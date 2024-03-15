@@ -77,7 +77,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     removeUserFromChannel = (channelId:string, userId?:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = useMemo(() => { 
-    const channel = idFromParams || state.network?.selected?.channel || GLOBAL_CHAT;
+    const channel = state.network?.selected?.channel || idFromParams || GLOBAL_CHAT;
     return notify ? NOTIFCATIONS : channel;
   }, [idFromParams, notify, state.network?.selected?.channel]);
   const unread:LooseObject = useMemo(() => {

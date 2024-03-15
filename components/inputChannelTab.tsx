@@ -50,6 +50,11 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
     const selectedChannel = channels.filter(channel => channel.id === newValue);
     changeHandler && changeHandler(selectedChannel[0].id);
     setSelected(selectedChannel[0].id);
+    window.history.pushState({
+      as: `/chat/${selectedChannel[0].id}`,
+      url: `/chat/[...id]`,
+      options: { shallow: true }
+    }, '', `/chat/${selectedChannel[0].id}`);
   };
   const handleScope = (event: React.SyntheticEvent, newValue: InputChannelScope) => {
     setScope(newValue);
