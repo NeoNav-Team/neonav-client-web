@@ -4,6 +4,7 @@ import DataContextCreator from "./dataContextCreator";
 import { 
   Action,
   DispatchFunc,
+  NnChatMessage,
   NnProviderValues,
   NnStore,
 } from './nnTypes';
@@ -71,6 +72,7 @@ import {
   getCookieToken,
   setCookieContext,
 } from "@/utilities/cookieContext";
+import { restrictedChannels } from "@/utilities/constants";
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
@@ -136,7 +138,13 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       clonedState.network.collections.messages = payload;
       break;
     case 'updateMessageHistory':
-      clonedState.network.collections.messages.unshift(payload);
+      const clonedPayload:NnChatMessage = JSON.parse(JSON.stringify(payload));
+      if (
+        clonedPayload.channel == clonedState.network.selected.channel
+        || clonedPayload.channel == restrictedChannels[1]
+      ){ // if selected channel or announcement
+        clonedState.network.collections.messages.unshift(payload);
+      }
       break;
     case 'setNetwork':
       clonedState.network.location = payload;
