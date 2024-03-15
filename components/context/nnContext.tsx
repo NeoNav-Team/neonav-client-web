@@ -10,6 +10,7 @@ import {
 import {
   closeAlert,
   closeAnnouncement,
+  fetchClipboardEntities,
   fetchNetworkStatus,
   setSelected,
 } from './nnActionsNetwork';
@@ -111,12 +112,17 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setUserContacts':
       clonedState.network.collections.contacts = payload;
       break;
-    case 'setRecentlyScanned':
-      const scannedEntities = clonedState.network.collections.scannedEntities;
-      if (!scannedEntities.includes(payload)) {
-        scannedEntities.unshift(payload);
-      }
+    case 'setClipboardEntities':
+      clonedState.network.collections.clipboardEntities = payload;
       break;
+    case 'updateClipboardEntities':
+      let clipboardEntities = clonedState.network.collections.clipboardEntities;
+      if (!clipboardEntities.includes(payload)) {
+        clipboardEntities.unshift(payload);
+      }
+      clonedState.network.collections.clipboardEntities = clipboardEntities;
+      break;
+      // TODO: refactor to setCollection and updateCollection
     case 'setUserStatuses':
       clonedState.network.collections.statuses = payload;
       break;
@@ -145,6 +151,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   newState = {...state, ...clonedState};
   const cookieState = JSON.parse(JSON.stringify(newState));
   delete cookieState.entity;
+  console.log('cookieState', cookieState);
   setCookieContext(cookieState);
   return newState;
 };
@@ -169,7 +176,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
               id: cookieDataObj.id,
               collection: [],
             }
-          ]
+          ],
         }
       },
       user: {
@@ -210,6 +217,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelHistory,
     fetchChannelUsers,
     fetchContact,
+    fetchClipboardEntities,
     fetchFactionDetails,
     fetchFactionStatuses,
     fetchNetworkStatus,

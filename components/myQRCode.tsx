@@ -1,6 +1,6 @@
 
 import {QRCodeSVG} from 'qrcode.react';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues } from '../components/context/nnTypes';
 
@@ -13,7 +13,10 @@ export default function MyQRCode(props:MyQRCodeProps):JSX.Element {
   const { 
     state,
   }: NnProviderValues = useContext(NnContext); 
-  const userId = state?.user?.profile?.auth?.userid || 'Meat Popcicle';
+
+  const userId:string = useMemo(() => {
+    return state?.user?.profile?.auth?.userid || 'Meat Popcicle';
+  }, [state]);
   const size = props?.size || 500;
   const value = props?.value || userId;
 

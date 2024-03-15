@@ -9,6 +9,7 @@ export default function QrCodeReader(props: QrCodeReaderProps): JSX.Element {
   const { successHandler, children } = props;
 
   const onSuccess = (result:any) => {
+    console.log('result', result);
     let cleanId = result?.replace(/[^0-9]+/g, '') || '';
     successHandler && successHandler(cleanId);
   }

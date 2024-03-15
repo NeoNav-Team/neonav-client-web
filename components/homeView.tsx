@@ -19,6 +19,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import CastleIcon from '@mui/icons-material/Castle';
 import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import IconFrame from './iconFrame';
 import Kitty from './svgr/kitty';
 import Cash from './svgr/cash';
@@ -289,6 +290,40 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
                         title="Factions"
                       />
                     </Link>
+                  </Box>
+                </Grid>
+              </Grid>
+              <Grid container item spacing={3}>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/clipboard">
+                      <IconFrame
+                        icon={<AssignmentIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                        title="Clipboard" />
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
                   </Box>
                 </Grid>
               </Grid>

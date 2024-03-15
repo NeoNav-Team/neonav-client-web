@@ -36,10 +36,12 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
   const [open, setOpen] = useState(false);
 
   const clickHandler = () => {
-    if (dialog && handleAction) {
-      setOpen(true);
-    } else if (handleAction) {
-      handleAction();
+    if (!disabled) {
+      if (dialog && handleAction) {
+        setOpen(true);
+      } else if (handleAction) {
+        handleAction();
+      }
     }
   }
 

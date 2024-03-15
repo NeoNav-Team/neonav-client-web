@@ -19,13 +19,14 @@ import {
   OutlinedInput,
   Stack
 } from '@mui/material';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import QrCodeIcon from '@mui/icons-material/QrCode';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import InputUser from './inputUser';
 import { use100vh } from 'react-div-100vh';
@@ -76,14 +77,6 @@ const modelStyle = {
   maxWidth: '800px',
   boxShadow: 24,
 };
-const modelTitleStyle = {
-  fontFamily: 'Jura',
-  fontSize: '18px',
-  letterSpacing: '0.1rem',
-  padding: '10px 16px 0',
-  filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)',
-}
-
 
 export default function CashApp(props: CashAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
@@ -105,7 +98,8 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const [ fetched, setFetched ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ scanning, setScanning ] = useState(false);
-  const [openModel, setOpenModel] = useState(false);
+  const [ openModel, setOpenModel ] = useState(false);
+  const [ lastEntity, setLastEntity ] = useState({});
   const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
   const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
   const [ recpientsValue, setRecpientsValue ] = useState<string[]>(props.id ? [props.id] : []); // TODO: refactor to payload form object
@@ -131,8 +125,8 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     { 
       label: 'Scanned',
       value: 'scanned',
-      icon: <QrCodeIcon />,
-      users: state?.network?.collections?.scannedEntities || [],
+      icon: <AssignmentIcon />,
+      users: state?.network?.collections?.clipboardEntities || [],
     },
     { 
       label: 'Faction',
@@ -213,9 +207,10 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }
 
   const handleRecipient = useCallback((recipientArr: Array<string>) => {
-    setRecpientsValue(recipientArr);
+    const newRecpients =  recpientsValue.concat(recipientArr);
+    setRecpientsValue(newRecpients);
     scrubErr('recipients');
-  }, [scrubErr])
+  }, [recpientsValue, scrubErr])
   
   const goSetRecentScan = useCallback(() => {
     const newScanId = scannedEntity?.id || '';
@@ -289,15 +284,22 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected]);
 
   useEffect(() => {
-    const scannedEntities:any[] = state?.network?.collections?.scannedEntities || [];
+    if (lastEntity !== scannedEntity) {
+      setLastEntity(scannedEntity);
+      setLoading(false);
+    }
+  }, [scannedEntity, lastEntity]);
+
+  useEffect(() => {
+    const clipboardEntities:any[] = state?.network?.collections?.clipboardEntities || [];
     const hasEntity = scannedEntity && typeof scannedEntity?.id !== 'undefined';
-    const newEntity = hasEntity && !scannedEntities.includes(scannedEntity);
+    const newEntity = hasEntity && !clipboardEntities.some(item => item.id == scannedEntity.id);
     if (newEntity && scanning) {
       goSetRecentScan();
       setScanning(false);
       setLoading(false);
     }
-  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.scannedEntities]);
+  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.clipboardEntities]);
 
 
   return (
@@ -355,6 +357,18 @@ export default function CashApp(props: CashAppProps):JSX.Element {
           </Box>
           <Box sx={flexFooter}>
             <FooterNav
+              firstHexProps={{
+                icon: <DriveFileRenameOutlineIcon />,
+                handleAction: handleIDScan,
+                dialog: 'User ID',
+                useInput: true,
+                disabled: loading,
+              }}
+              secondHexProps={{
+                icon: <QrCodeScannerIcon />,
+                handleAction: handleModelOpen,
+                disabled: loading,
+              }}
               bigHexProps={{
                 icon: <CurrencyExchangeIcon />,
                 handleAction: handleSubmit,
@@ -364,11 +378,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
               thirdHexProps={{
                 icon: <QueryStatsIcon />,
                 link: "/cash/history",
-              }}
-              secondHexProps={{
-                icon: <QrCodeScannerIcon />,
-                handleAction: handleModelOpen,
-                disabled: openModel || loading,
               }}
             />
           </Box>

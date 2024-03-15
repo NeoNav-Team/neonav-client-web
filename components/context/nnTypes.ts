@@ -106,6 +106,7 @@ export type NnFaction = {
 
 /* Entity is currently a catch-all but realistically should be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
 export type nnEntity = {
+    thumbnail?: string | undefined
     firstname?: string;
     lastname?: string;
     occupation?: string;
@@ -150,7 +151,7 @@ export type NnNetwork = {
         entityUsers?: NnContact[],
         factions?: NnFaction[],
         statuses: NnStatus[],
-        scannedEntities?: NnContact[] | NnFaction[],
+        clipboardEntities?: NnContact[] | NnFaction[],
     },
     entity: nnEntity;
 }
@@ -181,11 +182,12 @@ export type ActionTypes =
   'setChatMessages' |
   'setUserStatuses' |
   'setUserHiddenStatuses' | 
-  'setRecentlyScanned' |
   'setMessageHistory' |
+  'setClipboardEntities' |
   'removeStatus' |
   'setSelected' |
   'updateMessageHistory' |
+  'updateClipboardEntities' |
   'removeUserFromChannel' | 
   'fetchUnreadCount' |
   'setUnreadCount' |
@@ -232,11 +234,12 @@ export type NnProviderDispatch = {
     createNewChannel: (_channelName:string) => void;
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
-    fetchUserContacts: () => void;
+    fetchUserContacts: (refresh?:boolean) => void;
     fetchContact: (_userId:string) => void;
     fetchUserChannels: () => void;
     fetchUserFactions: () => void;
     fetchAllFactions: () => void;
+    fetchClipboardEntities: () => void;
     fetchChannelHistory: (_channelId:string) => void;
     fetchChannelDetails: (_channelId:string) => void;
     fetchChannelUsers: (_channelId:string) => void;

@@ -157,7 +157,6 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     }
   }, [entity, goFetchUser, goSetRecentScan, id, scanned]);
 
-
   useEffect(() => {
     if (
       alert?.show === true 

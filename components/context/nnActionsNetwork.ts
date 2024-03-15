@@ -1,4 +1,5 @@
 import executeApi from '@/utilities/executeApi';
+import { getCookieClipboard } from  '@/utilities/cookieContext';
 import { 
   APIResponse,
   DispatchFunc
@@ -22,6 +23,15 @@ export const setSelected = (dispatch: DispatchFunc) => async (indexType:string, 
   dispatch({
     type: 'setSelected',
     payload: {[indexType]: index},
+  })
+};
+
+export const fetchClipboardEntities = (dispatch: DispatchFunc) => async () => {
+  // grab the clipboard values
+  const payload = getCookieClipboard();
+  dispatch({
+    type: 'setClipboardEntities',
+    payload,
   })
 };
 
