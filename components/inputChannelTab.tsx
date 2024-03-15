@@ -34,10 +34,7 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
     return channels.filter(channel => channel.scope === scope);
   }
   const scopeLabel = (scope:string) => {
-    const tancifyName = `谈.${scope}`;
-    const firstChannel = scopedChannels(scope)[0] || '谈.社群.组';
-    const label = scopedChannels('public').length >= 2 ? tancifyName : firstChannel
-    return label;
+    return `谈.${scope}`;
   }
   const scopeDisable = (scope:string) => {
     return scopedChannels(scope)[0] ? false : true;
