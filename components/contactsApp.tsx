@@ -81,8 +81,9 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   const { 
     state,
     addRecentScan = (entity:any) => {},
+    befriend = (id:string) => {},
     fetchContact = (id:string) =>{},
-    fetchUserContacts = () =>{},
+    fetchUserContacts = (refresh?:boolean) =>{},
   }: NnProviderValues = useContext(NnContext);
   const collections = (collectionType:string) => {
     let selectedCollection:nnEntity[] = [];
@@ -119,14 +120,9 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   }, [contactsFetched, fetchUserContacts]);
     
   const goSetRecentScan = useCallback(() => {
-    const newScanId = scannedEntity?.id || '';
     addRecentScan(scannedEntity);
-    if (collection === 'contacts' ){
-      handleContactAdd(newScanId);
-    }
-  }, [addRecentScan, collection, scannedEntity]);
+  }, [addRecentScan, scannedEntity]);
 
-  const handleContactAdd = (scannedId: string) => {};
 
   const handleModelOpen = (submenu: string) => {
     setOpenModel(true);
@@ -149,10 +145,11 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   }, [loading, fetchContact]);
 
   useEffect(() => {
-    if(sortedContacts.length <= 0 ) {
+    if(sortedContacts.length <= 0 && !loading) {
+      setContactsFetched(false);
       goFetchContacts();
     }
-  }, [goFetchContacts, sortedContacts]);
+  }, [goFetchContacts, loading, sortedContacts]);
 
   useEffect(() => {
     const clipboardEntities:any[] = state?.network?.collections?.clipboardEntities || [];
@@ -163,7 +160,13 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
       setScanning(false);
       setLoading(false);
     }
-  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.clipboardEntities]);
+    if (hasEntity && collection === 'contacts' && scanning) {
+      const friendId = scannedEntity?.id || '';
+      befriend(friendId);
+      setScanning(false);
+      setLoading(false);
+    }
+  }, [befriend, collection, goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.clipboardEntities]);
 
   useEffect(() => {
     if (lastEntity !== scannedEntity) {

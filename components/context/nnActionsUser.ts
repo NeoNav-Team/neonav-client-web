@@ -128,7 +128,11 @@ export const unfriend = (dispatch: DispatchFunc) => async (id:string) => {
   executeApi('unfriend', {id, token}, onSuccess, onError);
 }
 
-export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
+export const clearUserContacts = (dispatch: DispatchFunc) => async () => {
+  
+} 
+
+export const fetchUserContacts = (dispatch: DispatchFunc) => async (refresh:boolean) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
@@ -146,7 +150,7 @@ export const fetchUserContacts = (dispatch: DispatchFunc) => async () => {
     })
   };
 
-  if (storedRecently('contacts')) {
+  if (!refresh && storedRecently('contacts')) {
     const data = getLocalStorage('contacts');
     dispatch({
       type: 'setUserContacts',

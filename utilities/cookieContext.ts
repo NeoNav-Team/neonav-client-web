@@ -65,7 +65,17 @@ export const getCookieClipboard = (): nnEntity[] => {
 
 export const setCookieClipboard = (clipboardEntity:nnEntity) => {
   const clipboardArr = getCookieClipboard();
-  clipboardArr.push(clipboardEntity);
+  console.log('clipboardEntity', clipboardEntity);
+  const simpleEntity = {
+    'id': clipboardEntity?.id || '',
+    'userid': clipboardEntity?.userid || '',
+    'name': clipboardEntity?.name || '',
+    'username': clipboardEntity?.username || '',
+  }
+  if (clipboardArr.length >= MAX_CLIPBOARD_ITEMS) { //limiting count since spam
+    clipboardArr.shift();
+  }
+  clipboardArr.push(simpleEntity);
   const unreadString = JSON.stringify(clipboardArr);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
   Cookies.set('nnClipboard', encodedStringState, { domain: '.neonav.net' });

@@ -205,9 +205,10 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }
 
   const handleRecipient = useCallback((recipientArr: Array<string>) => {
-    setRecpientsValue(recipientArr);
+    const newRecpients =  recpientsValue.concat(recipientArr);
+    setRecpientsValue(newRecpients);
     scrubErr('recipients');
-  }, [scrubErr])
+  }, [recpientsValue, scrubErr])
   
   const goSetRecentScan = useCallback(() => {
     const newScanId = scannedEntity?.id || '';
