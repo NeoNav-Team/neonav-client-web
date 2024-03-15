@@ -1,4 +1,6 @@
 
+import { useState } from 'react';
+import Link from 'next/link';
 import { 
   Box,
   Button,
@@ -49,7 +51,11 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
       </Stack>
       <div className={isSystemMsg(id, username) ? styles.systemLine : styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
         <Box>
-          <Typography><span className={styles.name}>{username}</span> 》 {text}</Typography>
+          <Typography>
+            <Link href={`/${id.includes('C') ? 'factions' : 'contacts'}/${id}`}>
+              <span className={styles.name}>{username}</span>
+            </Link>
+             》 {text}</Typography>
         </Box>
       </div>
       {hasButtons && (
