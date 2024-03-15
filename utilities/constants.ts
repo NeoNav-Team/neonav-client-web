@@ -1,4 +1,4 @@
-// 0 is is notifcations, 1 is annoucements
+// 0 is is notifications, 1 is announcements
 export const restrictedChannels = [
   "d6993467030d7398f0415badd9186aa0",
   "22c6fec7b63257ca0d7b743946090fa9",

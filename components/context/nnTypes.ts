@@ -87,7 +87,7 @@ export type NnStatus = {
 export type NnChatMessage = {
     id?: string,
     ts?: string,
-    channel?: string,
+    channel: string,
     fromid?: string,
     from?: string,
     text?: string,
