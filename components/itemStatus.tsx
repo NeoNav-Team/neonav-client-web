@@ -17,6 +17,7 @@ interface itemStatusProps {
     date?: string;
     id?: string;
     username?: string;
+    userid: string;
     text?: string;
     action?: string;
     collection?: string;
@@ -26,7 +27,7 @@ interface itemStatusProps {
   }
   
 export default function ItemStatus(props:itemStatusProps):JSX.Element {
-  const { date = '', id = '', username = '', text = '', value = '', action = 'comment', hidden, collection, tag } = props;
+  const { date = '', id = '', username = '', userid = '', text = '', value = '', action = 'comment', hidden, collection, tag } = props;
 
   const statusAction  = (type:string) => {
     let verb = 'comments';
@@ -70,7 +71,7 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
             alignItems="center"
           >
             <Typography>
-              <span className={styles.name}>{username}</span>  <span className={styles.action}>{statusAction(action)}</span> 》
+              <span className={styles.name}>{username} ({userid})</span>  <span className={styles.action}>{statusAction(action)}</span> 》
               <span className={styles.comment}>{statusText(action)}</span> {tag && <Chip icon={<Tag />} component="span" label={tag} className={styles.hashtag} />}
             </Typography>
             {collection && (<MoreVertIcon />)}

@@ -236,7 +236,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                             <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                               <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
                                 {statuses && statuses.length >= 1 && statuses.map((item:NnStatus) => {
-                                  const { id, ts, from, body } = item;
+                                  const { id, ts, from, sender, body } = item;
                                   const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
                                   const stringTags:String[] = (body || '').match(/#\w+/g) || [];
                                   return (
@@ -246,6 +246,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                                       <ItemStatus
                                         id={id}
                                         username={from}
+                                        userid={sender}
                                         date={ts}
                                         text={body}
                                         action={type}
