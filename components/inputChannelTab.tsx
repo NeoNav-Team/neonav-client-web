@@ -12,17 +12,17 @@ interface InputChannelTabProps {
 type InputChannelScope = 'global' | 'public' | 'group';
 
 const GLOBAL_CHAT = globalChannel;
-const NOTIFCATIONS = restrictedChannels[0];
+const NOTIFICATIONS = restrictedChannels[0];
 const ALERTS = restrictedChannels[1];
 
 const notifyChannels = [
-  {name:'Notifcations', id: NOTIFCATIONS, scope: 'global'},
+  {name:'Notifications', id: NOTIFICATIONS, scope: 'global'},
   {name: 'Alerts', id: ALERTS, scope: 'global'},
 ]
   
 export default function InputChannelTab(props:InputChannelTabProps):JSX.Element {
   const { changeHandler, notify, value } = props;
-  const [selected, setSelected] = useState<string | null>(notify ? NOTIFCATIONS : null);
+  const [selected, setSelected] = useState<string | null>(notify ? NOTIFICATIONS : null);
   const { state }: NnProviderValues = useContext(NnContext);
   const channels = useMemo(()=>{
     const userChannels = state.user?.channels || [];

@@ -41,7 +41,7 @@ export const nnSchema:NnStore = {
     },
     channels: [],
     wallets: [],
-    notifcations: [],
+    notifications: [],
     factions: [],
   },
 };

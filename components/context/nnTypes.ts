@@ -160,7 +160,7 @@ export type NnUser = {
     profile?: NnUserProfile,
     wallets?: NnWallet[],
     channels?: NnChannel[],
-    notifcations?: NnChatMessage[],
+    notifications?: NnChatMessage[],
     factions?: NnFaction[],
 }
 
