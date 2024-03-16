@@ -4,7 +4,7 @@ import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, nnEntity, NnContact } from './context/nnTypes';
+import { NnProviderValues, nnEntity, NnContact, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import SubheaderGarden from './subheaderEntity';
 import InputUser from './inputUser';
@@ -98,7 +98,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
   const profile:nnEntity  = useMemo(() => {
     return state?.network?.entity || {};
   }, [state]);
-  const contacts:NnContact[]  = useMemo(() => {
+  const contacts:NnContact[] | NnSimpleEntity[]  = useMemo(() => {
     return state?.network?.collections?.contacts || [];
   }, [state]);
   const userId = state?.user?.profile?.auth?.userid;

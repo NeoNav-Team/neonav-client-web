@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnFaction, nnEntity, NnProviderValues, NnContact } from './context/nnTypes';
+import { NnFaction, nnEntity, NnProviderValues, NnContact, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ToggleButtons from './toggleButtons';
 import InputUser from './inputUser';
@@ -112,8 +112,15 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const repsList = objectifyIds(entity?.reps || []);
   const memberList = objectifyIds(entity?.members || []);
   const userlist = [...repsList, ...memberList];
-  const contacts = state?.network?.collections?.contacts || [];
-  const sortedContacts = contacts.sort((a, b) => a.username.localeCompare(b.username));
+  const contacts:NnContact[] | NnSimpleEntity[] = state?.network?.collections?.contacts || [];
+  const sortedContacts = contacts.sort((a, b) => {
+    if (a.username && b.username) {
+      return a.username.localeCompare(b.username)
+    } 
+    else {
+      return 0
+    }
+  });
   const adminUser = entity.admin ? entity?.admin[0] :  {};
   const isAdmin = userId === adminUser.userid;
 

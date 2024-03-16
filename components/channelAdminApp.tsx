@@ -92,7 +92,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
   const entityId:string = id || '';
   const channels = state?.user?.channels || [];
   const channelInfo:NnChannel = channels.filter(arrItem => arrItem.id == entityId)[0];
-  const userList = state.network?.collections.entityUsers || [];
+  const userList = state.network?.collections?.entityUsers || [];
   const isAdmin = userId === channelInfo?.admin;
   const entity:nnEntity  = useMemo(() => {
     return state?.network?.entity || {};

@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnAlert, NnContact, nnEntity, NnProviderValues } from './context/nnTypes';
+import { NnAlert, NnContact, nnEntity, NnProviderValues, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import FooterNav from './footerNav';
 import { 
@@ -103,7 +103,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     fetchUserContacts = () => {},
   }: NnProviderValues = useContext(NnContext);
   const entityId:string = id || '';
-  const contacts:NnContact[] = useMemo(() => {
+  const contacts:NnContact[] | NnSimpleEntity[] = useMemo(() => {
     return state?.network?.collections?.contacts || [];
   }, [state]);
   const entity:nnEntity = useMemo(() => {

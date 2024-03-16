@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import styles from "../styles/generic.module.css";
 import { Context as NnContext } from "./context/nnContext";
-import { NnProviderValues, NnContact } from "./context/nnTypes";
+import { NnProviderValues, NnContact, NnSimpleEntity } from "./context/nnTypes";
 import SimpleScrollContainer from "./simpleScrollContainer";
 import ItemContact from "./itemContact";
 import FooterNav from "./footerNav";
@@ -59,10 +59,15 @@ export default function GardenSearchApp(
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const { state, userSearch = (search: string) => {} }: NnProviderValues =
     useContext(NnContext);
-  const searchArr: NnContact[] = state?.network?.collections?.entityUsers || [];
-  const sortedSearch = searchArr.sort((a, b) =>
-    a.username.localeCompare(b.username)
-  );
+  const searchArr: NnContact[] | NnSimpleEntity [] = state?.network?.collections?.entityUsers || [];
+  const sortedSearch = searchArr.sort((a, b) => {
+    if (a.username && b.username) {
+      return a.username.localeCompare(b.username)
+    } 
+    else {
+      return 0
+    }
+  });
 
   const [contactsFetched, setContactsFetched] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
