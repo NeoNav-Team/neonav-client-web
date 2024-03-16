@@ -49,7 +49,6 @@ export const setCookieContext = (state:NnStore) => {
     }
   }
   const stringState = JSON.stringify(state);
-  console.log('stringState', stringState);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
   Cookies.remove('nnContext', { domain: '.neonav.net' }); 
   Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net' });

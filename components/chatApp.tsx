@@ -215,7 +215,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                     <ItemMessage
                       key={`${index}-${item.ts}`}
                       date={item.ts}
-                      text={`${item.text} -  ${item.confirm}`}
+                      text={item.text}
                       username={item.from}
                       id={item.fromid}
                       dialogCallback={goDialogAction}
