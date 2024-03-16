@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Theme, useTheme } from '@mui/material/styles';
-import { nnEntity } from '../components/context/nnTypes';
+import { NnContact, nnEntity, NnFaction } from '../components/context/nnTypes';
 import styles from '../styles/generic.module.css';
 import {
   Box,
@@ -19,7 +19,6 @@ import {
   ClickAwayListener,
   InputAdornment,
   Checkbox,
-  Typography
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import PsychologyAltIcon from '@mui/icons-material/PsychologyAlt';
@@ -194,9 +193,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
             value={user.id || user.userid}
             style={getStyles((user.id || ''), (user.username as unknown as string[] || user.id), theme)}
           >
-            <Checkbox checked={value.indexOf(user?.id as string || user?.userid as string) !== -1} />
-            <strong>{(user.username as unknown as string[] || user.name as unknown as string[] || user.id || user.userid)}</strong>
-            &nbsp;|&nbsp;<Typography variant="overline">{user.id || user.userid}</Typography>
+            <Checkbox checked={value.indexOf(user?.id as string || user?.userid as string) !== -1} />{(user.username as unknown as string[] || user.name as unknown as string[] || user.id || user.userid)}
           </MenuItem>
         ))}
       </Select>
