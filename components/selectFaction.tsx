@@ -1,6 +1,6 @@
 import { useContext, useState, useMemo, MouseEvent } from 'react';
 import { Context as NnContext } from '../components/context/nnContext';
-import { NnProviderValues, NnFaction } from '../components/context/nnTypes';
+import { NnProviderValues, NnFaction, NnSimpleEntity } from '../components/context/nnTypes';
 import { IconButton } from "@mui/material";
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
@@ -33,7 +33,7 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     state,
     setSelected = (indexType:string, channelId:string) => {},
   }: NnProviderValues = useContext(NnContext); 
-  const factions:NnFaction[] = useMemo(() => { return state?.user?.factions || [] }, [state]);
+  const factions:NnFaction[] | NnSimpleEntity[] = useMemo(() => { return state?.user?.factions || [] }, [state]);
   const defaultSelected =  useMemo(() => { return state?.network?.selected?.account as unknown as number || -1 }, [state]);
   const user:string = useMemo(() => { return state?.user?.profile?.meta?.firstname || 'Personal' }, [state]);
   const userId:string = useMemo(() => { return state?.user?.profile?.auth?.userid || '' }, [state]);

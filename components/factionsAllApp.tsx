@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
-import { NnProviderValues, NnFaction } from './context/nnTypes';
+import { NnProviderValues, NnFaction, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemContact from './itemContact';
 import FooterNav from './footerNav';
@@ -54,9 +54,16 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
     state,
     fetchAllFactions = () =>{},
   }: NnProviderValues = useContext(NnContext);
-  const sortedFactions:NnFaction[]  = useMemo(() => {
+  const sortedFactions:NnFaction[] | NnSimpleEntity[] = useMemo(() => {
     const factions = state?.network?.collections?.factions || [];
-    return factions.sort((a:any, b:any) => a?.name.localeCompare(b?.name));
+    return factions.sort((a, b) => {
+      if (a.name && b.name) {
+        return a.name.localeCompare(b.name);
+      } 
+      else {
+        return 0
+      }
+    });
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
   const [ collectionFetched, setCollectionFetched ] = useState(false);

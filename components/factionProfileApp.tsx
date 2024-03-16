@@ -47,12 +47,17 @@ type FormKey =
   'tagline' | 
   'description';
 
-const defaultForm = {
+let defaultProfile = {
+  id: '',
   name: '',
-  image: '',
   tagline: '',
-  description: ''
-};
+  image: '',
+  thumbnail: '',
+  description: '',
+  admin: [],
+  members: [],
+  reps: []
+}
 
 const flexContainer = {
   height: '100%',
@@ -102,28 +107,28 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     return statuses.filter(status => status.class === 'public');
   }, [state?.network?.collections?.statuses]);
   const userId = state?.user?.profile?.auth?.userid;
-  const accountId = factionId || state?.network?.selected?.account || '';
+  const accountId = factionId || '';
   const admin = profile && profile?.admin?.length && profile?.admin[0];
   const reps = profile && profile?.reps;
   const isAdmin = profile && userId === admin?.userid;
   const isRep = isAdmin || (reps && reps.filter((user:NnContact) => user.id === userId).length >= 1);
   const [ profileFetched, setProfileFetched ] = useState(false);
   const [ editMode, setEditMode ] = useState(false);
-  const [ form, setForm ] = useState<Form>(defaultForm);
+  const [ form, setForm ] = useState<Form>(defaultProfile);
   const { name, image, tagline, description } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
-  const isRecentEntity = profile.id === accountId;
+  const [ completeProfile, setCompleteProfile ] = useState(defaultProfile);
+  const isRecentEntity = profile.id === factionId;
 
   const goFetchFactionProfile = useCallback(() => {
     if (!profileFetched || !isRecentEntity) {
       fetchFactionDetails(accountId);
       fetchFactionStatuses(accountId);
-      setProfileFetched(true);
     }
   }, [profileFetched, isRecentEntity, fetchFactionDetails, accountId, fetchFactionStatuses]);
 
   const updateDefaultForm = (profile:nnEntity) => {
-    let updatedDefaultForm:Form = defaultForm;
+    let updatedDefaultForm:Form = defaultProfile;
     Object.keys(updatedDefaultForm).map(function(key){
       if((profile as any)[key]) (updatedDefaultForm as any)[key]=(profile as any)[key]
     });
@@ -139,6 +144,16 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       updateDefaultForm(profile);
     }
   }, [profile]);
+
+  useEffect(() => {
+    if (isRecentEntity) {
+      console.log('profile', profile);
+      const completeProfile =  {...defaultProfile, ...profile};
+      console.log('completeProfile', completeProfile);
+      setCompleteProfile(completeProfile);
+      setProfileFetched(true);
+    }
+  }, [isRecentEntity, profile]);
 
   const resizeFile = (file:File, field:FormKey, size:number) => {
     Resizer.imageFileResizer(
@@ -222,7 +237,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                             </Stack>
                           ) : (
                             <>
-                              <SubheaderFaction title={name} subtitle={tagline} photo={image}/>
+                              <SubheaderFaction title={completeProfile.name} subtitle={completeProfile.tagline} photo={completeProfile.image}/>
                             </>
                           )}
                         </Box>
@@ -230,7 +245,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                       {!editMode && (
                         <Box>
                           <Divider variant="middle" color="primary"><Typography variant="h6">About Us</Typography></Divider>
-                          <p>{description}</p>
+                          <p>{completeProfile.description}</p>
                           <Divider variant="middle" color="(primary"><Typography variant="h6">Recent News</Typography></Divider>
                           {statuses && statuses.length >= 1 ? (
                             <Box sx={{ minWidth: '100%', minHeight: '100%' }}>

@@ -157,7 +157,7 @@ export type NnNetwork = {
         contacts?: NnContact[] | NnSimpleEntity[],
         entityUsers?: NnContact[] | NnSimpleEntity[],
         factions?: NnFaction[] | NnSimpleEntity[],
-        statuses?: NnStatus[] | NnSimpleEntity[],
+        statuses?: NnStatus[],
         clipboardEntities?: NnContact[] | NnFaction[] | NnSimpleEntity[],
     } | undefined,
     entity: nnEntity;
