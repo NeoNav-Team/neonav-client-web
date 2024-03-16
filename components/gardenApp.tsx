@@ -164,7 +164,7 @@ export default function GardenApp(props: GardenAppProps): JSX.Element {
                       {statuses &&
                         statuses.length >= 1 &&
                         statuses.map((item) => {
-                          const { id, ts, from, body } = item;
+                          const { id, ts, from, sender, body } = item;
                           const {
                             type = null,
                             value = null,
@@ -178,6 +178,7 @@ export default function GardenApp(props: GardenAppProps): JSX.Element {
                               <ItemStatus
                                 id={id}
                                 username={from}
+                                userid={sender}
                                 date={ts}
                                 text={body}
                                 action={type}

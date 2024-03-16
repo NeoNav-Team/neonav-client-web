@@ -135,7 +135,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
                 <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                   <Stack spacing={0} style={{ display: 'flex', flexDirection: 'column-reverse' }}>
                     {statusArr && statusArr[tabIndex].length >= 1 && statusArr[tabIndex].map(item => {
-                      const { id, ts, from, body } = item;
+                      const { id, ts, from, body, sender } = item;
                       const {type = null, value = null, tag = null } = isJsonStringValid(body || '') && JSON.parse(body || '');
                       const stringTags:String[] = (body || '').match(/#\w+/g) || [];
                       return (
@@ -145,6 +145,7 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
                           <ItemStatus
                             id={id}
                             username={from}
+                            userid={sender}
                             date={ts}
                             text={body}
                             action={type}

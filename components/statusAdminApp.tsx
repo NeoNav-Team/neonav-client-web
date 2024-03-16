@@ -134,6 +134,7 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
                       <ItemStatus
                         id={selectedStatus.id}
                         username={selectedStatus.from}
+                        userid={selectedStatus.sender}
                         date={selectedStatus.ts}
                         text={selectedStatus.body}
                         action={type}
