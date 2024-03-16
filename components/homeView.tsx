@@ -31,7 +31,7 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import Map from './svgr/map';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import Notifcations from './svgr/notifications';
+import Notifications from './svgr/notifications';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
 
@@ -181,7 +181,7 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
               minHeight={fixedHeight}
             >
               <Link href="/notifications">
-                <IconFrame icon={<Notifcations fontSize="inherit" />} title="Notifications" />
+                <IconFrame icon={<Notifications fontSize="inherit" />} title="Notifications" />
               </Link>
             </Box>
           </Grid>

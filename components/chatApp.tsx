@@ -23,7 +23,7 @@ interface ChatAppProps {
 }
 
 const GLOBAL_CHAT = globalChannel;
-const NOTIFCATIONS = restrictedChannels[0];
+const NOTIFICATIONS = restrictedChannels[0];
 
 const flexContainer = {
   height: '100%',
@@ -78,7 +78,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }: NnProviderValues = useContext(NnContext);
   const selectedChannel:string = useMemo(() => { 
     const channel = state.network?.selected?.channel || idFromParams || GLOBAL_CHAT;
-    return notify ? NOTIFCATIONS : channel;
+    return notify ? NOTIFICATIONS : channel;
   }, [idFromParams, notify, state.network?.selected?.channel]);
   const unread:LooseObject = useMemo(() => {
     return state?.network?.selected?.unread || {};
