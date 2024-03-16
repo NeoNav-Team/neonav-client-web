@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
+import ReactPlayer from 'react-player';
 import {
   Box,
   Container,
@@ -38,6 +39,7 @@ import UserSettings from './svgr/usersettings';
 interface HomeViewProps { }
 
 const fixedHeight = '16vh';
+const KITTY_VIDEO = 'https://sites.neonav.net/kitty.mp4';
 
 export default function HomeView(props: HomeViewProps): JSX.Element {
   //TODO: refactor this to dynamically take an array of "app" data -- icon, label, link
@@ -228,10 +230,9 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
               justifyContent="center"
               alignItems="center"
               minHeight={fixedHeight}
+              onClick={() => handleModelOpen('kitty')}
             >
-              <Link href="/">
-                <IconFrame icon={<Kitty fontSize="inherit" />} title="Kitty" />
-              </Link>
+              <IconFrame icon={<Kitty fontSize="inherit" />} title="Kitty" />
             </Box>
           </Grid>
         </Grid>
@@ -442,6 +443,14 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
               data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
             >
               <QrCodeReader successHandler={result => handleIDScan(result)} />
+            </div>
+          )}
+          {submenu === 'kitty' && (
+            <div
+              className={styles.qrScanPane}
+              data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
+            >
+              <ReactPlayer url={KITTY_VIDEO}  width={'100%'} playing={true} controls={true} />
             </div>
           )}
         </Box>
