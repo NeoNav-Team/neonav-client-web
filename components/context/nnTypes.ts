@@ -60,7 +60,7 @@ export type NnWallet = {
 }
 
 export type NnContact = {
-    thumbnail: string | undefined;
+    thumbnail?: string | undefined;
     id?: string,
     userid?: string,
     username: string,
@@ -130,6 +130,13 @@ export type nnEntity = {
     auth?: NnProfileAuth,
 }
 
+export type NnSimpleEntity = {
+    id?: string;
+    userid?: string;
+    name?: string;
+    username?: string;
+}
+
 export type NnCollection = NnWalletTransaction[] & NnChatMessage[] & NnContact[];
 
 export type NnNetwork = {
@@ -147,12 +154,12 @@ export type NnNetwork = {
     collections: {
         messages?: NnChatMessage[],
         transactions?: NnWalletTransaction[],
-        contacts?: NnContact[],
-        entityUsers?: NnContact[],
-        factions?: NnFaction[],
-        statuses: NnStatus[],
-        clipboardEntities?: NnContact[] | NnFaction[],
-    },
+        contacts?: NnContact[] | NnSimpleEntity[],
+        entityUsers?: NnContact[] | NnSimpleEntity[],
+        factions?: NnFaction[] | NnSimpleEntity[],
+        statuses?: NnStatus[] | NnSimpleEntity[],
+        clipboardEntities?: NnContact[] | NnFaction[] | NnSimpleEntity[],
+    } | undefined,
     entity: nnEntity;
 }
 
@@ -161,7 +168,7 @@ export type NnUser = {
     wallets?: NnWallet[],
     channels?: NnChannel[],
     notifications?: NnChatMessage[],
-    factions?: NnFaction[],
+    factions?: NnFaction[] | NnSimpleEntity[],
 }
 
 export type NnCollectionKeys = 'chats' | 'transactions' | 'users';
