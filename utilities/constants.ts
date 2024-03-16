@@ -142,7 +142,7 @@ export const authApiEnpoints = {
   },
   factionLeave: {
     method: "delete",
-    path: "/api/factions/$faction",
+    path: "/api/factions/$faction/$id",
   },
   factionAddRep: {
     method: "put",

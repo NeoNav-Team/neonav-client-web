@@ -185,6 +185,11 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
               collection: [],
             }
           ],
+          contacts: [],
+          entityUsers: [],
+          factions: [],
+          statuses: [],
+          clipboardEntities: [],
         }
       },
       user: {

@@ -98,6 +98,7 @@ export const updateFactionProfile = (dispatch: DispatchFunc) => async (id:string
 
 export const removeUserFromFaction = (dispatch: DispatchFunc) => (faction:string, id:string)  => {
   const token = getCookieToken();
+  console.log('faction', faction, 'id', id, token);
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
     dispatch({

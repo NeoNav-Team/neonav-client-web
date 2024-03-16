@@ -1,12 +1,55 @@
-import { NnStore, nnEntity } from "@/components/context/nnTypes";
+import { NnStore, nnEntity, NnSimpleEntity } from "@/components/context/nnTypes";
 import Cookies from "js-cookie";
 
 const MAX_UNREAD_COUNTED = 1000;
 const MAX_CLIPBOARD_ITEMS = 50;
 
+const setSimpleEntity = (contact:nnEntity): NnSimpleEntity => {
+  return {
+    'id': contact?.id || '',
+    'userid': contact?.userid || '',
+    'name': contact?.name || '',
+    'username': contact?.username || '',
+  }
+}
+const simplifyEntities =(entities: nnEntity[]): NnSimpleEntity[] => {
+  return entities.map(entity => {
+    return setSimpleEntity(entity);
+  })
+}
+
 export const setCookieContext = (state:NnStore) => {
-  console.log('setCookieContext', state);
+  // removes all thumbnails from cookies as they were breaking the length of possible cookie values
+  if (state.network && state.network.collections) {
+    if (state?.network?.collections.contacts){
+      state.network.collections.contacts = 
+      simplifyEntities(state.network.collections.contacts)
+    }
+    if (state?.network?.collections.entityUsers){
+      state.network.collections.entityUsers = 
+      simplifyEntities(state.network.collections.entityUsers)
+    }
+    if (state?.network?.collections.factions){
+      state.network.collections.factions = 
+      simplifyEntities(state.network.collections.factions)
+    }
+    if (state?.network?.collections.clipboardEntities){
+      state.network.collections.clipboardEntities = 
+      simplifyEntities(state.network.collections.clipboardEntities)
+    }
+    if (state?.network?.collections.contacts){
+      state.network.collections.contacts = 
+      simplifyEntities(state.network.collections.contacts)
+    }
+  }
+  if (state.user) {
+    if (state?.user?.factions){
+      state.user.factions = 
+      simplifyEntities(state?.user?.factions)
+    }
+  }
   const stringState = JSON.stringify(state);
+  console.log('stringState', stringState);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
   Cookies.remove('nnContext', { domain: '.neonav.net' }); 
   Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net' });
@@ -65,13 +108,7 @@ export const getCookieClipboard = (): nnEntity[] => {
 
 export const setCookieClipboard = (clipboardEntity:nnEntity) => {
   const clipboardArr = getCookieClipboard();
-  console.log('clipboardEntity', clipboardEntity);
-  const simpleEntity = {
-    'id': clipboardEntity?.id || '',
-    'userid': clipboardEntity?.userid || '',
-    'name': clipboardEntity?.name || '',
-    'username': clipboardEntity?.username || '',
-  }
+  const simpleEntity = setSimpleEntity(clipboardEntity);
   if (clipboardArr.length >= MAX_CLIPBOARD_ITEMS) { //limiting count since spam
     clipboardArr.shift();
   }

@@ -211,11 +211,11 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
             <SimpleScrollContainer>
               <Box sx={{maxWidth: '100%'}}>
                 <Stack spacing={0} style={{display: 'flex', flexDirection: `${notify ? 'column' : 'column-reverse'}` }}>
-                  {messages.map(item => (
+                  {messages.map((item, index) => (
                     <ItemMessage
-                      key={item.ts}
+                      key={`${index}-${item.ts}`}
                       date={item.ts}
-                      text={item.text}
+                      text={`${item.text} -  ${item.confirm}`}
                       username={item.from}
                       id={item.fromid}
                       dialogCallback={goDialogAction}
