@@ -17,13 +17,16 @@ import {
   LinearProgress,
   Chip,
 } from '@mui/material';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import TocIcon from '@mui/icons-material/Toc';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import NoMeetingRoomIcon from '@mui/icons-material/NoMeetingRoom';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
@@ -77,6 +80,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const requests = [
+    {label: 'Add', value:'add', icon: <PersonAddIcon />},
     {label: 'Remove', value:'remove', icon: <PersonRemoveIcon />},
     {label: 'Admin', value:'admin', icon: <LocalPoliceIcon />},
   ];
@@ -105,12 +109,25 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
 
   const usergroups = [
     { 
+      label: 'Room Members',
+      value: 'members',
+      icon: <MeetingRoomIcon />,
+      users: userList || [],
+    },
+    { 
       label: 'Contacts',
       value: 'contact',
       icon: <PeopleAltIcon />,
-      users: userList || [],
+      users: state?.network?.collections?.contacts || [],
+    },
+    { 
+      label: 'Scanned',
+      value: 'scanned',
+      icon: <AssignmentIcon />,
+      users: state?.network?.collections?.clipboardEntities || [],
     },
   ];
+
 
   const scrubErr = (errStr:string) => {
     const newErrFields = errFields;
@@ -213,13 +230,13 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
                 </Container>
                 <SimpleScrollContainer>
                   <div>
-                    {userList.length >= 1 && userList.map(item => {
+                    {userList.length >= 1 && userList.map((item, index) => {
                       return (
                         <Chip
                           sx={{margin: '2px'}}
                           label={item.username || item.id}
                           icon={adminBage(item?.id || item.userid || '')} 
-                          key={`chip_${item.username || item.id}_display`}
+                          key={`${index}_chip_${item.username || item.id}_display`}
                         />
                       )
                     })}

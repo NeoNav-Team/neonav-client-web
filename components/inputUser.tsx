@@ -47,10 +47,13 @@ const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 
 
-function getStyles(name: string, userName: readonly string[], theme: Theme) {
+function getStyles(name: string, userName: string, theme: Theme) {
+  const checkerStr: string = `${name}`;
+  const checkedStr: string = `${userName}`;
+  const hasSubstring = userName && checkedStr.indexOf(checkerStr) != -1;
   return {
     fontWeight:
-      userName.indexOf(name) === -1
+      hasSubstring
         ? theme.typography.fontWeightRegular
         : theme.typography.fontWeightMedium,
   };
@@ -107,7 +110,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
   const nameById = (id:string) => {  
     if(allKnownUsers.length !== 0) {
       const user = allKnownUsers.find(user => (user.id || user.userid) === id);
-      const username = user?.username || user?.name || id;
+      const username = user?.username || user?.name || id || '';
       const formattedName =  username && username?.length >= 12 ? `${username.substring(0, 12)}...` : username;
       return formattedName;
     }
@@ -192,7 +195,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
           <MenuItem
             key={`${user.id}_${index}`}
             value={user.id || user.userid}
-            style={getStyles((user.id || ''), (user.username as unknown as string[] || user.id), theme)}
+            style={getStyles((user.id || ''), (user.username || user.id || ''), theme)}
           >
             <Checkbox checked={value.indexOf(user?.id as string || user?.userid as string) !== -1} />
             <strong>{(user.username as unknown as string[] || user.name as unknown as string[] || user.id || user.userid)}</strong>
