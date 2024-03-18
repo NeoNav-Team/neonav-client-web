@@ -242,27 +242,27 @@ export const adminUserToChannel = (dispatch: DispatchFunc) => async (channel:str
   executeApi('channelAdmin', {channel, id, newAdmin, token}, onSuccess, onError);
 };
 
-export const joinUserToChannel  = (dispatch: DispatchFunc) => async (channel:string) => {
+export const inviteUserToChannel = (dispatch: DispatchFunc) => async (channel:string, id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {
     const { data } = response;
-    clearLocalStorage('lastFetch_channels');
     dispatch({
       type: 'setAlert',
-      payload: {severity: 'success', message: "Joined channel.", show: true},
+      payload: {severity: 'success', message: `${id} invited to channel.`, show: true},
     })
     return data;
   };
   const onError = (err:netcheckAPIResData) => {
-    const { message = 'Join channel error.' } = err;
+    const { message = 'Invite channel error.' } = err;
     dispatch({
       type: 'setAlert',
       payload: {severity: 'error', message, show: true},
     })
     return err;
   };
-  executeApi('channelJoin', {channel, token}, onSuccess, onError);
+  executeApi('channelInvite', {channel, id, token}, onSuccess, onError);
 };
+
 
 export const createNewChannel = (dispatch: DispatchFunc) => async (name:string) => {
   const token = getCookieToken();

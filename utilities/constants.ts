@@ -88,6 +88,10 @@ export const authApiEnpoints = {
     method: "post",
     path: "/api/chat/channels",
   },
+  channelInvite: {
+    method: "put",
+    path: "/api/chat/channels/$channel/invites/$id",
+  },
   channelJoin: {
     method: "put",
     path: "/api/chat/channels/$channel",

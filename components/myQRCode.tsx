@@ -6,7 +6,7 @@ import { NnProviderValues } from '../components/context/nnTypes';
 
 interface MyQRCodeProps {
   value?: string;
-  size: number;
+  size?: number;
 }
 
 export default function MyQRCode(props:MyQRCodeProps):JSX.Element {
