@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useState, useEffect, useMemo } from 're
 import styles from '../styles/card.module.css';
 import { clearLocalStorage } from '@/utilities/localStorage';
 import { Context as NnContext } from './context/nnContext';
-import { NnChannel, nnEntity, NnProviderValues } from './context/nnTypes';
+import { NnChannel, NnContact, nnEntity, NnFaction, NnProviderValues, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ToggleButtons from './toggleButtons';
 import InputUser from './inputUser';
@@ -107,7 +107,14 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
   const [ usersValue, setUsersValue ] = useState<string[]>([]);
   const [ scope, setScope ] = useState<string>(channelInfo?.scope);
 
-  const usergroups = [
+  type group = {
+    label: string,
+    value: string,
+    icon: React.ReactElement,
+    users: nnEntity[] | NnContact[] | NnFaction[] | NnSimpleEntity[],
+  }
+
+  const usergroups: group[] = [
     { 
       label: 'Room Members',
       value: 'members',
@@ -121,13 +128,27 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
       users: state?.network?.collections?.contacts || [],
     },
     { 
-      label: 'Scanned',
-      value: 'scanned',
+      label: 'Clipboard',
+      value: 'clipboard',
       icon: <AssignmentIcon />,
       users: state?.network?.collections?.clipboardEntities || [],
     },
   ];
 
+  const groupForAction = (requestValue:string):group[] => {
+    console.log('groups for action', requestValue);
+    let actionGroup:group[] = [];
+    if (requestValue == 'add') {
+      actionGroup.push(usergroups[1]);
+      actionGroup.push(usergroups[2]);
+    }
+    if (requestValue == 'remove' || requestValue == 'admin') {
+      actionGroup = [
+        usergroups[0],
+      ]
+    }
+    return actionGroup;
+  }
 
   const scrubErr = (errStr:string) => {
     const newErrFields = errFields;
@@ -217,7 +238,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
                         <InputUser
                           changeHandler={handleUsers}
                           value={usersValue}
-                          contactGroups={usergroups}
+                          contactGroups={groupForAction(requestValue)}
                           selectLimit={1}
                           error={hasErr('users')}
                         />
