@@ -265,6 +265,7 @@ export type NnProviderDispatch = {
     leaveFaction: (_factionId:string) => void;
     updateFactionProfile: (_factionId:string, _document:any, _update:any) => void;
     inviteUserToFaction: () => void;
+    inviteUserToChannel: (_channelId:string, _userId:string) => void;
     addRepToFaction: (_factionId:string, _userId:string) => void;
     removeRepToFaction: (_factionId:string, _userId:string) => void;
     joinFaction: (_factionId:string) => void;

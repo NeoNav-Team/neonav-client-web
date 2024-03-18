@@ -2,9 +2,8 @@
 'use client';
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
 import styles from '../styles/card.module.css';
-import { clearLocalStorage } from '@/utilities/localStorage';
 import { Context as NnContext } from './context/nnContext';
-import { NnChannel, nnEntity, NnProviderValues } from './context/nnTypes';
+import { NnChannel, NnContact, nnEntity, NnFaction, NnProviderValues, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ToggleButtons from './toggleButtons';
 import InputUser from './inputUser';
@@ -20,7 +19,6 @@ import {
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import TocIcon from '@mui/icons-material/Toc';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -30,6 +28,7 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import NoMeetingRoomIcon from '@mui/icons-material/NoMeetingRoom';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import MyQRCode from './myQRCode';
 
 
 interface ChannelAdminAppProps {
@@ -80,7 +79,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
   const requests = [
-    {label: 'Add', value:'add', icon: <PersonAddIcon />},
+    {label: 'Invite', value:'invite', icon: <PersonAddIcon />},
     {label: 'Remove', value:'remove', icon: <PersonRemoveIcon />},
     {label: 'Admin', value:'admin', icon: <LocalPoliceIcon />},
   ];
@@ -89,6 +88,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
     fetchChannelDetails = (id:string) =>{},
     fetchChannelUsers = (id:string) =>{},
     removeUserFromChannel = (channel:string, userId?:string) => {},
+    inviteUserToChannel = (channel:string, userId:string) => {},
     toggleChannelScope = (id:string) =>{},
     adminUserToChannel = (channel:string, id:string) => {},
   }: NnProviderValues = useContext(NnContext);
@@ -107,7 +107,14 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
   const [ usersValue, setUsersValue ] = useState<string[]>([]);
   const [ scope, setScope ] = useState<string>(channelInfo?.scope);
 
-  const usergroups = [
+  type group = {
+    label: string,
+    value: string,
+    icon: React.ReactElement,
+    users: nnEntity[] | NnContact[] | NnFaction[] | NnSimpleEntity[],
+  }
+
+  const usergroups: group[] = [
     { 
       label: 'Room Members',
       value: 'members',
@@ -121,13 +128,39 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
       users: state?.network?.collections?.contacts || [],
     },
     { 
-      label: 'Scanned',
-      value: 'scanned',
+      label: 'Clipboard',
+      value: 'clipboard',
       icon: <AssignmentIcon />,
       users: state?.network?.collections?.clipboardEntities || [],
     },
   ];
 
+  const groupForAction = (requestValue:string):group[] => {
+    let actionGroup:group[] = [];
+    if (requestValue == 'invite') {
+      actionGroup.push(usergroups[1]);
+      actionGroup.push(usergroups[2]);
+    }
+    if (requestValue == 'remove' || requestValue == 'admin') {
+      actionGroup = [
+        usergroups[0],
+      ]
+    }
+    return actionGroup;
+  }
+
+  const dialogForAction = (requestValue:string):string | undefined => {
+    switch (requestValue) {
+      case 'admin':
+        return 'You will no longer be admin. Continue?';
+        break;
+      case 'remove':
+        return 'Remove user?';
+        break;
+      default:
+        return undefined;
+    }
+  }
 
   const scrubErr = (errStr:string) => {
     const newErrFields = errFields;
@@ -162,6 +195,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
 
   const handleRequestToggle = (nextRequestValue: string) => {
     setRequestValue(nextRequestValue);
+    setUsersValue([]);
   }
   const handleUsers = (userArr: Array<string>) => {
     setUsersValue(userArr);
@@ -171,9 +205,14 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
     const selectedId = usersValue[0];
     if (requestValue === 'admin') {
       adminUserToChannel(channelInfo?.id, selectedId);
-    } else if (requestValue === 'remove') {
+    } 
+    if (requestValue === 'remove') {
       removeUserFromChannel(channelInfo?.id, selectedId);
     }
+    if (requestValue === 'invite') {
+      inviteUserToChannel(channelInfo?.id, selectedId);
+    }
+    setUsersValue([]);
   }
 
   const adminBage = (id:string) => {
@@ -217,7 +256,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
                         <InputUser
                           changeHandler={handleUsers}
                           value={usersValue}
-                          contactGroups={usergroups}
+                          contactGroups={groupForAction(requestValue)}
                           selectLimit={1}
                           error={hasErr('users')}
                         />
@@ -250,27 +289,26 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
           <Box sx={flexFooter}>
             <FooterNav
               firstHexProps={{
-                icon: <NoMeetingRoomIcon />,
-                handleAction: goLeaveChannel,
-                dialog: "Leave this channel?"
+          
               }}
               secondHexProps={{
-                icon: scope == 'group' ? <LockOpenIcon /> : <LockIcon />,
-                disabled: !isAdmin,
-                handleAction: goSetChannelScope,
+      
               }}
               bigHexProps={{
                 icon: <ManageAccountsIcon />,
                 disabled: !isAdmin,
-                dialog: requestValue === 'admin' ? "You will no longer be admin. Continue?" : 'Remove user?',
+                dialog: dialogForAction(requestValue),
                 handleAction: handleBigAction,
               }}
               thirdHexProps={{
-                disabled: true,
+                icon: <NoMeetingRoomIcon />,
+                handleAction: goLeaveChannel,
+                dialog: "Leave this channel?"
               }}
               fourthHexProps={{
-                icon: <TocIcon />,
-                link: '/channels',
+                icon: scope == 'group' ? <LockOpenIcon /> : <LockIcon />,
+                disabled: !isAdmin,
+                handleAction: goSetChannelScope,
               }}
             />
           </Box>
