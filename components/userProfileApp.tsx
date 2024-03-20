@@ -100,7 +100,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const [ profileFetched, setProfileFetched ] = useState(false);
   const [ editMode, setEditMode ] = useState(false);
   const [ form, setForm ] = useState<Form>(defaultForm);
-  const { avatar, username, firstname, lastname, skills, occupation, thumbnail, bio } = form;
+  const { avatar, username, firstname, lastname, skills, occupation, bio } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
 
   const goFetchProfile = useCallback(() => {
@@ -111,7 +111,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   }, [profileFetched, fetchUserProfile]);
 
   const updateDefaultForm = (profile:nnEntity) => {
-    let updatedDefaultForm:Form = defaultForm;
+    let updatedDefaultForm:Form = JSON.parse(JSON.stringify(defaultForm));
     Object.keys(updatedDefaultForm).map(function(key){
       if((profile as any)[key]) (updatedDefaultForm as any)[key]=(profile as any)[key]
     });

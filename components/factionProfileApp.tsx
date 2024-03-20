@@ -47,7 +47,7 @@ type FormKey =
   'tagline' | 
   'description';
 
-let defaultProfile = {
+const defaultProfile = {
   id: '',
   name: '',
   tagline: '',
@@ -121,16 +121,18 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const isRecentEntity = profile.id === factionId;
 
   const goFetchFactionProfile = useCallback(() => {
-    if (!profileFetched || !isRecentEntity) {
+    if (!profileFetched) {
       fetchFactionDetails(accountId);
       fetchFactionStatuses(accountId);
     }
-  }, [profileFetched, isRecentEntity, fetchFactionDetails, accountId, fetchFactionStatuses]);
+  }, [profileFetched, fetchFactionDetails, accountId, fetchFactionStatuses]);
 
   const updateDefaultForm = (profile:nnEntity) => {
-    let updatedDefaultForm:Form = defaultProfile;
+    let updatedDefaultForm:Form = JSON.parse(JSON.stringify(defaultProfile));
     Object.keys(updatedDefaultForm).map(function(key){
-      if((profile as any)[key]) (updatedDefaultForm as any)[key]=(profile as any)[key]
+      if((profile as any)[key]) {
+        (updatedDefaultForm as any)[key] = (profile as any)[key];
+      }
     });
     setForm(updatedDefaultForm);
   }
@@ -147,9 +149,9 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
 
   useEffect(() => {
     if (isRecentEntity) {
-      console.log('profile', profile);
-      const completeProfile =  {...defaultProfile, ...profile};
-      console.log('completeProfile', completeProfile);
+      const clonedProfile = JSON.parse(JSON.stringify(profile));
+      const clonedDefaultForm:Form = JSON.parse(JSON.stringify(defaultProfile));
+      const completeProfile =  {...clonedDefaultForm, ...clonedProfile};
       setCompleteProfile(completeProfile);
       setProfileFetched(true);
     }
