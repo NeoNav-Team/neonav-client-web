@@ -85,7 +85,6 @@ export const updateFactionProfile = (dispatch: DispatchFunc) => async (id:string
     return data;
   };
   const onError = (err:netcheckAPIResData) => {
-    console.log('err', err);
     const { message = 'Profile failure' } = err;
     dispatch({
       type: 'setAlert',
@@ -261,7 +260,6 @@ export const setFactionUserStatus = (dispatch: DispatchFunc) => async (faction: 
       payload: {severity: 'error', message, show: true},
     })
   };
-  console.log('factionSetStatus', faction, id, body, token);
   executeApi('factionSetStatus', {faction, id, body, token}, onSuccess, onError);
 }
 
