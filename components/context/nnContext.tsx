@@ -81,7 +81,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   const {payload, type = null} = action;
   let newState = null;
   let clonedState = JSON.parse(JSON.stringify(state));
-  console.log('payload', payload);
   switch (type) {
     case 'addMessage': 
       break;
@@ -160,8 +159,8 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   newState = {...state, ...clonedState};
   const cookieState = JSON.parse(JSON.stringify(newState));
   delete cookieState.entity;
-  console.log('cookieState', cookieState);
   setCookieContext(cookieState);
+  console.log('newState', newState);
   return newState;
 };
 

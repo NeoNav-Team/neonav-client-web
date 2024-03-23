@@ -126,7 +126,7 @@ export const authApiEnpoints = {
   },
   factions: {
     method: "get",
-    path: "/api/factions",
+    path: "/api/user/factions",
   },
   factionProfile: {
     method: "get",

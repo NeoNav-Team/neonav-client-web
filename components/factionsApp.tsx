@@ -54,7 +54,7 @@ export default function FactionsApp(props: FactionsAppProps):JSX.Element {
     fetchUserFactions = () =>{},
   }: NnProviderValues = useContext(NnContext);
   const sortedFactions:NnFaction[] | NnSimpleEntity[] = useMemo(() => {
-    const factions = state?.network?.collections?.factions || [];
+    const factions = state?.user?.factions || [];
     return factions.sort((a, b) => {
       if (a.name && b.name) {
         return a.name.localeCompare(b.name);
