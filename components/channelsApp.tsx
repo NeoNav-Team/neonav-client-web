@@ -100,7 +100,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
   useEffect(() => {
     if (alertShow && !refetched)  {
       setRefetched(true);
-      fetchUserChannels(userId);
+      fetchUserChannels();
     }
     if (!alertShow) {
       setRefetched(false);
