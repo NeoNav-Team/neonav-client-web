@@ -25,7 +25,9 @@ interface itemMessageProps {
   
 export default function ItemMessage(props:itemMessageProps):JSX.Element {
   const { buttons = {}, date = '', dialogCallback = null, id = '', username = '', text = '' } = props;
-  const hasButtons = JSON.stringify(buttons).length >= 3 && !JSON.stringify(buttons).includes('amount');
+  const hasButtons = 
+    JSON.stringify(buttons).length >= 3 
+    && !JSON.stringify(buttons).includes('amount');
   const hasRequest = JSON.stringify(buttons).includes('amount');
   const isSystemMsg = (id:string, username:string) => {
     return id === '0000000000' && username === 'tan/chat';

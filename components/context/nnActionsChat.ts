@@ -270,7 +270,7 @@ export const inviteUserToChannel = (dispatch: DispatchFunc) => async (channel:st
     const { data } = response;
     dispatch({
       type: 'setAlert',
-      payload: {severity: 'success', message: `${id} invited to channel.`, show: true},
+      payload: {severity: 'success', message: `Notification invite to channel sent to user ${id}.`, show: true},
     })
     return data;
   };
