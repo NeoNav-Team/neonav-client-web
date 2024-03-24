@@ -82,7 +82,7 @@ export default function FactionsApp(props: FactionsAppProps):JSX.Element {
   }, [goFetchFactions, sortedFactions]);
 
   return (
-    <Container disableGutters style={{height: '100%'}}>
+    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
       <div
         className={styles.darkPane}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}

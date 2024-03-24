@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
 import { LooseObject } from './context/nnTypes';
@@ -24,15 +25,15 @@ interface itemMessageProps {
   
 export default function ItemMessage(props:itemMessageProps):JSX.Element {
   const { buttons = {}, date = '', dialogCallback = null, id = '', username = '', text = '' } = props;
-  const hasButtons = JSON.stringify(buttons).length >= 3;
+  const hasButtons = JSON.stringify(buttons).length >= 3 && !JSON.stringify(buttons).includes('amount');
+  const hasRequest = JSON.stringify(buttons).includes('amount');
   const isSystemMsg = (id:string, username:string) => {
     return id === '0000000000' && username === 'tan/chat';
   }
 
   const clickHandler = (buttonAction:string) => {
-    const actionParams = buttons[buttonAction].split('=');
+    const actionParams = buttons[buttonAction].split(/[=&]+/);
     actionParams.push(buttonAction);
-    console.log(buttons[buttonAction], actionParams);
     dialogCallback && dialogCallback(actionParams);
   }
   
@@ -58,6 +59,25 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
              》 {text}</Typography>
         </Box>
       </div>
+      {hasRequest && (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center" 
+          justifyContent="flex-end" 
+          sx={{minWidth:'100%'}}
+        >
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            onClick={() => {clickHandler('confirm')}}
+            endIcon={<CurrencyExchangeIcon />}>
+                View in c±sн
+          </Button>
+        </Stack>
+
+      )}
       {hasButtons && (
         <Stack
           direction="row"

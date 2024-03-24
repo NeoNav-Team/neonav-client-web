@@ -97,7 +97,7 @@ export const themeOptions: ExtendedThemeOptions = {
     MuiChip: {
       styleOverrides: {
         root: {
-          padding: '0 10px 0 0',
+          padding: '0 10px 0',
           'span': {
             padding: '0',
             fontSize: '16px',

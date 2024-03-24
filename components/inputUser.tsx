@@ -134,7 +134,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
         renderValue={(selected) => (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {selected.map((value ) => (
-              <Chip key={`chip_${value}_select`} label={nameById(value)} />
+              <Chip key={`chip_${value}_select`} label={`${nameById(value)}`} />
             ))}
           </Box>
         )}
