@@ -17,7 +17,9 @@ import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 
-interface CashAppProps {};
+interface CashAppProps {
+  id?: string;
+};
 
 const flexContainer = {
   height: '100%',
@@ -54,6 +56,7 @@ const flexFooter = {
 };
 
 export default function CashApp(props: CashAppProps):JSX.Element {
+  const { id } = props;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;

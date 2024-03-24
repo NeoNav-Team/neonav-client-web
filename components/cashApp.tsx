@@ -118,7 +118,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const accountId = state?.network?.selected?.account || '';
   const selected = wallets?.map(function(x) {return x.id; }).indexOf(accountId) || 0;
   const wallet = wallets[selected] || wallets[0];
-  console.log('wallet', wallet);
   const balance = wallet ? wallet?.balance : null;
 
   const usergroups = [
@@ -392,7 +391,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
               }}
               thirdHexProps={{
                 icon: <QueryStatsIcon />,
-                link: "/cash/history",
+                link: `/cash/history/${accountId}`,
               }}
             />
           </Box>
