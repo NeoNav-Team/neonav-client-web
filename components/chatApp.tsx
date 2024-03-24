@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { restrictedChannels, globalChannel } from '../utilities/constants';
 import styles from '../styles/generic.module.css';
 import { Container, Box, Stack, Typography} from '@mui/material';
@@ -61,7 +60,6 @@ const flexFooter = {
 
 export default function ChatApp(props:ChatAppProps):JSX.Element {
   const { msgBtn, notify, params } = props;
-  const router = useRouter();
   const idFromParams = params?.id;
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
@@ -131,7 +129,6 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     const entity = actionArgs[0];
     const entityId = actionArgs[1];
     const action = actionArgs[2];
-    const option = actionArgs[3];
     switch (entity) {
       case 'faction':
         if(action === 'confirm') {
@@ -149,8 +146,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
           removeUserFromChannel(entityId);
         }
         break;
-      case 'amount':
-        router.push(`/cash/${option}#${entityId}`);
+      
       default:
         break;
     }
@@ -182,7 +178,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [clearUnreadCountByType, lastUnread, selectedChannel, setLastUnread]);
 
   return (
-    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
+    <Container disableGutters style={{height: '100%'}}>
       <div
         className={styles.darkPane}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}

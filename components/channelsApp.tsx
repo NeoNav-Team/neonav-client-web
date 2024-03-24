@@ -65,12 +65,17 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
   const unread:LooseObject = useMemo(() => {
     return state?.network?.selected?.unread || {};
   }, [state]);
+  const alertShow = useMemo(() => { 
+    return state?.network?.alert?.show || false;
+  }, [state]);
   const accountId = state?.network?.selected?.account || '';
   const sortedChannels = channels.sort((a, b) => a.name.localeCompare(b.name));
   const userCreatedChannels = sortedChannels.filter(channel => forbiddenChannels.indexOf(channel.id) === -1);
   const administerdChannels = userCreatedChannels.filter(channel => channel.admin === accountId);
   const subscribedChannels = userCreatedChannels.filter(channel => channel.admin !== accountId);
   const [ collectionFetched, setCollectionFetched ] = useState(false);
+  const [ fetched, setfetched ] = useState(false);
+  const [ refetched, setRefetched ] = useState(false);
 
   const goFetchChannels = useCallback(() => {
     if (!collectionFetched) {
@@ -86,7 +91,21 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
   useEffect(() => {
     const channelsSize = channels && channels.length;
     channelsSize === 0 && goFetchChannels();
-  }, [channels, goFetchChannels]);
+    if (!fetched) {
+      goFetchChannels();
+      setfetched(true);
+    }
+  }, [channels, fetched, goFetchChannels]);
+
+  useEffect(() => {
+    if (alertShow && !refetched)  {
+      setRefetched(true);
+      fetchUserChannels(userId);
+    }
+    if (!alertShow) {
+      setRefetched(false);
+    }
+  }, [alertShow, fetchUserChannels, refetched]);
 
 
   return (

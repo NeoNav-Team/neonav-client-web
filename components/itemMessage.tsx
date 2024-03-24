@@ -10,6 +10,7 @@ import {
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
 import { LooseObject } from './context/nnTypes';
@@ -25,8 +26,12 @@ interface itemMessageProps {
   
 export default function ItemMessage(props:itemMessageProps):JSX.Element {
   const { buttons = {}, date = '', dialogCallback = null, id = '', username = '', text = '' } = props;
-  const hasButtons = JSON.stringify(buttons).length >= 3 && !JSON.stringify(buttons).includes('amount');
+  const hasButtons = 
+    JSON.stringify(buttons).length >= 3 
+    && !JSON.stringify(buttons).includes('amount')
+    && !JSON.stringify(buttons).includes('channel');
   const hasRequest = JSON.stringify(buttons).includes('amount');
+  const hasChannelInvite = JSON.stringify(buttons).includes('channel');
   const isSystemMsg = (id:string, username:string) => {
     return id === '0000000000' && username === 'tan/chat';
   }
@@ -59,6 +64,25 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
              》 {text}</Typography>
         </Box>
       </div>
+      {hasChannelInvite && (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center" 
+          justifyContent="flex-end" 
+          sx={{minWidth:'100%'}}
+        >
+          <Button
+            size="small"
+            variant="outlined"
+            color="primary"
+            onClick={() => {clickHandler('confirm')}}
+            endIcon={<MeetingRoomIcon />}>
+                Go to Channel
+          </Button>
+        </Stack>
+
+      )}
       {hasRequest && (
         <Stack
           direction="row"
