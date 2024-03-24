@@ -48,7 +48,7 @@ export const requestPayment = (dispatch: DispatchFunc) => (id:string, amount:str
   const onSuccess = (response:APIResponse) => {
     dispatch({
       type: 'setAlert',
-      payload: {severity: 'success', message: 'Requests Successful', show: true},
+      payload: {severity: 'success', message: 'Payment has been requested. Please check history for receipt of payment.', show: true},
     })
   };
   const onError = (err:netcheckAPIResData) => {

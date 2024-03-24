@@ -115,7 +115,7 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
   }
 
   return (
-    <Container disableGutters style={{height: '100%'}}>
+    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
       <div
         className={styles.idCardFrame}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}

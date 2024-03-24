@@ -8,10 +8,11 @@ import styles from '../styles/generic.module.css';
 interface InputBalanceProps {
   balance?: number | null;
   children?: React.ReactNode;
+  label?: string;
 }
 
 export default function InputBalance(props:InputBalanceProps):JSX.Element {
-  const { balance } = props;
+  const { balance, label = 'BALANCE' } = props;
 
   return (
     <div
@@ -26,7 +27,7 @@ export default function InputBalance(props:InputBalanceProps):JSX.Element {
         opacity: '0.5',
         fontSize: { xs: '1rem', sm: '1.5rem', md: '2.125rem' }
       }}>
-            BALANCE
+            {label}
       </Typography>
       <Grid
         container

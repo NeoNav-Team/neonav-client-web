@@ -95,10 +95,15 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     sendPayment = (user:string, amount:string) => {},
     sendFactionPayment = (faction: string, user:string, amount:string) => {},
   }: NnProviderValues = useContext(NnContext);
+  const getHash = () =>
+    typeof window !== 'undefined'
+      ? decodeURIComponent(window.location.hash.replace("#", ""))
+      : undefined;
   const [ fetched, setFetched ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ scanning, setScanning ] = useState(false);
   const [ openModel, setOpenModel ] = useState(false);
+  const [ hashPlaced, setHashPlaced ] = useState(false);
   const [ lastEntity, setLastEntity ] = useState({});
   const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
   const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
@@ -112,7 +117,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
   const selected = wallets?.map(function(x) {return x.id; }).indexOf(accountId) || 0;
-  const wallet = wallets[selected];
+  const wallet = wallets[selected] || wallets[0];
   const balance = wallet ? wallet?.balance : null;
 
   const usergroups = [
@@ -280,8 +285,17 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   useEffect(() => {
     const walletSize = wallets && wallets.length;
     walletSize === 0 && goFetchUserWallets();
-
-  }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected]);
+    const hash = getHash();
+    if (
+      hash 
+      && hash.length >= 1 
+      && !hashPlaced
+      && transactionValue == 0
+    ) {
+      setTransactionValue(parseFloat(hash));
+      setHashPlaced(true);
+    }
+  }, [wallets, fetchUserWallets, fetched, goFetchUserWallets, selected, transactionValue, hashPlaced]);
 
   useEffect(() => {
     if (lastEntity !== scannedEntity) {
@@ -303,7 +317,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
 
   return (
-    <Container disableGutters style={{height: '100%'}}>
+    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
       <div
         className={styles.darkPane}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
@@ -312,7 +326,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={flexHeader}>
             <Container sx={{paddingTop: '20px'}}>
-              <InputBalance balance={balance} />
+              <InputBalance label={wallet?.name} balance={balance} />
             </Container>
           </Box>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
@@ -377,7 +391,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
               }}
               thirdHexProps={{
                 icon: <QueryStatsIcon />,
-                link: "/cash/history",
+                link: `/cash/history/${accountId}`,
               }}
             />
           </Box>
