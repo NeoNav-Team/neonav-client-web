@@ -27,7 +27,7 @@ export default function InputBalance(props:InputBalanceProps):JSX.Element {
         opacity: '0.5',
         fontSize: { xs: '1rem', sm: '1.5rem', md: '2.125rem' }
       }}>
-            {label}
+        {label}
       </Typography>
       <Grid
         container
