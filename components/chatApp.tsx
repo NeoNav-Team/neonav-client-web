@@ -182,7 +182,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [clearUnreadCountByType, lastUnread, selectedChannel, setLastUnread]);
 
   return (
-    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
+    <Container disableGutters style={{height: '100%'}}>
       <div
         className={styles.darkPane}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}

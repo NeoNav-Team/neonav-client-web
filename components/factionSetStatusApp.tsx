@@ -259,7 +259,7 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
   }, [accountId, goFetchFactionProfile, profile]);
 
   return (
-    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
+    <Container disableGutters style={{height: '100%'}}>
       <div
         className={styles.darkPane}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}

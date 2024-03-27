@@ -199,7 +199,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   }
 
   return (
-    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
+    <Container disableGutters style={{height: '100%'}}>
       <div
         className={styles.idCardFrame}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}

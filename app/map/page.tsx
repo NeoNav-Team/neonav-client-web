@@ -1,5 +1,5 @@
-import SitesApp from '@/components/sitesApp';
+import MapApp from '@/components/mapApp';
 
 export default function Map() {
-  return (<SitesApp index={'https://sites.neonav.net/neomap.png'} indexBtn={false} />);
+  return (<MapApp />);
 }

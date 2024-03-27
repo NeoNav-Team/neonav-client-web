@@ -207,7 +207,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   }
 
   return (
-    <Container disableGutters style={{height: '100%', position: 'absolute', bottom: 0}}>
+    <Container disableGutters style={{height: '100%'}}>
       <div
         className={styles.darkPane}
         style={{height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px'}}
@@ -228,7 +228,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                         >
                           {editMode ? (
                             <Stack spacing={2} >
-                              <img src={photo || image} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%'}} />
+                              <img src={photo || image} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%', maxHeight: 400}} />
                               <Button variant="contained" component="label" endIcon={<PhotoCameraIcon />}>
                                 Upload
                                 <input hidden multiple type="file" onChange={uploadHandler} accept="image/png, image/jpeg" />
