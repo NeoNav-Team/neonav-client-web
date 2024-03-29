@@ -26,10 +26,13 @@ import Kitty from './svgr/kitty';
 import Cash from './svgr/cash';
 import TanChat from './svgr/tanchat';
 import NeoSites from './svgr/neosites';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import AttractionsIcon from '@mui/icons-material/Attractions';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
 import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import PolicyIcon from '@mui/icons-material/Policy';
 import Map from './svgr/map';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import Notifications from './svgr/notifications';
@@ -193,10 +196,9 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
               justifyContent="center"
               alignItems="center"
               minHeight={fixedHeight}
+              onClick={() => handleModelOpen('informationSubmenu')}
             >
-              <Link href="/help">
-                <IconFrame icon={<Help fontSize="inherit" />} title="Help" />
-              </Link>
+              <IconFrame icon={<Help fontSize="inherit" />} title="Help" />
             </Box>
           </Grid>
         </Grid>
@@ -424,6 +426,59 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
                     alignItems="center"
                     minHeight={fixedHeight}
                   >
+                  </Box>
+                </Grid>
+              </Grid>
+            </div>
+          )}
+          {submenu === 'informationSubmenu' && (
+            <div
+              className={styles.submenuPane}
+              data-augmented-ui="tl-clip tr-clip-x  bl-clip br-clip  both"
+            >
+              <Typography sx={modelTitleStyle}>User Settings</Typography>
+              <Grid container item spacing={3}>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/help">
+                      <IconFrame
+                        icon={<HelpOutlineIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                        title="NeoNav Help" />
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/rules">
+                      <IconFrame
+                        icon={<AttractionsIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                        title="Mission Rules" />
+                    </Link>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight={fixedHeight}
+                  >
+                    <Link href="/eula">
+                      <IconFrame
+                        icon={<PolicyIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                        title="EULA"
+                      />
+                    </Link>
                   </Box>
                 </Grid>
               </Grid>
