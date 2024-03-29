@@ -273,6 +273,7 @@ export type NnProviderDispatch = {
     longPollMessages: (_since:string) => void;
     removeUserFromChannel: (_channelId:string,_userId?:string) => void;
     requestPayment: (_userId:string, _amount:string) => void;
+    requestFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;
     sendPayment: (_user:string, _amount:string) => void;
     sendFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;
     sendChannelMessage: (_channelId:string, _text:string) => void;

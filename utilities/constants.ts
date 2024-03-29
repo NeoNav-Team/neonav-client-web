@@ -72,6 +72,10 @@ export const authApiEnpoints = {
     method: "put",
     path: "/api/user/$id/walletrequest",
   },
+  factionRequest: {
+    method: "put",
+    path: "/api/factions/$faction/$id/walletrequest",
+  },
   contacts: {
     method: "get",
     path: "/api/user/friends",

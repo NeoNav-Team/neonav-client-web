@@ -92,6 +92,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     fetchUserWallets = () => {},
     fetchContact = (id:string) =>{},
     requestPayment = (user:string, amount:string) => {},
+    requestFactionPayment = (faction: string, user:string, amount:string) => {},
     sendPayment = (user:string, amount:string) => {},
     sendFactionPayment = (faction: string, user:string, amount:string) => {},
   }: NnProviderValues = useContext(NnContext);
@@ -266,7 +267,16 @@ export default function CashApp(props: CashAppProps):JSX.Element {
           if (userId.charAt(0) !== ("c" || "C")) {
             //TODO: request money from factions...?
             limit(() => {
-              requestPayment(userId, transactionValue as string);
+              if (selected === 0) {
+                limit(() => {
+                  requestPayment(userId, transactionValue as string);
+                });
+              }
+              else {
+                limit(() => {
+                  requestFactionPayment(accountId, userId, transactionValue as string);
+                });
+              }
             });
           }
           break;
