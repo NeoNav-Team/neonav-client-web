@@ -61,6 +61,24 @@ export const requestPayment = (dispatch: DispatchFunc) => (id:string, amount:str
   setTimeout(() => executeApi('request', {token, id, amount}, onSuccess, onError), 2000);
 }
 
+export const requestFactionPayment = (dispatch: DispatchFunc) => (faction: string, id:string, amount:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'success', message: 'Notification request payment has been sent. Please check history for receipt of payment.', show: true},
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Request Failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  setTimeout(() => executeApi('factionRequest', {token, faction, id, amount}, onSuccess, onError), 2000);
+}
+
 export const fetchUserWallets = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {

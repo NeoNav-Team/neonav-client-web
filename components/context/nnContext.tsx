@@ -35,6 +35,7 @@ import {
   fetchUserWallets,
   fetchUserWalletHistory,
   requestPayment,
+  requestFactionPayment,
   sendPayment,
   sendFactionPayment,
 } from './nnActionsCash';
@@ -253,6 +254,7 @@ export const { Context, Provider } = DataContextCreator(
     removeUserFromChannel,
     removeUserFromFaction,
     requestPayment,
+    requestFactionPayment,
     sendChannelMessage,
     sendFactionPayment,
     sendPayment,
