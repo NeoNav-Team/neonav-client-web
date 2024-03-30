@@ -13,12 +13,11 @@ export default function MyQRCode(props:MyQRCodeProps):JSX.Element {
   const { 
     state,
   }: NnProviderValues = useContext(NnContext); 
+  
+  const accountId = state?.network?.selected?.account || 'Meat Popsicle';
 
-  const userId:string = useMemo(() => {
-    return state?.user?.profile?.auth?.userid || 'Meat Popcicle';
-  }, [state]);
   const size = props?.size || 500;
-  const value = props?.value || userId;
+  const value = props?.value || accountId;
 
   return (
     <>
