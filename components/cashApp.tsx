@@ -263,11 +263,12 @@ export default function CashApp(props: CashAppProps):JSX.Element {
           }
           break;
         case "request":
-          if (userId.charAt(0) !== ("c" || "C")) {
-            //TODO: request money from factions...?
+          if (userId.charAt(0).toLowerCase() !== "c") {
             limit(() => {
               requestPayment(userId, transactionValue as string);
             });
+          } else {
+            //TODO: request money from factions...?
           }
           break;
       }
