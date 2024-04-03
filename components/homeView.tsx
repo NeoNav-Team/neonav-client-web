@@ -54,7 +54,10 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
     setSubmenu(submenu);
     setOpenModel(true);
   }
-  const handleModelClose = () => setOpenModel(false);
+  const handleModelClose = () => {
+    setOpenModel(false);
+    setSubmenu('groupSettings');
+  }
   const handleIDScan = (result:string) => {
     if (result.length >= 5) {
       router.push(`/contacts/${result}#scan`);
@@ -505,7 +508,12 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
               className={styles.qrScanPane}
               data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
             >
-              <ReactPlayer url={KITTY_VIDEO}  width={'100%'} playing={true} controls={true} />
+              <ReactPlayer
+                url={KITTY_VIDEO}
+                width={'100%'}
+                controls={true}
+                stopOnUnmount={true}
+              />
             </div>
           )}
         </Box>
