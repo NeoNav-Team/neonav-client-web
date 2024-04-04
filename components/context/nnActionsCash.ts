@@ -127,3 +127,31 @@ export const fetchUserWalletHistory = (dispatch: DispatchFunc) => async () => {
     executeApi('walletHistory', {token}, onSuccess, onError); 
   }
 };
+
+export const fetchFactionWalletHistory = (dispatch: DispatchFunc) => async (faction:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    storeFetched('userWallet', data);
+    dispatch({
+      type: 'setWalletTransactions',
+      payload: data,
+    })
+  };
+  const onError = (err:netcheckAPIResData) => {
+    const { message = 'Wallet History failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+  };
+  if (storedRecently('userWallet')) {
+    const data = getLocalStorage('userWallet');
+    dispatch({
+      type: 'setWalletTransactions',
+      payload: data,
+    })
+  } else {
+    executeApi('factionWalletHistory', {token, faction}, onSuccess, onError); 
+  }
+};
