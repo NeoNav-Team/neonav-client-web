@@ -64,6 +64,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     state,
     fetchUserWallets = () =>{},
     fetchUserWalletHistory = () => {},
+    fetchFactionWalletHistory = () => {},
   }: NnProviderValues = useContext(NnContext);
 
   const getFilteredItemValue = (collection:Record<string, any>[], selectedId:string, returnKey:string) => {
@@ -77,7 +78,6 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     return filteredValue;
   }
 
-
   const [ walletFetched, setWalletFetched ] = useState(false);
   const [ transactionsFetched, setTransactionsFetched ] = useState(false);
   const wallets = useMemo(() => { return state?.user?.wallets || [{}] }, [state]);
@@ -85,12 +85,21 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const selectedAccount = state?.network?.selected.account || personalWallet;
   const wallet = wallets && wallets.filter(arrItem => arrItem.id == selectedAccount)[0];
   const balance = wallet ? wallet?.balance : null;
-  const transactions = useMemo(() => { 
+  const walletId = wallet ? wallet?.id : personalWallet;
+  const [ lastWalletFetched, setLastWalletFetched ] = useState(walletId);
+  const transactions = useMemo(() => {
+    if (walletId != lastWalletFetched) {
+      setLastWalletFetched(walletId);
+      setTransactionsFetched(false);
+      setWalletFetched(false);
+    }
+    setTransactionsFetched(false);
     const transArr = state?.network?.collections?.transactions || [];
     return transArr.length > 30 ? transArr.slice(0, 30) : transArr;
-  }, [state]);
+  }, [lastWalletFetched, walletId, state]);
 
   const goFetchWallets = useCallback(() => {
+
     if (!walletFetched) {
       fetchUserWallets();
       setWalletFetched(true);
@@ -99,10 +108,15 @@ export default function CashApp(props: CashAppProps):JSX.Element {
 
   const goFetchWalletsHistory = useCallback(() => {
     if (!transactionsFetched) {
-      fetchUserWalletHistory();
+      if (walletId?.charAt(0) != "C") {
+        fetchUserWalletHistory();
+      }
+      else {
+        fetchFactionWalletHistory(walletId);
+      }
       setTransactionsFetched(true);
     }
-  }, [transactionsFetched, fetchUserWalletHistory])
+  }, [walletId, transactionsFetched, fetchUserWalletHistory, fetchFactionWalletHistory])
 
   useEffect(() => {
     if (!wallets.length) {
@@ -111,10 +125,13 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }, [wallets, goFetchWallets]);
 
   useEffect(() => {
+    
     if (!transactions.length) {
       goFetchWalletsHistory();
     }
   }, [transactions, goFetchWalletsHistory]);
+
+  if (lastWalletFetched != walletId) { goFetchWalletsHistory() };
 
   return (
     <Container disableGutters style={{height: '100%'}}>
