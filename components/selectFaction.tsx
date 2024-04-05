@@ -33,7 +33,7 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     state,
     setSelected = (indexType:string, channelId:string) => {},
   }: NnProviderValues = useContext(NnContext); 
-  const factions:NnFaction[] | NnSimpleEntity[] = useMemo(() => { return state?.user?.factions || [] }, [state]);
+  const factions:NnFaction[] = useMemo(() => { return state?.user?.factions as NnFaction[] || [] }, [state]);
   const defaultSelected =  useMemo(() => { return state?.network?.selected?.account as unknown as number || -1 }, [state]);
   const user:string = useMemo(() => { return state?.user?.profile?.meta?.firstname || 'Personal' }, [state]);
   const userId:string = useMemo(() => { return state?.user?.profile?.auth?.userid || '' }, [state]);
