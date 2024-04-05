@@ -213,7 +213,16 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }
 
   const handleRecipient = useCallback((recipientArr: Array<string>) => {
-    const newRecpients =  recpientsValue.concat(recipientArr);
+    let newRecpients =  [];
+    //do comparison of arrays
+    console.log('recpientsValue', recpientsValue);
+    console.log('recipientArr', recipientArr);
+    if(recipientArr.length <= recpientsValue.length) {
+      newRecpients = recipientArr;
+    }  else {
+      const concatRecpients = recpientsValue.concat(recipientArr);
+      newRecpients = [...new Set(concatRecpients)];
+    }
     setRecpientsValue(newRecpients);
     scrubErr('recipients');
   }, [recpientsValue, scrubErr])
