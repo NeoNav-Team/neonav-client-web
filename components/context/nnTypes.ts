@@ -101,6 +101,7 @@ export type NnFaction = {
     id: string,
     admin: string,
     name: string,
+    reps?: string[],
 }
 
 
