@@ -16,6 +16,7 @@ import {
   LinearProgress,
   Chip,
 } from '@mui/material';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import TocIcon from '@mui/icons-material/Toc';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import ShieldIcon from '@mui/icons-material/Shield';
@@ -25,6 +26,7 @@ import RemoveModeratorIcon from '@mui/icons-material/RemoveModerator';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import NoMeetingRoomIcon from '@mui/icons-material/NoMeetingRoom';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
@@ -111,7 +113,8 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   }, [state]);
   const repsList = objectifyIds(entity?.reps || []);
   const memberList = objectifyIds(entity?.members || []);
-  const userlist = [...repsList, ...memberList];
+  const nRepsList:NnContact[] | NnSimpleEntity[] = entity?.reps || [];
+  const nMemberList:NnContact[] | NnSimpleEntity[] = entity?.members || [];
   const contacts:NnContact[] | NnSimpleEntity[] = state?.network?.collections?.contacts || [];
   const sortedContacts = contacts.sort((a, b) => {
     if (a.username && b.username) {
@@ -129,24 +132,58 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
   const [ requestValue, setRequestValue ] = useState<string>(requests[0].value);
   const [ usersValue, setUsersValue ] = useState<string[]>([]);
 
-  const addGroups = [
+  type group = {
+    label: string,
+    value: string,
+    icon: React.ReactElement,
+    users: nnEntity[] | NnContact[] | NnFaction[] | NnSimpleEntity[],
+  }
+
+  const usergroups: group[] = [
+    { 
+      label: 'Faction Members',
+      value: 'members',
+      icon: <PeopleAltIcon />,
+      users: nMemberList || [],
+    },
     { 
       label: 'Contacts',
       value: 'contact',
       icon: <PeopleAltIcon />,
       users: sortedContacts || [],
     },
-  ];
-
-  const factionGroups = [
     { 
-      label: 'Faction',
-      value: 'faction',
-      icon: <PeopleAltIcon />,
-      users: userlist || [],
+      label: 'Clipboard',
+      value: 'clipboard',
+      icon: <AssignmentIcon />,
+      users: state?.network?.collections?.clipboardEntities || [],
+    },
+    { 
+      label: 'Reps',
+      value: 'reps',
+      icon: <MeetingRoomIcon />,
+      users: nRepsList || [],
     },
   ];
 
+  const groupForAction = (requestValue:string):group[] => {
+    let actionGroup:group[] = [];
+    if (requestValue == 'add') {
+      actionGroup.push(usergroups[1]);
+      actionGroup.push(usergroups[2]);
+    }
+    if (requestValue == 'remove' || requestValue == 'addRep') {
+      actionGroup = [
+        usergroups[0],
+      ]
+    }
+    if (requestValue == 'removeRep') {
+      actionGroup = [
+        usergroups[3],
+      ]
+    }
+    return actionGroup;
+  }
 
   const scrubErr = (errStr:string) => {
     const newErrFields = errFields;
@@ -232,7 +269,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                         <InputUser
                           changeHandler={handleUsers}
                           value={usersValue}
-                          contactGroups={addGroups}
+                          contactGroups={groupForAction(requestValue)}
                           selectLimit={1}
                           error={hasErr('users')}
                         />
