@@ -51,6 +51,16 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     setSelected('account', factionId);
     handleClose();
   }
+  const reppedFactions = (faction:NnFaction[]): NnFaction[] => {
+    let reppedFactions: NnFaction[]  = [];
+    faction.map( faction => {
+      if (userId == faction.admin ||
+        (faction.reps && faction.reps.indexOf(userId) !== -1)) {
+        reppedFactions.push(faction)
+      }
+    });
+    return reppedFactions;
+  }
 
   return (
     <>
@@ -77,7 +87,7 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
             </ListItemIcon>
             {user}
           </MenuItem>
-          {factions.map((faction, index) => (
+          {reppedFactions(factions).map((faction, index) => (
             <MenuItem 
               onClick={(event:any) => handleMenuItemClick(event, index)}
               key={faction?.id}
