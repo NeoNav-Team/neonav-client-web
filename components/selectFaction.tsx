@@ -62,8 +62,6 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     return reppedFactions;
   }
 
-  console.log('factions', factions);
-
   return (
     <>
       <IconButton
