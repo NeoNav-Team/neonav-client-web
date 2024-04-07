@@ -34,6 +34,7 @@ import {
 import {
   fetchUserWallets,
   fetchUserWalletHistory,
+  fetchFactionWalletHistory,
   requestPayment,
   requestFactionPayment,
   sendPayment,
@@ -243,6 +244,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserSetStatuses,
     fetchUserStatuses,
     fetchUserWalletHistory,
+    fetchFactionWalletHistory,
     fetchUserWallets,
     initContext,
     joinFaction,

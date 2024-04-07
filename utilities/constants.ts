@@ -58,7 +58,11 @@ export const authApiEnpoints = {
   },
   walletHistory: {
     method: "get",
-    path: "/api/user/walletHistory",
+    path: "/api/user/wallethistory",
+  },
+  factionWalletHistory: {
+    method: "get",
+    path: "/api/factions/$faction/wallethistory",
   },
   pay: {
     method: "put",

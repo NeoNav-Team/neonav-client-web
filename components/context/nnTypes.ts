@@ -262,6 +262,7 @@ export type NnProviderDispatch = {
     setFactionUserStatus: (_factionId:string, _body:string, _userId?:string) => void;
     fetchUserSetStatuses: (_userId:string) => void;
     fetchUserWalletHistory: () => void;
+    fetchFactionWalletHistory: (_factionId:string) => void;
     initContext: () => void;
     leaveFaction: (_factionId:string) => void;
     updateFactionProfile: (_factionId:string, _document:any, _update:any) => void;

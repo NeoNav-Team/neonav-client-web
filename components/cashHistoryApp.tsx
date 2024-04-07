@@ -64,6 +64,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     state,
     fetchUserWallets = () =>{},
     fetchUserWalletHistory = () => {},
+    fetchFactionWalletHistory = () => {},
   }: NnProviderValues = useContext(NnContext);
 
   const getFilteredItemValue = (collection:Record<string, any>[], selectedId:string, returnKey:string) => {
@@ -85,6 +86,8 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const selectedAccount = state?.network?.selected.account || personalWallet;
   const wallet = wallets && wallets.filter(arrItem => arrItem.id == selectedAccount)[0];
   const balance = wallet ? wallet?.balance : null;
+  const walletId = wallet ? wallet?.id : personalWallet;
+  const [ lastWalletFetched, setLastWalletFetched ] = useState(walletId);
   const transactions = useMemo(() => { 
     const transArr = state?.network?.collections?.transactions || [];
     return transArr.length > 30 ? transArr.slice(0, 30) : transArr;
@@ -98,11 +101,17 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }, [walletFetched, fetchUserWallets])
 
   const goFetchWalletsHistory = useCallback(() => {
+    setLastWalletFetched(walletId);
     if (!transactionsFetched) {
-      fetchUserWalletHistory();
+      if (walletId?.charAt(0) != "C") {
+        fetchUserWalletHistory();
+      }
+      else {
+        fetchFactionWalletHistory(walletId);
+      }
       setTransactionsFetched(true);
     }
-  }, [transactionsFetched, fetchUserWalletHistory])
+  }, [walletId, transactionsFetched, fetchUserWalletHistory, fetchFactionWalletHistory])
 
   useEffect(() => {
     if (!wallets.length) {
@@ -115,6 +124,17 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       goFetchWalletsHistory();
     }
   }, [transactions, goFetchWalletsHistory]);
+
+  useEffect(() => {
+    if (walletId != lastWalletFetched) {
+      setLastWalletFetched(walletId);
+      goFetchWalletsHistory()
+    }
+    else {
+      setTransactionsFetched(true);
+    }
+    setTransactionsFetched(false);
+  }, [walletId, lastWalletFetched])
 
   return (
     <Container disableGutters style={{height: '100%'}}>
