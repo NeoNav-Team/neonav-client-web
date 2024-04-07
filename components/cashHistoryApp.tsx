@@ -134,7 +134,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       setTransactionsFetched(true);
     }
     setTransactionsFetched(false);
-  }, [walletId, lastWalletFetched])
+  }, [walletId, lastWalletFetched, goFetchWalletsHistory])
 
   return (
     <Container disableGutters style={{height: '100%'}}>
