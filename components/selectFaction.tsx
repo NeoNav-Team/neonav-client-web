@@ -45,12 +45,7 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const handleMenuItemClick = (event: MouseEvent<HTMLButtonElement>, index: number) => {
-    setSelectedFaction(index);
-    const factionId = factions[index]?.id || userId;
-    setSelected('account', factionId);
-    handleClose();
-  }
+
   const reppedFactions = (faction:NnFaction[]): NnFaction[] => {
     let reppedFactions: NnFaction[]  = [];
     faction.map( faction => {
@@ -60,6 +55,14 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
       }
     });
     return reppedFactions;
+  }
+
+  const handleMenuItemClick = (event: MouseEvent<HTMLButtonElement>, index: number) => {
+    setSelectedFaction(index);
+    const filteredFactions = reppedFactions(factions);
+    const factionId = filteredFactions[index]?.id || userId;
+    setSelected('account', factionId);
+    handleClose();
   }
 
   return (
