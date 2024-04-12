@@ -125,7 +125,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     }
   }, [transactions, goFetchWalletsHistory]);
 
-  useEffect(() => {
+  (() => {
     if (walletId != lastWalletFetched) {
       setLastWalletFetched(walletId);
       goFetchWalletsHistory()
