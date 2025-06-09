@@ -71,7 +71,8 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
             alignItems="center"
           >
             <Typography>
-              <span className={styles.name}>{username} ({userid})</span>  <span className={styles.action}>{statusAction(action)}</span> 》
+              <Link href={`/${id.includes('C') ? 'factions' : 'contacts'}/${id}`}>
+              <span className={styles.name}>{username} ({userid})</span></Link>  <span className={styles.action}>{statusAction(action)}</span> 》
               <span className={styles.comment}>{statusText(action)}</span> {tag && <Chip icon={<Tag />} component="span" label={tag} className={styles.hashtag} />}
             </Typography>
             {collection && (<MoreVertIcon />)}
