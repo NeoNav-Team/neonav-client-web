@@ -107,6 +107,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                               </InputAdornment>
                             ),
                           },
+                        }}
                       />
                       <TextField
                         name="email"
