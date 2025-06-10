@@ -16,6 +16,7 @@ import {
   TextField,
 } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -97,9 +98,15 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                         label="User ID"
                         variant="outlined"
                         style={input}
-                        InputProps={{
-                          readOnly: true,
-                        }}
+                        slotProps={{
+                          input: {
+                            readOnly: true,
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <ContentCopyIcon />
+                              </InputAdornment>
+                            ),
+                          },
                       />
                       <TextField
                         name="email"
