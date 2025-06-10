@@ -112,7 +112,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                   <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                     <Stack spacing={0} sx={{ display: 'flex' }}>
                       <Divider variant="middle" color="primary"><Typography variant="h6">Account Details</Typography></Divider>
-                      <Tooltip title="User ID Copied!" placement="top" open={showCopyTooltip} disableFocusListener disableHoverListener disableTouchListener >
+                      <Tooltip title="User ID Copied to Clipboard!" placement="top" open={showCopyTooltip} disableFocusListener disableHoverListener disableTouchListener >
                         <TextField
                           name="userid"
                           value={AuthProfile?.userid}
