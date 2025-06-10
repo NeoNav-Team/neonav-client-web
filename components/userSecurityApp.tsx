@@ -89,7 +89,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     if (userid) {
       navigator.clipboard.writeText(userid);
       setShowCopyTooltip(true);
-      setTimeout(setShowCopyTooltip(false), 3000); // 3 is a magic number https://www.youtube.com/watch?v=J8lRKCw2_Pk
+      setTimeout(() => setShowCopyTooltip(false), 3000); // 3 is a magic number https://www.youtube.com/watch?v=J8lRKCw2_Pk
     }
   }
 
