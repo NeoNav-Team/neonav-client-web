@@ -74,8 +74,6 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     }
   }, [SecurityFetched, fetchUserProfile]);
 
-  const handleClickCopyID = () => setClipboard();
-
   const handleMouseDownCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
@@ -129,7 +127,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                                 <InputAdornment position="end">
                                   <IconButton 
                                     aria-label='Copy User ID'
-                                    onClick={handleClickCopyID}
+                                    onClick={setClipboard}
                                     onMouseDown={handleMouseDownCopy}
                                     onMouseUp={handleMouseUpCopy}
                                     edge="end"
