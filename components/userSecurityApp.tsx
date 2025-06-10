@@ -14,6 +14,7 @@ import {
   Link,
   Typography,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -82,12 +83,15 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
   const handleMouseUpCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
-
+  
+  const [showCopyTooltip, setShowCopyTooltip] = React.useState(false);
+  
   const setClipboard = () => {
     let userid = AuthProfile?.userid;
     if (userid) {
       navigator.clipboard.writeText(userid);
-      // pop tooltip saying id was copied
+      setShowCopyTooltip(true);
+      setTimeout(setShowCopyTooltip(false), 3000); // 3 is a magic number https://www.youtube.com/watch?v=J8lRKCw2_Pk
     }
   }
 
@@ -110,32 +114,34 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                   <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                     <Stack spacing={0} sx={{ display: 'flex' }}>
                       <Divider variant="middle" color="primary"><Typography variant="h6">Account Details</Typography></Divider>
-                      <TextField
-                        name="userid"
-                        value={AuthProfile?.userid}
-                        label="User ID"
-                        variant="outlined"
-                        style={input}
-                        onClick={setClipboard}
-                        slotProps={{
-                          input: {
-                            readOnly: true,
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton 
-                                  aria-label='Copy User ID'
-                                  onClick={handleClickCopyID}
-                                  onMouseDown={handleMouseDownCopy}
-                                  onMouseUp={handleMouseUpCopy}
-                                  edge="end"
-                                >
-                                  <ContentCopyIcon />
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          },
-                        }}
-                      />
+                      <Tooltip title="User ID Copied!" placement="top" open={showCopyTooltip} disableFocusListener disableHoverListener disableTouchListener >
+                        <TextField
+                          name="userid"
+                          value={AuthProfile?.userid}
+                          label="User ID"
+                          variant="outlined"
+                          style={input}
+                          onClick={setClipboard}
+                          slotProps={{
+                            input: {
+                              readOnly: true,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton 
+                                    aria-label='Copy User ID'
+                                    onClick={handleClickCopyID}
+                                    onMouseDown={handleMouseDownCopy}
+                                    onMouseUp={handleMouseUpCopy}
+                                    edge="end"
+                                  >
+                                    <ContentCopyIcon />
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            },
+                          }}
+                        />
+                      </Tooltip>
                       <TextField
                         name="email"
                         value={AuthProfile?.email}
