@@ -73,6 +73,24 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     }
   }, [SecurityFetched, fetchUserProfile]);
 
+  const handleClickCopyID = () => setClipboard();
+
+  const handleMouseDownCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
+  const setClipboard = () => {
+    let userid = AuthProfile?.userid;
+    if (userid) {
+      navigator.clipboard.writeText(userid);
+      // pop tooltip saying id was copied
+    }
+  }
+
   useEffect(() => {
     goFetchSecurity();
   }, [goFetchSecurity, AuthProfile]);
@@ -98,12 +116,21 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                         label="User ID"
                         variant="outlined"
                         style={input}
+                        onClick={setClipboard}
                         slotProps={{
                           input: {
                             readOnly: true,
                             endAdornment: (
                               <InputAdornment position="end">
-                                <ContentCopyIcon />
+                                <IconButton 
+                                  aria-label='Copy User ID'
+                                  onClick={handleClickCopyID}
+                                  onMouseDown={handleMouseDownCopy}
+                                  onMouseUp={handleMouseUpCopy}
+                                  edge="end"
+                                >
+                                  <ContentCopyIcon />
+                                </IconButton>
                               </InputAdornment>
                             ),
                           },
