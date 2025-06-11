@@ -1,5 +1,6 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnFaction, NnSimpleEntity } from './context/nnTypes';
@@ -67,6 +68,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
   const [ collectionFetched, setCollectionFetched ] = useState(false);
+  const location = useLocation();
 
   const goFetchFactions = useCallback(() => {
     if (!collectionFetched) {
@@ -79,6 +81,26 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
     const factionsSize = sortedFactions && sortedFactions.length;
     factionsSize === 0 && goFetchFactions();
   }, [goFetchFactions, sortedFactions]);
+
+  useEffect(() => {
+    const storedScroll = sessionStorage.getItem(location.pathname);
+    const scroller = document.getElementById('simpleScoll');
+    if (scroller && storedScroll) {
+      scroller.scrollTop = parseInt(storedScroll);
+      sessionStorage.removeItem(location.pathname);
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [location]);
+
+  const handleBeforeUnload = () => {
+    const scroller = document.getElementById('simpleScoll');
+    if (scroller) {
+      sessionStorage.setItem(location.pathname, scroller.scrollTop);
+    }
+  };
 
   return (
     <Container disableGutters style={{height: '100%'}}>
