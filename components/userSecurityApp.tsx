@@ -122,23 +122,20 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                           variant="outlined"
                           style={input}
                           onClick={setClipboard}
-                          slotProps={{
-                            input: {
-                              readOnly: true,
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <IconButton 
-                                    aria-label='Copy User ID'
-                                    onClick={setClipboard}
-                                    onMouseDown={handleMouseDownCopy}
-                                    onMouseUp={handleMouseUpCopy}
-                                    edge="end"
-                                  >
-                                    <ContentCopyIcon />
-                                  </IconButton>
-                                </InputAdornment>
-                              ),
-                            },
+                          InputProps={{
+                            readOnly: true,
+                            endAdornment:
+                              <InputAdornment position="end">
+                                <IconButton 
+                                  aria-label='Copy User ID'
+                                  onClick={setClipboard}
+                                  onMouseDown={handleMouseDownCopy}
+                                  onMouseUp={handleMouseUpCopy}
+                                  edge="end"
+                                >
+                                  <ContentCopyIcon />
+                                </IconButton>
+                              </InputAdornment>
                           }}
                         />
                       </Tooltip>
