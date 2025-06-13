@@ -1,13 +1,13 @@
 'use client';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation'
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnFaction, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemContact from './itemContact';
 import FooterNav from './footerNav';
-import { 
+import {
   Container,
   Box,
   Typography,
@@ -28,7 +28,7 @@ const flexContainer = {
   justifyContent: 'center',
   alignContent: 'space-around',
   alignItems: 'stretch',
-};  
+};
 
 const flexBody = {
   order: 0,
@@ -51,7 +51,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
-  const { 
+  const {
     state,
     fetchAllFactions = () =>{},
   }: NnProviderValues = useContext(NnContext);
@@ -60,7 +60,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
     return factions.sort((a, b) => {
       if (a.name && b.name) {
         return a.name.localeCompare(b.name);
-      } 
+      }
       else {
         return 0
       }
@@ -68,7 +68,8 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
   const [ collectionFetched, setCollectionFetched ] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname();
+  const pathnameString = pathname ? pathname.toString() : '';
 
   const goFetchFactions = useCallback(() => {
     if (!collectionFetched) {
@@ -83,22 +84,22 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
   }, [goFetchFactions, sortedFactions]);
 
   useEffect(() => {
-    const storedScroll = sessionStorage.getItem(location.pathname);
+    const storedScroll = sessionStorage.getItem(pathnameString);
     const scroller = document.getElementById('simpleScoll');
     if (scroller && storedScroll) {
       scroller.scrollTop = parseInt(storedScroll);
-      sessionStorage.removeItem(location.pathname);
+      sessionStorage.removeItem(pathnameString);
     }
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    const intervalId = setInterval(handleBeforeUnload, 1000);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      clearInterval(intervalId);
     };
-  }, [location]);
+  }, []);
 
   const handleBeforeUnload = () => {
     const scroller = document.getElementById('simpleScoll');
     if (scroller) {
-      sessionStorage.setItem(location.pathname, scroller.scrollTop);
+      sessionStorage.setItem(pathnameString, scroller.scrollTop.toString());
     }
   };
 
@@ -130,7 +131,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
                             username={item.name}
                             collection="factions"
                           />
-                        </div> 
+                        </div>
                       )
                     })}
                   </Stack>
