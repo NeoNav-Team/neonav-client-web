@@ -76,11 +76,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     }
   }, [SecurityFetched, fetchUserProfile]);
 
-  const handleMouseDownCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
-
-  const handleMouseUpCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseUpDownIgnore = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
   
@@ -129,8 +125,8 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                                 <IconButton 
                                   aria-label='Copy User ID'
                                   onClick={setClipboard}
-                                  onMouseDown={handleMouseDownCopy}
-                                  onMouseUp={handleMouseUpCopy}
+                                  onMouseDown={handleMouseUpDownIgnore}
+                                  onMouseUp={handleMouseUpDownIgnore}
                                   edge="end"
                                 >
                                   <ContentCopyIcon />
