@@ -90,13 +90,13 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
       scroller.scrollTop = parseInt(storedScroll);
       sessionStorage.removeItem(pathnameString);
     }
-    const intervalId = setInterval(handleBeforeUnload, 1000);
+    const intervalId = setInterval(saveScrollPos, 1000);
     return () => {
       clearInterval(intervalId);
     };
   }, []);
 
-  const handleBeforeUnload = () => {
+  const saveScrollPos = () => {
     const scroller = document.getElementById('simpleScoll');
     if (scroller) {
       sessionStorage.setItem(pathnameString, scroller.scrollTop.toString());
