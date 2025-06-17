@@ -82,7 +82,7 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
 
   return (
     <Box className={styles.footerItem}>
-      {link ?  (
+      {link && !disabled ?  (
         <Link href={link}>
           <HexButton />
         </Link>
