@@ -29,6 +29,7 @@ import NoMeetingRoomIcon from '@mui/icons-material/NoMeetingRoom';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 import MyQRCode from './myQRCode';
+import {setSelected} from "@/components/context/nnActionsNetwork";
 
 
 interface ChannelAdminAppProps {
@@ -87,6 +88,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
     state,
     fetchChannelDetails = (id:string) =>{},
     fetchChannelUsers = (id:string) =>{},
+    setSelected = (indexType:string, channelId:string) => {},
     removeUserFromChannel = (channel:string, userId?:string) => {},
     inviteUserToChannel = (channel:string, userId:string) => {},
     toggleChannelScope = (id:string) =>{},
@@ -186,6 +188,9 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
 
   const goLeaveChannel = () =>  {
     removeUserFromChannel(channelInfo?.id, userId);
+    if (channelInfo?.id === state.network?.selected?.channel) {
+      setSelected('channel', '');
+    }
   }
   const goSetChannelScope = () => {
     toggleChannelScope(channelInfo?.id);
