@@ -67,7 +67,7 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
     <>
       <Fab color="secondary"
         aria-label="scan"
-        style={{ opacity: icon ? 1 : 0.3 }}
+        style={{ opacity: icon && !disabled ? 1 : 0.3 }}
         sx={getsize(size)}
         disabled={disabled || icon ? false : true}
         onClick={() => clickHandler()}
