@@ -121,6 +121,16 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     setMsg(event?.target?.value);
   }
 
+  const addUserMention = (username: string | undefined) => {
+    if (username) {
+      if (msg.length > 0) {
+        setMsg(`${msg}@${username} `);
+      } else {
+        setMsg(`@${username} `);
+      }
+    }
+  }
+
   const goSendMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     sendChannelMessage(selectedChannel, msg);
@@ -216,6 +226,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
               <Box sx={{maxWidth: '100%'}}>
                 <Stack spacing={0} style={{display: 'flex', flexDirection: `${notify ? 'column' : 'column-reverse'}` }}>
                   {messages.map((item, index) => (
+                    <div onClick={addUserMention.bind(null, item.from)}>
                     <ItemMessage
                       key={`${index}-${item.ts}`}
                       date={item.ts}
@@ -228,6 +239,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                         decline: item.decline,
                       }}
                     />
+                    </div>
                   ))}
                 </Stack>
               </Box>
