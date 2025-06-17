@@ -11,6 +11,13 @@ export function middleware(request: NextRequest) {
     if(!hasToken) {
       return NextResponse.redirect('https://auth.neonav.net');
     }
+    // Legacy URL support; targeted at allowing users to join chat channels, but is dynamic enough to handle other URLs
+    if(request.nextUrl.searchParams.has('p')
+      && request.nextUrl.searchParams.has('c')
+      && request.nextUrl.searchParams.has('a')) {
+      let nextUrl = request.nextUrl.clone();
+      return NextResponse.redirect(new URL("/" + params['p'] + "/" + params['c'] + "/" + params['a'], nextUrl));
+    }
 }
 
 export const config = {
