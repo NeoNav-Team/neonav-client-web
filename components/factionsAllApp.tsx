@@ -106,6 +106,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
                             key={`${item.id}`}
                             id={item.id || ''}
                             username={item.name}
+                            thumbnail={(item as NnFaction).thumbnail}
                             collection="factions"
                           />
                         </div> 
