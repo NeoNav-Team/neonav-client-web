@@ -107,6 +107,10 @@ export default function InputUser(props:InputUserProps):JSX.Element {
     value !== userName && setUserName(value);
   }, [userName, value]);
 
+  useEffect(() => {
+    setSelectedIndex(0);
+  } , [contactGroups]);
+
   const nameById = (id:string) => {  
     if(allKnownUsers.length !== 0) {
       const user = allKnownUsers.find(user => (user.id || user.userid) === id);
@@ -115,6 +119,8 @@ export default function InputUser(props:InputUserProps):JSX.Element {
       return formattedName;
     }
   }
+
+
 
 
   return (
@@ -148,7 +154,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
               aria-haspopup="menu"
               onClick={handleToggle}
             >
-              {contactGroups[selectedIndex].icon}
+              {contactGroups[selectedIndex]?.icon}
             </Button>
           </ButtonGroup>
           <Popper
@@ -191,7 +197,7 @@ export default function InputUser(props:InputUserProps):JSX.Element {
 
         </InputAdornment>}
       >
-        {contactGroups[selectedIndex].users && contactGroups[selectedIndex].users.map((user, index) => (
+        {contactGroups[selectedIndex] && contactGroups[selectedIndex].users && contactGroups[selectedIndex].users.map((user, index) => (
           <MenuItem
             key={`${user.id}_${index}`}
             value={user.id || user.userid}
