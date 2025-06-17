@@ -61,6 +61,28 @@ export const updateUserProfile = (dispatch: DispatchFunc) => async (doc:any, pro
   executeApi('profileUpdate', {...doc, profile, token}, onSuccess, onError);
 }
 
+export const patchUserToken = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const onSuccess = (response:APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setAccessToken',
+      payload: data,
+    });
+    return data;
+  }
+  const onError = (err:netcheckAPIResData) => {
+    console.log('err', err);
+    const { message = 'Token patch failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: {severity: 'error', message, show: true},
+    })
+    return err;
+  }
+  executeApi('patchToken', {token}, onSuccess, onError);
+}
+
 export const fetchContact = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {

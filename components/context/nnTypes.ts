@@ -201,7 +201,8 @@ export type ActionTypes =
   'setUnreadCount' |
   'clearUnreadCountByType' |
   'clearAllUnreadCounts' |
-  'initContext';
+  'initContext' |
+  'setAccessToken';
 
 export interface Action {
     type: ActionTypes,
@@ -254,6 +255,7 @@ export type NnProviderDispatch = {
     fetchFactionDetails: (_factionId:string) => void;
     fetchFactionStatuses: (_factionId:string) => void;
     fetchUserProfile: () => void;
+    patchUserToken: () => void;
     fetchUnreadCount: () => void;
     updateUserProfile: (_document:any, _update:any) => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
