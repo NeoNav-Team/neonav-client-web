@@ -6,7 +6,7 @@ import { NnProviderValues, NnFaction, NnSimpleEntity } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemContact from './itemContact';
 import FooterNav from './footerNav';
-import { 
+import {
   Container,
   Box,
   Typography,
@@ -27,7 +27,7 @@ const flexContainer = {
   justifyContent: 'center',
   alignContent: 'space-around',
   alignItems: 'stretch',
-};  
+};
 
 const flexBody = {
   order: 0,
@@ -50,7 +50,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
-  const { 
+  const {
     state,
     fetchAllFactions = () =>{},
   }: NnProviderValues = useContext(NnContext);
@@ -59,7 +59,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
     return factions.sort((a, b) => {
       if (a.name && b.name) {
         return a.name.localeCompare(b.name);
-      } 
+      }
       else {
         return 0
       }
@@ -109,7 +109,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
                             thumbnail={(item as NnFaction).thumbnail}
                             collection="factions"
                           />
-                        </div> 
+                        </div>
                       )
                     })}
                   </Stack>
