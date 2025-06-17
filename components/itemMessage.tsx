@@ -42,7 +42,7 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
   return (
     <Box style={{padding: '1vh 0', width: '100%'}}>
       <Stack direction="row" spacing={1} alignItems="flex-end">
-        <Box sx={{minWidth:'60%', maxWidth: '80%'}}>
+        <Box sx={{minWidth:'60%', maxWidth: '100%'}}>
           <div className={styles.dateLine} data-augmented-ui="tr-clip both">
             <Stack direction="row" spacing={1}>
               <div className={styles.idSmallText}>{id}</div>

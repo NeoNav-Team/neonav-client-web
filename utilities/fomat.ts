@@ -1,4 +1,5 @@
 const LANDFALL = 2021;
+const TIME_DILATION = 200;
 
 export const isoDateToDaily = (isoDate: string) => {
   return new Date(isoDate).toLocaleDateString(
@@ -15,8 +16,8 @@ export const isoDateToDaily = (isoDate: string) => {
 export const isoDateToMonth = (isoDate: string) => {
   const calendarDate = isoDate.split('T')[0];
   const calArr = calendarDate.split('-');
-  const difference = (parseInt(calArr[0], 10) - LANDFALL);
-  return `✦ ${calArr[1]}-${calArr[2]}  ❂ ${ordinal(difference)}`;
+  const difference = (parseInt(calArr[0], 10) + TIME_DILATION);
+  return `✦ ${calArr[1]}-${calArr[2]}  ❂ ${difference}`;
 }
 
 const ordinal = (i: number) => {
