@@ -77,6 +77,26 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     return totalUnread;
   }
 
+  function notificationsLabel(count: number) {
+    if (count === 0) {
+      return 'no notifications';
+    }
+    if (count > 99) {
+      return 'more than 99 notifications';
+    }
+    return `${count} notifications`;
+  }
+
+  function mailLabel(count: number) {
+    if (count === 0) {
+      return 'no new mails';
+    }
+    if (count > 99) {
+      return 'more than 99 new mails';
+    }
+    return `show ${count} new mails` ;
+  }
+
 
   return (
 
@@ -111,18 +131,16 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'flex', md: 'flex' } }}>
               <Link href="/channels">
-                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                <IconButton size="large" aria-label={mailLabel(totalUnread(unread))} color="inherit">
                   <Badge badgeContent={totalUnread(unread)} color="secondary">
                     <ChatIcon />
                   </Badge>
                 </IconButton>
               </Link>
               <Link href="/notifications">
-                <IconButton
-                  size="large"
-                >
+                <IconButton size="large" aria-label={notificationsLabel(unread[restrictedChannels[0]])} color="inherit">
                   <Badge badgeContent={unread[restrictedChannels[0]]} color="secondary">
-                    <NotificationsIcon fill="#fff" />
+                    <NotificationsIcon />
                   </Badge>
                 </IconButton>
               </Link>
