@@ -7,15 +7,16 @@ import ListIcon from '@mui/icons-material/List';
 interface PageContainerProps {
   index?: string;
   indexBtn?: boolean;
+  target?: string;
 }
 
 const NEOSITES_INDEX = 'https://sites.neonav.net'
 
 export default function SitesApp(props:PageContainerProps):JSX.Element {
-  const { index, indexBtn } = props;
+  const { index, indexBtn, target } = props;
 
   return (<>
-    <Iframe url={index || NEOSITES_INDEX}
+    <Iframe url={index || target || NEOSITES_INDEX}
       width="100%"
       height="100%"
       display="block"

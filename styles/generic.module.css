@@ -18,6 +18,16 @@
     --aug-inlay-opacity: 0.5;
 }
 
+.hackPane {
+    --aug-tr: 10px;
+    --aug-b-extend1: 50%;
+    --aug-border-all: 2px;
+    --aug-border-bg: radial-gradient(var(--background-color), #e0f000) 100% 100% / 100% 100%;
+    --aug-inlay-all: 4px;
+    --aug-inlay-bg: radial-gradient(ellipse at top, #000, transparent)  50% 50% / 100% 100%;
+    --aug-inlay-opacity: 0.5;
+}
+
 .lightPane {
     --aug-tr: 10px;
     --aug-b-extend1: 50%;
@@ -95,7 +105,7 @@
 }
 
 .selectMenu {
-    background-color: rgba(8,4,88, 0.8);
+    background-color: rgba(8,4,88, 1);
     max-height: 33vh;
 }
 
