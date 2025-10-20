@@ -11,11 +11,15 @@ import {
   Button,
   CircularProgress,
   Divider,
+  InputAdornment,
+  IconButton,
   Link,
   Typography,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
@@ -72,6 +76,21 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     }
   }, [SecurityFetched, fetchUserProfile]);
 
+  const handleMouseUpDownIgnore = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+  
+  const [showCopyTooltip, setShowCopyTooltip] = React.useState(false);
+  
+  const setClipboard = () => {
+    let userid = AuthProfile?.userid;
+    if (userid && window.isSecureContext) {
+      navigator.clipboard.writeText(userid);
+      setShowCopyTooltip(true);
+      setTimeout(() => setShowCopyTooltip(false), 3000); // 3 is a magic number https://www.youtube.com/watch?v=J8lRKCw2_Pk
+    }
+  }
+
   useEffect(() => {
     goFetchSecurity();
   }, [goFetchSecurity, AuthProfile]);
@@ -91,16 +110,31 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                   <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
                     <Stack spacing={0} sx={{ display: 'flex' }}>
                       <Divider variant="middle" color="primary"><Typography variant="h6">Account Details</Typography></Divider>
-                      <TextField
-                        name="userid"
-                        value={AuthProfile?.userid}
-                        label="User ID"
-                        variant="outlined"
-                        style={input}
-                        InputProps={{
-                          readOnly: true,
-                        }}
-                      />
+                      <Tooltip title="User ID Copied to Clipboard!" placement="top" open={showCopyTooltip} disableFocusListener disableHoverListener disableTouchListener >
+                        <TextField
+                          name="userid"
+                          value={AuthProfile?.userid}
+                          label="User ID"
+                          variant="outlined"
+                          style={input}
+                          onClick={setClipboard}
+                          InputProps={{
+                            readOnly: true,
+                            endAdornment:
+                              <InputAdornment position="end">
+                                {window.isSecureContext && <IconButton 
+                                  aria-label='Copy User ID'
+                                  onClick={setClipboard}
+                                  onMouseDown={handleMouseUpDownIgnore}
+                                  onMouseUp={handleMouseUpDownIgnore}
+                                  edge="end"
+                                >
+                                  <ContentCopyIcon />
+                                </IconButton>}
+                              </InputAdornment>
+                          }}
+                        />
+                      </Tooltip>
                       <TextField
                         name="email"
                         value={AuthProfile?.email}
