@@ -83,6 +83,13 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
     factionsSize === 0 && goFetchFactions();
   }, [goFetchFactions, sortedFactions]);
 
+  const saveScrollPos = useCallback(() => {
+    const scroller = document.getElementById('simpleScoll');
+    if (scroller) {
+      sessionStorage.setItem(pathnameString, scroller.scrollTop.toString());
+    }
+  }, [pathnameString]);
+
   useEffect(() => {
     const storedScroll = sessionStorage.getItem(pathnameString);
     const scroller = document.getElementById('simpleScoll');
@@ -94,14 +101,7 @@ export default function FactionsAllApp(props: FactionsAllAppProps):JSX.Element {
     return () => {
       clearInterval(intervalId);
     };
-  }, []);
-
-  const saveScrollPos = () => {
-    const scroller = document.getElementById('simpleScoll');
-    if (scroller) {
-      sessionStorage.setItem(pathnameString, scroller.scrollTop.toString());
-    }
-  };
+  }, [pathnameString, saveScrollPos]);
 
   return (
     <Container disableGutters style={{height: '100%'}}>

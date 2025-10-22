@@ -72,7 +72,7 @@ export default function ItemStatus(props:itemStatusProps):JSX.Element {
           >
             <Typography>
               <Link href={`/${userid.includes('C') ? 'factions' : 'contacts'}/${userid}`}>
-              <span className={styles.name}>{username} ({userid})</span></Link>  <span className={styles.action}>{statusAction(action)}</span> 》
+                <span className={styles.name}>{username} ({userid})</span></Link>  <span className={styles.action}>{statusAction(action)}</span> 》
               <span className={styles.comment}>{statusText(action)}</span> {tag && <Chip icon={<Tag />} component="span" label={tag} className={styles.hashtag} />}
             </Typography>
             {collection && (<MoreVertIcon />)}

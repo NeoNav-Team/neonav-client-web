@@ -52,16 +52,17 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
     filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)',
     border: '1px solid #e0f0e0',
   }
-  const errorBoxShownStyle = {
+  const errorBoxShownStyle = useMemo(() => ({
     height: '100%',
     background: 'radial-gradient(ellipse, transparent, #A00)  100% 100% / 100% 100%',
     transition: 'all 0.1s ease-in-out',
-  }
-  const errorBoxHiddenStyle = {
+  }), []);
+
+  const errorBoxHiddenStyle = useMemo(() => ({
     height: '100%',
     background: 'transparent',
     transition: 'all 0.1s ease-in-out',
-  }
+  }), []);
   const addrWhite = "#ffffd0";
   const asciiWhite = "#d0ffd0";
 
@@ -87,7 +88,7 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
   const [inputValue2, setInputValue2] = useState<string>('');
   const [inputValue3, setInputValue3] = useState<string>('');
   const [inputValue4, setInputValue4] = useState<string>('');
-  const loadingMessages = [
+  const loadingMessages = useMemo(() => [
     "Opening ports...",
     "Establishing connection...",
     "Bypassing security protocols...",
@@ -95,7 +96,7 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
     "Defragging memory segments...",
     "Compiling breach sequence...",
     "Finalizing setup...",
-  ];
+  ], []);
 
   const generatePuzzleOrder = () => {
     // Generate the order we'll use for the puzzle
@@ -107,7 +108,7 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
     setTargetOrder(shuffled);
   };
 
-  const generateGrid = (targetPosition: number) => {
+  const generateGrid = useCallback((targetPosition: number) => {
     // Pick 4 random indices from hexSymbols to be our target symbols
     let targetIndices: number[] = [];
     while (targetIndices.length < 4) {
@@ -149,7 +150,7 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
 
     setHexGrid(hexGridSymbols);
     setAsciiGrid(asciiGridSymbols);
-  };
+  }, [targetOrder]);
 
   const onGridClick = (index: number) => {
     if (!timeoutPointer) {
@@ -243,7 +244,7 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
         setInitialized(true);
       }, 1200);
     }
-  }, [initializeProgress]);
+  }, [initializeProgress, loadingMessages]);
 
   // Update the time left and time left percent to render the progress bar
   useEffect(() => {
@@ -257,23 +258,23 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
         setErrorBoxStyle(errorBoxHiddenStyle);
       }, 100); // Hide the error box after 100ms
     }
-  }, [timeLeft]);
+  }, [timeLeft, generateGrid, targetPosition, errorBoxShownStyle, errorBoxHiddenStyle]);
 
   useEffect(() => {
     generateGrid(0);
-  }, [targetOrder]);
+  }, [targetOrder, generateGrid]);
 
   useEffect(() => {
     //console.log(crypto.createHash('md5').update('756B2003C3B9219B').digest('hex'));
     // Hide the header element
     let headerElem = document.getElementsByTagName('header');
     if (headerElem[0]) {
-        //headerElem[0].style.display = 'none';
-        headerElem[0].style.background = '#000';
+      //headerElem[0].style.display = 'none';
+      headerElem[0].style.background = '#000';
     }
     let headerTitleElem = document.getElementsByTagName('h4');
     if (headerTitleElem[0]) {
-        headerTitleElem[0].innerHTML = 'N A V H A C K';
+      headerTitleElem[0].innerHTML = 'N A V H A C K';
     }
     generatePuzzleOrder();
 
@@ -312,7 +313,7 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
                     spacing={1}
                     justifyContent="center"
                     alignItems="center"
-                    >
+                  >
                     <TextField ref={inputRef1} size="small" value={inputValue1} style={inputFieldStyle} onChange={handleInput1Change} inputProps={{ maxLength: 4, style: inputFieldFontStyle }} />
                     <TextField ref={inputRef2} size="small" value={inputValue2} style={inputFieldStyle} onChange={handleInput2Change} inputProps={{ maxLength: 4, style: inputFieldFontStyle }} />
                     <TextField ref={inputRef3} size="small" value={inputValue3} style={inputFieldStyle} onChange={handleInput3Change} inputProps={{ maxLength: 4, style: inputFieldFontStyle }} />
@@ -334,7 +335,7 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
                 </div>
                 <div style={{minWidth: '100%', justifyItems: 'center'}}>
                   <LinearProgress color="primary" variant="determinate"
-                                  value={100 * initializeProgress / initializeTime} style={{width: '80%'}}/>
+                    value={100 * initializeProgress / initializeTime} style={{width: '80%'}}/>
                 </div>
                 <div style={{minWidth: '100%'}}>
                   <Typography sx={textBodyStyle} component="p" style={{color: '#fff', textAlign: 'center', fontSize: '12px'}}>{loadingMessage}</Typography>
@@ -344,15 +345,15 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
             {initialized && (
               <div style={{height: '100%', maxHeight: '100%', padding: '32px 16px'}}>
                 <Stack direction="row"
-                       spacing={1}
-                       justifyContent="space-between"
-                       alignItems="center"
+                  spacing={1}
+                  justifyContent="space-between"
+                  alignItems="center"
                 >
                   <div className={styles.darkPane} style={{width: '50%', padding: '16px'}} data-augmented-ui="tl-clip both">
                     <Stack direction="row"
-                           spacing={1}
-                           justifyContent="space-between"
-                           alignItems="center"
+                      spacing={1}
+                      justifyContent="space-between"
+                      alignItems="center"
                     >
                       <Typography sx={textBodyStyle} component="p">BREACH TIME REMAINING</Typography>
                       <Typography sx={textBodyStyleOutline} component="p" style={{color: (timeLeft > 2000 ? '#fff' : '#d00')}}>{(timeLeft / 1000).toFixed(2)}</Typography>
@@ -361,9 +362,9 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
                   </div>
                   <div className={styles.darkPane} style={{width: '50%', padding: '16px'}} data-augmented-ui="tr-clip both">
                     <Stack direction="row"
-                           spacing={1}
-                           justifyContent="space-between"
-                           alignItems="center"
+                      spacing={1}
+                      justifyContent="space-between"
+                      alignItems="center"
                     >
                       <Typography sx={textBodyStyleOutline} component="p">{hexGrid[targetOrder[targetPosition]]}</Typography>
                       <Typography sx={textBodyStyle} component="p">TARGET BUFFER</Typography>
@@ -388,12 +389,12 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
                         </div>
                       </Grid>
                       <Grid item xs="auto" >
-                          <Typography component="p" sx={hexBodyStyle} style={{color: asciiWhite, whiteSpace: 'pre'}}>{asciiGrid[0]}{asciiGrid[1]}{asciiGrid[2]}{asciiGrid[3]}</Typography>
+                        <Typography component="p" sx={hexBodyStyle} style={{color: asciiWhite, whiteSpace: 'pre'}}>{asciiGrid[0]}{asciiGrid[1]}{asciiGrid[2]}{asciiGrid[3]}</Typography>
                       </Grid>
                     </Grid>
                     <Grid container item xs={12} style={{ justifyContent: 'center'}}>
                       <Grid item xs="auto" style={{ justifyItems: 'end' }}>
-                          <Typography component="p" sx={hexBodyStyle} style={{color: addrWhite}}>00006DC0</Typography>
+                        <Typography component="p" sx={hexBodyStyle} style={{color: addrWhite}}>00006DC0</Typography>
                       </Grid>
                       <Grid item xs="auto" style={{ justifyItems: 'center' }}>
                         <div style={{display: "flex", padding: "0px 16px 0"}}>
@@ -407,12 +408,12 @@ export default function HexhackApp(props: HexHackAppProps): JSX.Element {
                         </div>
                       </Grid>
                       <Grid item xs="auto">
-                          <Typography component="p" sx={hexBodyStyle} style={{color: asciiWhite, whiteSpace: 'pre'}}>{asciiGrid[4]}{asciiGrid[5]}{asciiGrid[6]}{asciiGrid[7]}</Typography>
+                        <Typography component="p" sx={hexBodyStyle} style={{color: asciiWhite, whiteSpace: 'pre'}}>{asciiGrid[4]}{asciiGrid[5]}{asciiGrid[6]}{asciiGrid[7]}</Typography>
                       </Grid>
                     </Grid>
                     <Grid container item xs={12} style={{ justifyContent: 'center'}}>
                       <Grid item xs="auto" style={{ justifyItems: 'end' }}>
-                          <Typography component="p" sx={hexBodyStyle} style={{color: addrWhite}}>00006DD0</Typography>
+                        <Typography component="p" sx={hexBodyStyle} style={{color: addrWhite}}>00006DD0</Typography>
                       </Grid>
                       <Grid item xs="auto" style={{ justifyItems: 'center' }}>
                         <div style={{display: "flex", padding: "0px 16px 0"}}>

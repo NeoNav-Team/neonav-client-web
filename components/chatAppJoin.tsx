@@ -34,7 +34,7 @@ export default function ChatApp(props:ChatAppJoinProps):JSX.Element {
       joinUserToChannel(idFromParams);
       setSelected('channel', idFromParams);
     }
-  }, []);
+  }, [idFromParams, joinUserToChannel, setSelected]);
 
   useEffect(() => {
     if (alert.severity === "success") {
@@ -42,7 +42,7 @@ export default function ChatApp(props:ChatAppJoinProps):JSX.Element {
     } else if (alert.severity === "error") {
       setJoinFailure(true);
     }
-  }, [alert.show]);
+  }, [alert.severity, idFromParams, router]);
 
   return (
     <Container disableGutters style={{height: '100%'}}>
@@ -87,5 +87,5 @@ export default function ChatApp(props:ChatAppJoinProps):JSX.Element {
         </div>
       </div>
     </Container>
-)
+  )
 }
