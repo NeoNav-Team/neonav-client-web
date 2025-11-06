@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo, MouseEvent } from 'react';
+import { useContext, useState, useMemo, MouseEvent, ReactNode } from 'react';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues, NnFaction, NnSimpleEntity } from '../components/context/nnTypes';
 import { IconButton } from "@mui/material";
@@ -25,7 +25,7 @@ const colors = [
   '#0000FF',
 ]
 
-export default function SelectFaction(props:SelectFactionProps):JSX.Element {
+export default function SelectFaction(props:SelectFactionProps):ReactNode {
   const { children } = props;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -65,6 +65,11 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     handleClose();
   }
 
+  const selectableFactions = reppedFactions(factions);
+  if (selectableFactions.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <IconButton
@@ -81,7 +86,7 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
           onClose={handleClose}
           sx={{maxWidth: '300px'}}
         >
-          <MenuItem 
+          <MenuItem
             onClick={(event:any) => handleMenuItemClick(event, -1)}
             selected={selected === -1}
           >
@@ -90,8 +95,8 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
             </ListItemIcon>
             {user}
           </MenuItem>
-          {reppedFactions(factions).map((faction, index) => (
-            <MenuItem 
+          {selectableFactions.map((faction, index) => (
+            <MenuItem
               onClick={(event:any) => handleMenuItemClick(event, index)}
               key={faction?.id}
               selected={selected === index}
