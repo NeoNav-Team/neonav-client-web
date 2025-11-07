@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo, MouseEvent, ReactNode } from 'react';
+import { useContext, useState, useMemo, MouseEvent } from 'react';
 import { Context as NnContext } from '../components/context/nnContext';
 import { NnProviderValues, NnFaction, NnSimpleEntity } from '../components/context/nnTypes';
 import { IconButton } from "@mui/material";
@@ -25,7 +25,7 @@ const colors = [
   '#0000FF',
 ]
 
-export default function SelectFaction(props:SelectFactionProps):ReactNode {
+export default function SelectFaction(props:SelectFactionProps):JSX.Element {
   const { children } = props;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -46,6 +46,14 @@ export default function SelectFaction(props:SelectFactionProps):ReactNode {
     setAnchorEl(null);
   };
 
+  const handleMenuItemClick = (event: MouseEvent<HTMLButtonElement>, index: number) => {
+    setSelectedFaction(index);
+    const filteredFactions = reppedFactions(factions);
+    const factionId = filteredFactions[index]?.id || userId;
+    setSelected('account', factionId);
+    handleClose();
+  }
+
   const reppedFactions = (faction:NnFaction[]): NnFaction[] => {
     let reppedFactions: NnFaction[]  = [];
     faction.map( faction => {
@@ -57,17 +65,9 @@ export default function SelectFaction(props:SelectFactionProps):ReactNode {
     return reppedFactions;
   }
 
-  const handleMenuItemClick = (event: MouseEvent<HTMLButtonElement>, index: number) => {
-    setSelectedFaction(index);
-    const filteredFactions = reppedFactions(factions);
-    const factionId = filteredFactions[index]?.id || userId;
-    setSelected('account', factionId);
-    handleClose();
-  }
-
   const selectableFactions = reppedFactions(factions);
   if (selectableFactions.length === 0) {
-    return null;
+    return <></>;
   }
 
   return (
