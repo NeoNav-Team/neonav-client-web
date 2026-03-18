@@ -20,6 +20,7 @@ import {
   befriend,
   fetchContact,
   fetchUserProfile,
+  patchUserToken,
   fetchUserContacts,
   updateUserProfile,
   unfriend,
@@ -71,10 +72,11 @@ import {
 } from './nnActionsFaction';
 import { fetchAllLocations } from './nnActionsLocation';
 import { nnSchema } from "./nnSchema";
-import { 
+import {
   getCookieContext,
   getCookieToken,
   setCookieContext,
+  setCookieToken,
 } from "@/utilities/cookieContext";
 import { restrictedChannels } from "@/utilities/constants";
 
@@ -87,6 +89,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   switch (type) {
     case 'addMessage': 
       break;
+    case 'setAccessToken':
+      const tokenPayload = JSON.parse(JSON.stringify(payload));
+      setCookieToken(tokenPayload.accessToken);
     case 'setAlert':
       clonedState.network.alert = {...clonedState.network.alert, ...payload}
       break;
@@ -256,6 +261,7 @@ export const { Context, Provider } = DataContextCreator(
     joinUserToChannel,
     inviteUserToChannel,
     longPollMessages,
+    patchUserToken,
     removeRepToFaction,
     removeStatus,
     removeUserFromChannel,

@@ -84,7 +84,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
   
   const setClipboard = () => {
     let userid = AuthProfile?.userid;
-    if (userid) {
+    if (userid && window.isSecureContext) {
       navigator.clipboard.writeText(userid);
       setShowCopyTooltip(true);
       setTimeout(() => setShowCopyTooltip(false), 3000); // 3 is a magic number https://www.youtube.com/watch?v=J8lRKCw2_Pk
@@ -122,7 +122,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                             readOnly: true,
                             endAdornment:
                               <InputAdornment position="end">
-                                <IconButton 
+                                {window.isSecureContext && <IconButton 
                                   aria-label='Copy User ID'
                                   onClick={setClipboard}
                                   onMouseDown={handleMouseUpDownIgnore}
@@ -130,7 +130,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                                   edge="end"
                                 >
                                   <ContentCopyIcon />
-                                </IconButton>
+                                </IconButton>}
                               </InputAdornment>
                           }}
                         />

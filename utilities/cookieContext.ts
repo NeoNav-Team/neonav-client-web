@@ -96,6 +96,11 @@ export const clearCookieUnread = () => {
   return [];
 }
 
+export const setCookieToken = (newToken:string) => {
+  Cookies.remove('accessToken', { domain: '.neonav.net' });
+  Cookies.set('accessToken', newToken, { domain: '.neonav.net' });
+}
+
 //TODO: update functions to use same set of set / update collection functions
 
 export const getCookieClipboard = (): nnEntity[] => {

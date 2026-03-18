@@ -91,6 +91,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
     state,
     fetchUserProfile = () => {},
     updateUserProfile = (document:any, update:any) => {},
+    patchUserToken = () => {},
   }: NnProviderValues = useContext(NnContext);
   const profile:nnEntity = useMemo(() => {
     return state?.network?.entity?.profile || {};
@@ -174,6 +175,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
     if (editMode) {
       saveProfileChanges();
       setPhoto(avatar);
+      patchUserToken();
     } else {
       goFetchProfile(); //get latest before editing
     }
