@@ -216,4 +216,8 @@ export const authApiEnpoints = {
     method: "post",
     path: "/api/user/search",
   },
+  locations: {
+    method: "get",
+    path: "/api/locations",
+  },
 };

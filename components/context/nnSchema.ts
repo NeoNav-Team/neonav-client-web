@@ -27,6 +27,7 @@ export const nnSchema:NnStore = {
       factions: [],
       statuses: [],
       clipboardEntities: [],
+      locations: [],
     },
     entity: {},
   },

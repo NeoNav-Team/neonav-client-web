@@ -69,6 +69,7 @@ import {
   setFactionUserStatus,
   fetchFactionStatuses,
 } from './nnActionsFaction';
+import { fetchAllLocations } from './nnActionsLocation';
 import { nnSchema } from "./nnSchema";
 import { 
   getCookieContext,
@@ -118,6 +119,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setClipboardEntities':
       clonedState.network.collections.clipboardEntities = payload;
+      break;
+    case 'setLocations':
+      clonedState.network.collections.locations = payload;
       break;
     case 'updateClipboardEntities':
       let clipboardEntities = clonedState.network.collections.clipboardEntities;
@@ -240,6 +244,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserChannels,
     fetchUserContacts,
     fetchUserFactions,
+    fetchAllLocations,
     fetchUserProfile,
     fetchUserSetStatuses,
     fetchUserStatuses,
