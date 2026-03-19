@@ -9,14 +9,11 @@ import {
   Box,
   Container,
   Divider,
-  FormControlLabel,
-  FormGroup,
   IconButton,
   Link,
   Modal,
   Paper,
   Stack,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -69,6 +66,10 @@ import ItemStatus from "@/components/itemStatus";
 import SimpleScrollContainer from "@/components/simpleScrollContainer";
 import { Context as NnContext } from "@/components/context/nnContext";
 import { NnProviderValues } from "@/components/context/nnTypes";
+import MapLayersModal from "@/components/mapLayersModal";
+import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
+import { createDummyLocationMarkers } from "@/utilities/mapDummyLocationMarkers";
+import { renderLocationsToLeafletLayers } from "@/utilities/mapLeafletLocationsRenderer";
 
 
 interface PageContainerProps {
@@ -833,17 +834,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         },
       ];
 
-      // Add location markers layer to layerData and add to map
-      layerData.set("locationMarkersLayer", L.layerGroup());
-      mymap.addLayer(layerData.get("locationMarkersLayer")!);
-
-      // Add megablock and megamall layer groups to layerData
-      layerData.set("megablockLocations", L.layerGroup());
-      layerData.set("megamallLocations", L.layerGroup());
-
-      // Add megablock and megamall layer group to layerData and add to map
-      layerData.set("megablockAndMegamallLocations", L.layerGroup());
-      mymap.addLayer(layerData.get("megablockAndMegamallLocations")!);
+      // Set up structural layers (location markers + zoom-toggled megablock/megamall).
+      initStaticLayerGroups(mymap, layerData);
 
       const eventMarkerLayer = L.layerGroup();
       metaMarkers.forEach((markerInfo) => {
@@ -888,11 +880,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       L.rectangle(L.latLngBounds(devMarkers[5].pos, devMarkers[6].pos)).addTo(devLayer);
       layerData.set("devLayer", devLayer);
 
-      // Placeholder layers for the layer modal switches (currently empty).
-      layerData.set("testLayer2", L.layerGroup());
-      layerData.set("testLayer3", L.layerGroup());
-
-
       // Set up listeners/hooks
       mymap.on('locationfound', (e) => {
         console.log("Location found:", e);
@@ -908,31 +895,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         alert("Location access denied.");
       });
 
-      // Listen to zoom level changes to toggle megablock and megamall layers
-      mymap.on('zoomend', (e) => {
-        const zoomLevel = mymap.getZoom();
-        if (zoomLevel >= 21) {
-          if (!mymap.hasLayer(layerData.get("megablockLocations")!)) {
-            mymap.addLayer(layerData.get("megablockLocations")!);
-          }
-          if (!mymap.hasLayer(layerData.get("megamallLocations")!)) {
-            mymap.addLayer(layerData.get("megamallLocations")!);
-          }
-          if (mymap.hasLayer(layerData.get("megablockAndMegamallLocations")!)) {
-            mymap.removeLayer(layerData.get("megablockAndMegamallLocations")!);
-          }
-        } else {
-          if (mymap.hasLayer(layerData.get("megablockLocations")!)) {
-            mymap.removeLayer(layerData.get("megablockLocations")!);
-          }
-          if (mymap.hasLayer(layerData.get("megamallLocations")!)) {
-            mymap.removeLayer(layerData.get("megamallLocations")!);
-          }
-          if (!mymap.hasLayer(layerData.get("megablockAndMegamallLocations")!)) {
-            mymap.addLayer(layerData.get("megablockAndMegamallLocations")!);
-          }
-        }
-      });
+      // Listen to zoom level changes to toggle megablock and megamall layers.
+      wireZoomLayerVisibility(mymap, layerData);
 
       mymap.on('moveend', (e) => {
         //console.log(mymap.getCenter());
@@ -962,193 +926,31 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }, [fetchAllLocations]);
 
   useEffect(() => {
-      // TODO: Remove these dummy testing markers
-      const markers = [
-        {
-          id: "L000000000",
-          name: "Domecile Heating & Cooling",
-          owner: "0000000000",
-          venuetype: "Resistance Strike Team Refuge",
-          verified: true,
-          pos: L.latLng(35.080055, -117.822362), // Needed in api
-          hours: hours,
-          reviews: [
-            {
-              "reviewer": "0000000000",
-              "reviewerName": "[REDADCTED]",
-              "ts": "2025-04-12T09:15:00-04:00",
-              "rating": 7.2,
-              "review": "Was a dome."
-            },
-            {
-              "reviewer": "0000000000",
-              "reviewerName": "[REDADCTED]",
-              "ts": "2025-04-15T15:09:00-04:00",
-              "rating": 9.8,
-              "review": "Further Clarification: To the extent that any suspected \"Resistance Strike Team\" members may have been photographed, videoed or otherwise recorded within its Cooling Dome, DOMECILE Heating and Cooling denies any and all allegations of harboring said fugitives from justice and respectfully requests viewers to disregard the evidence of their own eyes and ears. Thank you."
-            },
-          ],
-          ownername: "[REDADCTED]",
-          prettyhours: rows,   // Calculated
-          showtooltip: true,  // Need to be calculated somehow?
-          icon: <AdjustIcon style={{color: cyberYellow}}/>,  // Needed in api or calculated by venuetype
-          color: cyberBlueDark // Needed in api or calculated by venuetype
-        },
-        {
-          id: "L242126597",
-          name: "WCC Uplink Facility Neotropolis-7",
-          owner: "C174357092",
-          venuetype: "Arcade",
-          verified: true,
-          pos: L.latLng(35.079775, -117.822339),
-          hours: hours,
-          reviews: [],
-          ownername: "Wayward Communication Corporation",
-          prettyhours: rows,
-          showtooltip: true,
-          icon: <GamepadIcon style={{color: cyberOrange}}/>,
-          color: cyberBlueLight
-        },
-        {
-          id: "L000000000",
-          name: "Cybereats",
-          owner: "",
-          venuetype: "Food Stall",
-          verified: true,
-          pos: L.latLng(35.079789, -117.822615),
-          hours: hours,
-          reviews: [],
-          ownername: "",
-          prettyhours: rows,
-          showtooltip: true,
-          icon: <RamenDiningIcon style={{color: cyberYellow}}/>,
-          color: cyberGreen
-        },
-        {
-          id: "L000000000",
-          name: "Not A Tea Shop",
-          owner: "",
-          venuetype: "Food Stall",
-          verified: true,
-          pos: L.latLng(35.079277, -117.822483),
-          hours: hours,
-          reviews: [],
-          ownername: "",
-          prettyhours: rows,
-          showtooltip: true,
-          icon: <LocalBarIcon style={{color: cyberYellow}}/>,
-          color: cyberGreen
-        },
-        {
-          id: "L000000000",
-          name: "Nightcrawlers Crop.",
-          owner: "",
-          venuetype: "Corp.",
-          verified: true,
-          pos: L.latLng(35.079237, -117.822379),
-          hours: hours,
-          reviews: [],
-          ownername: "",
-          prettyhours: rows,
-          showtooltip: true,
-          icon: <SimCardIcon style={{color: cyberOrange}}/>,
-          color: cyberBlueLight
-        },
-        
-      ];
-
-    let locations = state?.network?.collections?.locations;
+    const locations = state?.network?.collections?.locations;
     if (!locations?.length) return;
-    const mymap = myMapObjects.get("map") as L.Map;
-    const locationMarkersLayer = layerData.get("locationMarkersLayer") as L.LayerGroup;
+
+    const mymap = myMapObjects.get("map") as L.Map | undefined;
+    const locationMarkersLayer = layerData.get("locationMarkersLayer") as L.LayerGroup | undefined;
     if (!mymap || !locationMarkersLayer) return;
-    locationMarkersLayer.clearLayers();
-    console.log("Locations:", locations);
-    locations = locations.concat(markers)
-    console.log("Locations (test):", locations);
-    // TODO: These should be calculated from devMarkers (which should also be moved to the db) or markers fetched directly from api
-    const megablockRect = L.latLngBounds(L.latLng(35.079398, -117.822520), L.latLng(35.079091, -117.822274));
-    const megamallRect = L.latLngBounds(L.latLng(35.079605, -117.822139), L.latLng(35.079321, -117.821962));
-    const megablockLoc = {
-      id: "L000000000",
-      name: "Megablock 01",
-      owner: "",
-      venuetype: "megablock",
-      verified: true,
-      pos: megablockRect.getCenter(),
-    };
-    const megamallLoc = {
-      id: "L000000000",
-      name: "Megamall",
-      owner: "",
-      venuetype: "megablock",
-      verified: true,
-      pos: megamallRect.getCenter(),
-    };
 
-    // Create megablock meta icon
-    const { icon: megablockIcon, color: megablockColor } = getVenueIconAndColor(megablockLoc.venuetype);
-    const megablockMarker = L.marker(megablockLoc.pos, { icon: getDivIcon(megablockIcon, megablockColor) })
-      .addTo(layerData.get("megablockAndMegamallLocations") as L.LayerGroup)
-      .on('click', () => {
-        mymap.flyTo(megablockMarker.getLatLng());
-      });
-      megablockMarker.bindTooltip(megablockLoc.name, { permanent: true, direction: 'right' });
+    const markers = createDummyLocationMarkers({ hours, rows });
 
-    // Create megamall meta icon
-    const { icon: megamallIcon, color: megamallColor } = getVenueIconAndColor(megamallLoc.venuetype);
-    const megamallMarker = L.marker(megamallLoc.pos, { icon: getDivIcon(megamallIcon, megamallColor) })
-      .addTo(layerData.get("megablockAndMegamallLocations") as L.LayerGroup)
-      .on('click', () => {
-        mymap.flyTo(megamallMarker.getLatLng());
-      });
-      megamallMarker.bindTooltip(megamallLoc.name, { permanent: true, direction: 'right' });
-
-
-    locations.forEach((loc: any) => {
-      const lat = loc.pos?.lat ?? loc.pos?.latitude;
-      const lng = loc.pos?.lng ?? loc.pos?.longitude;
-      if (lat == null || lng == null) return;
-      const { icon: venueIcon, color: venueColor } = getVenueIconAndColor(loc.venuetype ?? '');
-      // TODO: hours and reviews don't come from this api, so we need to fetch them from the location api by id on click
-      const markerInfo = {
-        id: loc.id,
-        name: loc.name ?? '',
-        owner: loc.owner ?? '',
-        venuetype: loc.venuetype ?? '',
-        verified: !!loc.verified,
-        pos: L.latLng(lat, lng),
-        hours: loc.hours ?? [],
-        reviews: loc.reviews ?? [],
-        ownername: loc.ownername ?? '',
-        prettyhours: compressHoursAcrossMidnight(loc.hours ?? []),
-        showtooltip: true,
-        icon: venueIcon,
-        color: venueColor,
-      };
-      
-      // If marker is within megablock or megamall area, add to corresponding layer group instead of map directly so they can be toggled with zoom level
-      let targetLayer = locationMarkersLayer;
-      if (megablockRect.contains(markerInfo.pos)) {
-        targetLayer = layerData.get("megablockLocations") as L.LayerGroup;
-      } else if (megamallRect.contains(markerInfo.pos)) {
-        targetLayer = layerData.get("megamallLocations") as L.LayerGroup;
-      }
-      if (markerInfo.verified 
-        || markerInfo.owner === state?.user?.profile?.auth?.userid 
-        || (markerInfo.owner.startsWith('C') && state?.user?.factions?.some((faction: any) => faction.id === markerInfo.owner))) {
-        const leafletMarker = L.marker(markerInfo.pos, { icon: getDivIcon(markerInfo.icon, markerInfo.color) })
-          .addTo(targetLayer)
-          .on('click', () => {
-            // TODO: Fetch hours and reviews from location api by id on click and set markerInfo.hours and markerInfo.reviews if they are not already set
-            
-            myMapObjects.set("selectedMarker", leafletMarker);
-            mymap.flyTo(leafletMarker.getLatLng());
-            openInfoModal();
-          });
-        leafletMarker.bindTooltip(markerInfo.name, { permanent: true, direction: 'right' });
-        (leafletMarker as any).neonavdata = markerInfo;
-      }
+    renderLocationsToLeafletLayers({
+      mymap,
+      layerData,
+      locations,
+      extraMarkers: markers,
+      userId: state?.user?.profile?.auth?.userid,
+      factions: state?.user?.factions,
+      getVenueIconAndColor,
+      getDivIcon,
+      compressHoursAcrossMidnight,
+      onMarkerClick: (leafletMarker) => {
+        // `openInfoModal()` reads from `myMapObjects.selectedMarker`.
+        myMapObjects.set("selectedMarker", leafletMarker);
+        mymap.flyTo(leafletMarker.getLatLng());
+        openInfoModal();
+      },
     });
   }, [state?.network?.collections?.locations]);
 
@@ -1326,52 +1128,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             )}
         </Box>
       </Modal>
-      <Modal
+      <MapLayersModal
         open={showLayerModal}
         onClose={closeLayerModal}
-        sx={{
-          '& .MuiModal-backdrop': {
-            backgroundColor: 'rgba(93, 28, 194, 0.2)', // Change the color and opacity
-          },
-        }}
-      >
-        <Box sx={layerModalSizeStyle}
-          className={styles.submenuPane}
-          data-augmented-ui="tl-clip tr-clip-y br-2-clip-x both"
-        >
-          <Stack direction="column"
-            spacing={1}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <FormGroup>
-              {["eventLayer", "devLayer", "testLayer2", "testLayer3"].map((layerId) => {
-                const labels: Record<string, string> = {
-                  "eventLayer": "Event Locations",
-                  "devLayer": "Dev Layer",
-                  "testLayer2": "Placeholder 2",
-                  "testLayer3": "Placeholder 3"
-                };
-                const checked = layerStates?.[layerId] ?? false;
-                return (
-                  <FormControlLabel
-                    key={layerId}
-                    control={
-                      <Switch
-                        color="warning"
-                        id={layerId}
-                        checked={checked}
-                        onChange={handleLayerSwitch}
-                      />
-                    }
-                    label={labels[layerId]}
-                  />
-                );
-              })}
-            </FormGroup>
-          </Stack>
-        </Box>
-      </Modal>
+        layerModalSizeStyle={layerModalSizeStyle}
+        layerStates={layerStates}
+        onToggle={handleLayerSwitch}
+      />
       <Box sx={footerStyle} hidden={!showInfoModal}>
         <FooterNav
           firstHexProps={{
