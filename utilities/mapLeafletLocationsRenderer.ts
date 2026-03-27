@@ -47,6 +47,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
   const allLocations = locations.concat(extraMarkers ?? []);
 
+  // TODO: These should be calculated from the database.
   const megablockRect = L.latLngBounds(
     L.latLng(35.079398, -117.822520),
     L.latLng(35.079091, -117.822274),
@@ -95,9 +96,9 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
   megamallMarker.bindTooltip(megamallLoc.name, { permanent: true, direction: "right" });
 
   allLocations.forEach((loc: any) => {
-    const lat = loc.pos?.lat ?? loc.pos?.latitude;
-    const lng = loc.pos?.lng ?? loc.pos?.longitude;
-    if (lat == null || lng == null) return;
+    const lat = loc.lat;
+    const long = loc.long;
+    if (lat == null || long == null) return;
 
     const { icon: venueIcon, color: venueColor } = getVenueIconAndColor(loc.venuetype ?? "");
 
@@ -107,7 +108,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
       owner: loc.owner ?? "",
       venuetype: loc.venuetype ?? "",
       verified: !!loc.verified,
-      pos: L.latLng(lat, lng),
+      pos: L.latLng(lat, long),
       hours: loc.hours ?? [],
       reviews: loc.reviews ?? [],
       ownername: loc.ownername ?? "",

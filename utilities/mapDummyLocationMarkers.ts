@@ -1,5 +1,4 @@
 import React from "react";
-import L from "leaflet";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import GamepadIcon from "@mui/icons-material/Gamepad";
 import RamenDiningIcon from "@mui/icons-material/RamenDining";
@@ -26,7 +25,8 @@ export function createDummyLocationMarkers(params: {
       owner: "0000000000",
       venuetype: "Resistance Strike Team Refuge",
       verified: true,
-      pos: L.latLng(35.080055, -117.822362), // Needed in api
+      lat: "35.080055",
+      long: "-117.822362",
       hours,
       reviews: [
         {
@@ -53,27 +53,13 @@ export function createDummyLocationMarkers(params: {
       color: cyberBlueDark,
     },
     {
-      id: "L242126597",
-      name: "WCC Uplink Facility Neotropolis-7",
-      owner: "C174357092",
-      venuetype: "Arcade",
-      verified: true,
-      pos: L.latLng(35.079775, -117.822339),
-      hours,
-      reviews: [],
-      ownername: "Wayward Communication Corporation",
-      prettyhours: rows,
-      showtooltip: true,
-      icon: React.createElement(GamepadIcon, { style: { color: cyberOrange } }),
-      color: cyberBlueLight,
-    },
-    {
       id: "L000000000",
       name: "Cybereats",
       owner: "",
       venuetype: "Food Stall",
       verified: true,
-      pos: L.latLng(35.079789, -117.822615),
+      lat: "35.079789",
+      long: "-117.822615",
       hours,
       reviews: [],
       ownername: "",
@@ -88,7 +74,8 @@ export function createDummyLocationMarkers(params: {
       owner: "",
       venuetype: "Food Stall",
       verified: true,
-      pos: L.latLng(35.079277, -117.822483),
+      lat: "35.079277",
+      long: "-117.822483",
       hours,
       reviews: [],
       ownername: "",
@@ -103,7 +90,8 @@ export function createDummyLocationMarkers(params: {
       owner: "",
       venuetype: "Corp.",
       verified: true,
-      pos: L.latLng(35.079237, -117.822379),
+      lat: "35.079237",
+      long: "-117.822379",
       hours,
       reviews: [],
       ownername: "",

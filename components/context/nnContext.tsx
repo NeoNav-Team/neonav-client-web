@@ -128,6 +128,13 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setLocations':
       clonedState.network.collections.locations = payload;
       break;
+    case 'setLocation':
+      const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
+      console.log(location);
+      if (location) {
+        clonedState.network.collections.locations = clonedState.network.collections.locations.map((l:any) => l.id === (payload as any)?.id ? payload as any : l);
+      }
+      break;
     case 'updateClipboardEntities':
       let clipboardEntities = clonedState.network.collections.clipboardEntities;
       if (!clipboardEntities.includes(payload)) {

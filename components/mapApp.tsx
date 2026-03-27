@@ -195,7 +195,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
 
-  const { state, fetchAllLocations = () => {} }: NnProviderValues = React.useContext(NnContext);
+  const { state, fetchAllLocations = () => {},
+   fetchLocationById = (id: string) => {} }: NnProviderValues = React.useContext(NnContext);
 
   const options: L.MapOptions = {
     center: L.latLng(35.0798889, -117.8222298), // Intersection of Main & Alpha
@@ -432,7 +433,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
 
   const openInfoModal = () => {
-    // Compress defualt hours across midnight for pretty display (should be removed)
+    const locationId = myMapObjects.get("selectedMarker").neonavdata.id;
+    if (locationId) {
+      // TODO: Fetch location data from the database and set it to the selected marker.
+      // fetchLocationById(dispatch)(locationId);
+    }
+
+    // Compress debug hours across midnight for pretty display (should be removed)
     const compressedHours = compressHoursAcrossMidnight(hours);
     
     // Find the open/closed status and next open/close time for the selected location
@@ -677,49 +684,56 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         {
           name: "Alpha & Main",
           showtooltip: true,
-          pos: L.latLng(35.079882, -117.822212),
+          lat: "35.079882",
+          long: "-117.822212",
           icon: <AdjustIcon/>,
           color: "#FF0000"
         },
         {
           name: "Beta & Main",
           showtooltip: true,
-          pos: L.latLng(35.080166, -117.822212),
+          lat: "35.080166",
+          long: "-117.822212",
           icon: <AdjustIcon/>,
           color: "#FF0000"
         },
         {
           name: "Beta & First",
           showtooltip: true,
-          pos: L.latLng(35.080166, -117.822973),
+          lat: "35.080166",
+          long: "-117.822973",
           icon: <AdjustIcon/>,
           color: "#FF0000"
         },
         {
           name: "Megamall NW",
           showtooltip: true,
-          pos: L.latLng(35.079605, -117.822139),
+          lat: "35.079605",
+          long: "-117.822139",
           icon: <AdjustIcon/>,
           color: "#FF0000"
         },
         {
           name: "Megamall SE",
           showtooltip: true,
-          pos: L.latLng(35.079321, -117.821962),
+          lat: "35.079321",
+          long: "-117.821962",
           icon: <AdjustIcon/>,
           color: "#FF0000"
         },
         {
           name: "Megablock NW",
           showtooltip: true,
-          pos: L.latLng(35.079398, -117.822520),
+          lat: "35.079398",
+          long: "-117.822520",
           icon: <AdjustIcon/>,
           color: "#FF0000"
         },
         {
           name: "Megablock SE",
           showtooltip: true,
-          pos: L.latLng(35.079091, -117.822274),
+          lat: "35.079091",
+          long: "-117.822274",
           icon: <AdjustIcon/>,
           color: "#FF0000"
         },
@@ -733,7 +747,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           owner: "",
           venuetype: "",
           verified: true,
-          pos: L.latLng(35.0798820, -117.822212),
+          lat: "35.079882",
+          long: "-117.822212",
           hours: hours,
           reviews: [],
           ownername: "",
@@ -748,7 +763,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           owner: "",
           venuetype: "",
           verified: true,
-          pos: L.latLng(35.079780, -117.823289),
+          lat: "35.079780",
+          long: "-117.823289",
           hours: hours,
           reviews: [],
           ownername: "",
@@ -763,7 +779,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           owner: "",
           venuetype: "",
           verified: true,
-          pos: L.latLng(35.079713, -117.822826),
+          lat: "35.079713",
+          long: "-117.822826",
           hours: hours,
           reviews: [],
           ownername: "",
@@ -778,7 +795,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           owner: "",
           venuetype: "",
           verified: true,
-          pos: L.latLng(35.079938, -117.821790),
+          lat: "35.079938",
+          long: "-117.821790",
           hours: hours,
           reviews: [],
           ownername: "",
@@ -793,7 +811,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           owner: "",
           venuetype: "",
           verified: true,
-          pos: L.latLng(35.080499, -117.822094),
+          lat: "35.080499",
+          long: "-117.822094",
           hours: hours,
           reviews: [],
           ownername: "",
@@ -808,7 +827,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           owner: "",
           venuetype: "",
           verified: true,
-          pos: L.latLng(35.079939, -117.822806),
+          lat: "35.079939",
+          long: "-117.822806",
           hours: hours,
           reviews: [],
           ownername: "",
@@ -823,7 +843,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           owner: "",
           venuetype: "",
           verified: true,
-          pos: L.latLng(35.078660, -117.822000),
+          lat: "35.078660",
+          long: "-117.822000",
           hours: hours,
           reviews: [],
           ownername: "",
@@ -839,7 +860,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       const eventMarkerLayer = L.layerGroup();
       metaMarkers.forEach((markerInfo) => {
-        let leafletMarker = L.marker(markerInfo.pos, {icon: getDivIcon(markerInfo.icon, markerInfo.color)})
+        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(markerInfo.icon, markerInfo.color)})
           .addTo(eventMarkerLayer)
           .on('click', () => {
             myMapObjects.set("selectedMarker", leafletMarker);
@@ -857,7 +878,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       const devLayer = L.layerGroup();
       // Locator markers for Alpha & Main, Beta & Main, and Beta & First
       devMarkers.forEach((markerInfo) => {
-        let leafletMarker = L.marker(markerInfo.pos, {icon: getDivIcon(markerInfo.icon, markerInfo.color)})
+        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(markerInfo.icon, markerInfo.color)})
           .addTo(devLayer)
           .on('click', () => {
             mymap.flyTo(leafletMarker.getLatLng());
@@ -876,8 +897,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         .on('dragend', (e) => {
           console.log(devMarker.getLatLng().lat + ", " + devMarker.getLatLng().lng);
         });
-      L.rectangle(L.latLngBounds(devMarkers[3].pos, devMarkers[4].pos)).addTo(devLayer);
-      L.rectangle(L.latLngBounds(devMarkers[5].pos, devMarkers[6].pos)).addTo(devLayer);
+      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[3].lat), parseFloat(devMarkers[3].long)), L.latLng(parseFloat(devMarkers[4].lat), parseFloat(devMarkers[4].long)))).addTo(devLayer);
+      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[5].lat), parseFloat(devMarkers[5].long)), L.latLng(parseFloat(devMarkers[6].lat), parseFloat(devMarkers[6].long)))).addTo(devLayer);
       layerData.set("devLayer", devLayer);
 
       // Set up listeners/hooks
@@ -1002,7 +1023,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   {myMapObjects.get("selectedMarker").neonavdata.venuetype}
                 </Typography>
                 <Typography sx={modalBodyStyle} component="p">
-                  Closed ⋅ Opens 10 AM Wed
+                  {myMapObjects.get("selectedMarker").neonavdata.openState} ⋅ {myMapObjects.get("selectedMarker").neonavdata.openStateMsg}
                 </Typography>
               </Box>
             )}
@@ -1039,7 +1060,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   <Typography sx={modalBodyStyle} component="p">
                     {myMapObjects.get("selectedMarker").neonavdata.venuetype}
                   </Typography>
-                  <Typography sx={modalBodyStyle} component="p">Closed ⋅ Opens 10 AM Wed</Typography>
+                  <Typography sx={modalBodyStyle} component="p">{myMapObjects.get("selectedMarker").neonavdata.openState} ⋅ {myMapObjects.get("selectedMarker").neonavdata.openStateMsg}</Typography>
                   <Divider color="secondary" flexItem/>
                   <Typography sx={modalBodyStyle} component="p">
                     {(myMapObjects.get("selectedMarker").neonavdata.ownerisfaction ?
@@ -1051,7 +1072,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                     </Link>
                   </Typography>
                   <Divider color="secondary" flexItem/>
-                  <Typography sx={modalBodyStyle} component="p"><QueryBuilderIcon fontSize="inherit"/>&nbsp;Closed</Typography>
+                  <Typography sx={modalBodyStyle} component="p"><QueryBuilderIcon fontSize="inherit"/>&nbsp;{myMapObjects.get("selectedMarker").neonavdata.openState}</Typography>
                   <TableContainer component={Paper} style={{padding: '1vh'}}>
                     <Table aria-label="simple table">
                       <TableBody>
