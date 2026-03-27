@@ -108,11 +108,11 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
       owner: loc.owner ?? "",
       venuetype: loc.venuetype ?? "",
       verified: !!loc.verified,
-      pos: L.latLng(lat, long),
-      hours: loc.hours ?? [],
-      reviews: loc.reviews ?? [],
-      ownername: loc.ownername ?? "",
-      prettyhours: compressHoursAcrossMidnight(loc.hours ?? []),
+      pos: L.latLng(lat, long), 
+      hours: loc.hours ?? [],           // This field is only retreived from a second api call this should move to a second call
+      reviews: loc.reviews ?? [],                                 // Also this one
+      ownername: loc.ownername ?? "",                             // And this one 
+      prettyhours: compressHoursAcrossMidnight(loc.hours ?? []),  // And this one
       showtooltip: true,
       icon: venueIcon,
       color: venueColor,

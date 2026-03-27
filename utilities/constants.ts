@@ -36,10 +36,6 @@ export const authApiEnpoints = {
     method: "put",
     path: "/api/user",
   },
-  patchToken: {
-    method: "patch",
-    path: "/api/auth/user",
-  },
   befriend: {
     method: "post",
     path: "/api/user/friends/$id",
@@ -224,4 +220,8 @@ export const authApiEnpoints = {
     method: "get",
     path: "/api/locations",
   },
+  location: {
+    method: "get",
+    path: "/api/locations/$id",
+  }
 };

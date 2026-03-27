@@ -968,6 +968,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       compressHoursAcrossMidnight,
       onMarkerClick: (leafletMarker) => {
         // `openInfoModal()` reads from `myMapObjects.selectedMarker`.
+        fetchLocationById((leafletMarker as any).neonavdata.id);
         myMapObjects.set("selectedMarker", leafletMarker);
         mymap.flyTo(leafletMarker.getLatLng());
         openInfoModal();

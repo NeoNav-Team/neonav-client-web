@@ -70,7 +70,7 @@ import {
   setFactionUserStatus,
   fetchFactionStatuses,
 } from './nnActionsFaction';
-import { fetchAllLocations } from './nnActionsLocation';
+import { fetchAllLocations, fetchLocationById } from './nnActionsLocation';
 import { nnSchema } from "./nnSchema";
 import {
   getCookieContext,
@@ -130,7 +130,7 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setLocation':
       const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
-      console.log(location);
+      console.log("nnContext: " + JSON.stringify(location));
       if (location) {
         clonedState.network.collections.locations = clonedState.network.collections.locations.map((l:any) => l.id === (payload as any)?.id ? payload as any : l);
       }
@@ -257,6 +257,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserContacts,
     fetchUserFactions,
     fetchAllLocations,
+    fetchLocationById,
     fetchUserProfile,
     fetchUserSetStatuses,
     fetchUserStatuses,

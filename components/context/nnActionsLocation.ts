@@ -26,3 +26,25 @@ export const fetchAllLocations = (dispatch: DispatchFunc) => async () => {
   };
   executeApi('locations', { token }, onSuccess, onError);
 };
+
+export const fetchLocationById = (dispatch: DispatchFunc) => async (id: string) => {
+  console.log("fetchLocationById: fetching " + id);
+  const token = getCookieToken();
+  const onSuccess = (response: APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setLocation',
+      payload: data,
+    });
+    return data;
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Location failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+    return err;
+  };
+  executeApi('location', { id, token }, onSuccess, onError);
+};
