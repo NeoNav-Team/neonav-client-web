@@ -130,7 +130,6 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setLocation':
       const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
-      console.log("nnContext: " + JSON.stringify(location));
       if (location) {
         clonedState.network.collections.locations = clonedState.network.collections.locations.map((l:any) => l.id === (payload as any)?.id ? payload as any : l);
       }

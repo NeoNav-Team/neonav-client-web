@@ -28,7 +28,6 @@ export const fetchAllLocations = (dispatch: DispatchFunc) => async () => {
 };
 
 export const fetchLocationById = (dispatch: DispatchFunc) => async (id: string) => {
-  console.log("fetchLocationById: fetching " + id);
   const token = getCookieToken();
   const onSuccess = (response: APIResponse) => {
     const { data } = response;

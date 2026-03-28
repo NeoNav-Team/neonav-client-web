@@ -215,6 +215,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     };
   };
 
+  // maybe this should move to locations render util
   const getDivIcon = (materialIcon: any, color: string) => {
     const settings = getIconSettings(materialIcon, color);
     return L.divIcon({
@@ -226,6 +227,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     });
   };
 
+  // This should move to time/hours util file
   const compressHoursAcrossMidnight = (hoursData: any[]) => {
     // Helper function to convert 24-hour time to 12-hour format
     const formatTime = (time24: string) => {
@@ -433,21 +435,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
 
   const openInfoModal = () => {
-    const locationId = myMapObjects.get("selectedMarker").neonavdata.id;
-    if (locationId) {
-      // TODO: Fetch location data from the database and set it to the selected marker.
-      // fetchLocationById(dispatch)(locationId);
-    }
-
-    // Compress debug hours across midnight for pretty display (should be removed)
-    const compressedHours = compressHoursAcrossMidnight(hours);
-    
     // Find the open/closed status and next open/close time for the selected location
-
-    // Use the compressedHours above, but if available use selected marker's prettyhours data (which might come from API)
     const markerData = myMapObjects.get("selectedMarker")?.neonavdata || {};
-    const prettyHours = markerData.prettyhours || compressedHours;
 
+    // TODO: move to util file
     // Function to parse a time string like "10:00AM" or "7:00PM"
     const parseTimeString = (timeStr: string, refDate: Date) => {
       const ampm = timeStr.slice(-2);
@@ -459,13 +450,14 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       return date;
     };
 
+    // This whole thing should move to a funciton in util file
     // Find today's row in prettyHours
     const now = new Date();
     const dayOfWeek = now.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
-    let todayRow = prettyHours.find((row: any) => row.day.toLowerCase() === dayOfWeek);
+    let todayRow = markerData.prettyhours.find((row: any) => row.day.toLowerCase() === dayOfWeek);
     // Fallback if not found - possible capitalisation error
-    if (!todayRow && prettyHours.length) {
-      todayRow = prettyHours.find((row: any) => row.day.toLowerCase().startsWith(dayOfWeek.substring(0, 3)));
+    if (!todayRow && markerData.prettyhours.length) {
+      todayRow = markerData.prettyhours.find((row: any) => row.day.toLowerCase().startsWith(dayOfWeek.substring(0, 3)));
     }
     let openState = "Closed";
     let nextTimeMsg = "";
@@ -507,9 +499,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         const tomorrow = new Date(now);
         tomorrow.setDate(now.getDate() + 1);
         const tomorrowDay = tomorrow.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
-        let tomorrowRow = prettyHours.find((row: any) => row.day.toLowerCase() === tomorrowDay);
-        if (!tomorrowRow && prettyHours.length) {
-          tomorrowRow = prettyHours.find((row: any) => row.day.toLowerCase().startsWith(tomorrowDay.substring(0, 3)));
+        let tomorrowRow = markerData.prettyHours.find((row: any) => row.day.toLowerCase() === tomorrowDay);
+        if (!tomorrowRow && markerData.prettyHours.length) {
+          tomorrowRow = markerData.prettyHours.find((row: any) => row.day.toLowerCase().startsWith(tomorrowDay.substring(0, 3)));
         }
         if (tomorrowRow && Array.isArray(tomorrowRow.hours)) {
           for (let i = 0; i < tomorrowRow.hours.length; i++) {
@@ -523,9 +515,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }
         }
       }
-    } else {
-      openState = "Closed";
-      nextTimeMsg = "";
     }
 
     // Set display info on selectedMarker for modal use
@@ -540,17 +529,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         ratingSum += review.rating;
       });
       myMapObjects.get("selectedMarker").neonavdata.rating = "Rating: " + ratingSum / myMapObjects.get("selectedMarker").neonavdata.reviews.length;
-    } else {
-      myMapObjects.get("selectedMarker").neonavdata.rating = "No Reviews";
-    }
-
-    // Create link path to owner
-    if (myMapObjects.get("selectedMarker").neonavdata.owner.startsWith("C")) {
-      myMapObjects.get("selectedMarker").neonavdata.ownerisfaction = true;
-      myMapObjects.get("selectedMarker").neonavdata.ownerlink = '/faction/' + myMapObjects.get("selectedMarker").neonavdata.owner;
-    } else {
-      myMapObjects.get("selectedMarker").neonavdata.ownerisfaction = false;
-      myMapObjects.get("selectedMarker").neonavdata.ownerlink = '/contacts/' + myMapObjects.get("selectedMarker").neonavdata.owner;
     }
 
     setInfoModalSize(10);
@@ -561,8 +539,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     setTimeout(() => {
       setInfoModalSizeStyle(modalStyle_10);
     }, 0);
-    // DEBUG: print selected marker data to console to verify it's being set correctly on click
-    console.log(myMapObjects.get("selectedMarker"));
   }
 
   const closeInfoModal = () => {
@@ -622,19 +598,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     // Keep the modal switch UI in sync with Leaflet.
     setLayerStates((prev) => ({ ...prev, [event.target.id]: event.target.checked }));
   };
-
-  // Debug hours data with various edge cases to make sure compression function works correctly
-  const hours = [
-    {"day": "wednesday", "open": "10:00", "close": "24:00"},
-    {"day": "thursday", "open": "10:00", "close": "24:00"},
-    {"day": "friday", "open": "00:00", "close": "01:00"},
-    {"day": "friday", "open": "10:00", "close": "24:00"},
-    {"day": "saturday", "open": "00:00", "close": "02:00"},
-    {"day": "saturday", "open": "10:00", "close": "24:00"},
-    {"day": "sunday", "open": "00:00", "close": "01:00"}
-  ];
-
-  const rows = compressHoursAcrossMidnight(hours);
 
   // Cyberpunk 2077 Blue #5191ff
   
@@ -749,10 +712,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           verified: true,
           lat: "35.079882",
           long: "-117.822212",
-          hours: hours,
+          hours: [],
           reviews: [],
           ownername: "",
-          prettyhours: rows,
+          prettyhours: [],
           showtooltip: true,
           icon: <AdjustIcon/>,
           color: cyberOrange
@@ -765,10 +728,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           verified: true,
           lat: "35.079780",
           long: "-117.823289",
-          hours: hours,
+          hours: [],
           reviews: [],
           ownername: "",
-          prettyhours: rows,
+          prettyhours: [],
           showtooltip: true,
           icon: <LocalPoliceIcon/>,
           color: cyberOrange
@@ -781,10 +744,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           verified: true,
           lat: "35.079713",
           long: "-117.822826",
-          hours: hours,
+          hours: [],
           reviews: [],
           ownername: "",
-          prettyhours: rows,
+          prettyhours: [],
           showtooltip: true,
           icon: <HealthAndSafetyIcon/>,
           color: cyberOrange
@@ -797,10 +760,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           verified: true,
           lat: "35.079938",
           long: "-117.821790",
-          hours: hours,
+          hours: [],
           reviews: [],
           ownername: "",
-          prettyhours: rows,
+          prettyhours: [],
           showtooltip: false,
           icon: <WcIcon/>,
           color: cyberOrange
@@ -813,10 +776,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           verified: true,
           lat: "35.080499",
           long: "-117.822094",
-          hours: hours,
+          hours: [],
           reviews: [],
           ownername: "",
-          prettyhours: rows,
+          prettyhours: [],
           showtooltip: false,
           icon: <WcIcon/>,
           color: cyberOrange
@@ -829,10 +792,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           verified: true,
           lat: "35.079939",
           long: "-117.822806",
-          hours: hours,
+          hours: [],
           reviews: [],
           ownername: "",
-          prettyhours: rows,
+          prettyhours: [],
           showtooltip: false,
           icon: <WcIcon/>,
           color: cyberOrange
@@ -845,10 +808,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           verified: true,
           lat: "35.078660",
           long: "-117.822000",
-          hours: hours,
+          hours: [],
           reviews: [],
           ownername: "",
-          prettyhours: rows,
+          prettyhours: [],
           showtooltip: false,
           icon: <WcIcon/>,
           color: cyberOrange
@@ -954,7 +917,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     const locationMarkersLayer = layerData.get("locationMarkersLayer") as L.LayerGroup | undefined;
     if (!mymap || !locationMarkersLayer) return;
 
-    const markers = createDummyLocationMarkers({ hours, rows });
+    const markers = createDummyLocationMarkers({ hours: [], prettyhours: [] });
 
     renderLocationsToLeafletLayers({
       mymap,
