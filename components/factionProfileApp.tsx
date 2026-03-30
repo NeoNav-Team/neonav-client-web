@@ -4,6 +4,9 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
 import { isJsonStringValid } from '@/utilities/json';
+import { imageUrl } from '@/utilities/constants';
+import executeAPI from '@/utilities/executeApi';
+import { getCookieToken } from '@/utilities/cookieContext';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, nnEntity, NnContact, NnStatus } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
@@ -115,7 +118,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const [ profileFetched, setProfileFetched ] = useState(false);
   const [ editMode, setEditMode ] = useState(false);
   const [ form, setForm ] = useState<Form>(defaultProfile);
-  const { name, image, tagline, description } = form;
+  const { name, tagline, description } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
   const [ completeProfile, setCompleteProfile ] = useState(defaultProfile);
   const isRecentEntity = profile.id === factionId;
@@ -139,7 +142,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
 
   useEffect(() => {
     goFetchFactionProfile();
-  }, [accountId, goFetchFactionProfile, profile]);
+  }, [accountId, goFetchFactionProfile]);
 
   useEffect(() => {
     if (Object.keys(profile).length >= 3) {
@@ -167,7 +170,10 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       0,
       (uri) => {
         setForm({...form, [field]:uri } );
-        setPhoto(uri as string);
+        if (field === 'image') {
+          setPhoto(uri as string);
+          executeAPI('updateFactionImage', { faction: factionId, image: uri, token: getCookieToken() }, null, null);
+        }
       },
       "base64"
     );
@@ -189,14 +195,16 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       _id: state?.network?.entity?._id,
       _rev: state?.network?.entity?._rev,
     }
+    setProfileFetched(false);
     updateFactionProfile(accountId, doc, form);
-  } 
+  }
 
   const editButtonAction = ()=> {
     if (editMode) {
       saveProfileChanges();
-      setPhoto(image);
+      setPhoto(undefined);
     } else {
+      setProfileFetched(false);
       goFetchFactionProfile(); //get latest before editing
     }
     setEditMode(!editMode);
@@ -228,7 +236,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                         >
                           {editMode ? (
                             <Stack spacing={2} >
-                              <img src={photo || image} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%', maxHeight: 400}} />
+                              <img src={photo || imageUrl(factionId)} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%', maxHeight: 400}} />
                               <Button variant="contained" component="label" endIcon={<PhotoCameraIcon />}>
                                 Upload
                                 <input hidden multiple type="file" onChange={uploadHandler} accept="image/png, image/jpeg" />
@@ -239,7 +247,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                             </Stack>
                           ) : (
                             <>
-                              <SubheaderFaction title={completeProfile.name} subtitle={completeProfile.tagline} photo={completeProfile.image}/>
+                              <SubheaderFaction title={completeProfile.name} subtitle={completeProfile.tagline} photo={imageUrl(factionId)}/>
                             </>
                           )}
                         </Box>
