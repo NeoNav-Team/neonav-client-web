@@ -11,6 +11,9 @@ export const apiUrl = {
   port: "",
 };
 
+export const imageUrl = (userId: string, thumbnail = false) =>
+  `${apiUrl.protocol}://${apiUrl.hostname}/api/image/${userId}${thumbnail ? '/thumbnail' : ''}`;
+
 export const authApiEnpoints = {
   login: {
     method: "post",
@@ -219,5 +222,13 @@ export const authApiEnpoints = {
   searchUsers: {
     method: "post",
     path: "/api/user/search",
+  },
+  updateImage: {
+    method: "put",
+    path: "/api/image/$id",
+  },
+  updateFactionImage: {
+    method: "put",
+    path: "/api/image/faction/$faction",
   },
 };
