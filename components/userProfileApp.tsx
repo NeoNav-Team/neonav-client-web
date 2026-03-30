@@ -151,7 +151,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
         setForm({...form, [field]:uri } );
         if (field === 'avatar') {
           setPhoto(uri as string);
-          executeAPI('updateImage', { id: userId, image: uri, token: getCookieToken() }, null, null);
+          executeAPI('updateImage', { image: uri, token: getCookieToken() }, null, null);
         }
       },
       "base64"
