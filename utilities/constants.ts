@@ -225,7 +225,7 @@ export const authApiEnpoints = {
   },
   updateImage: {
     method: "put",
-    path: "/api/image/$id",
+    path: "/api/image",
   },
   updateFactionImage: {
     method: "put",
