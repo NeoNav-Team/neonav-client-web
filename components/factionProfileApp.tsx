@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
 import { isJsonStringValid } from '@/utilities/json';
@@ -115,7 +115,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const reps = profile && profile?.reps;
   const isAdmin = profile && userId === admin?.userid;
   const isRep = isAdmin || (reps && reps.filter((user:NnContact) => user.id === userId).length >= 1);
-  const [ profileFetched, setProfileFetched ] = useState(false);
+  const fetchedRef = useRef(false);
   const [ editMode, setEditMode ] = useState(false);
   const [ form, setForm ] = useState<Form>(defaultProfile);
   const { name, tagline, description } = form;
@@ -124,11 +124,9 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const isRecentEntity = profile.id === factionId;
 
   const goFetchFactionProfile = useCallback(() => {
-    if (!profileFetched) {
-      fetchFactionDetails(accountId);
-      fetchFactionStatuses(accountId);
-    }
-  }, [profileFetched, fetchFactionDetails, accountId, fetchFactionStatuses]);
+    fetchFactionDetails(accountId);
+    fetchFactionStatuses(accountId);
+  }, [fetchFactionDetails, accountId, fetchFactionStatuses]);
 
   const updateDefaultForm = (profile:nnEntity) => {
     let updatedDefaultForm:Form = JSON.parse(JSON.stringify(defaultProfile));
@@ -141,7 +139,10 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   }
 
   useEffect(() => {
-    goFetchFactionProfile();
+    if (!fetchedRef.current) {
+      fetchedRef.current = true;
+      goFetchFactionProfile();
+    }
   }, [accountId, goFetchFactionProfile]);
 
   useEffect(() => {
@@ -156,7 +157,6 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       const clonedDefaultForm:Form = JSON.parse(JSON.stringify(defaultProfile));
       const completeProfile =  {...clonedDefaultForm, ...clonedProfile};
       setCompleteProfile(completeProfile);
-      setProfileFetched(true);
     }
   }, [isRecentEntity, profile]);
 
@@ -195,7 +195,6 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       _id: state?.network?.entity?._id,
       _rev: state?.network?.entity?._rev,
     }
-    setProfileFetched(false);
     updateFactionProfile(accountId, doc, form);
   }
 
@@ -204,7 +203,6 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       saveProfileChanges();
       setPhoto(undefined);
     } else {
-      setProfileFetched(false);
       goFetchFactionProfile(); //get latest before editing
     }
     setEditMode(!editMode);
@@ -223,7 +221,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
-            {(profileFetched && isRecentEntity) ? (
+            {isRecentEntity ? (
               profile && Object.keys(profile).length !== 0 ?(
                 <SimpleScrollContainer>
                   <Box sx={{minWidth: '100%', minHeight: '100%'}}>
