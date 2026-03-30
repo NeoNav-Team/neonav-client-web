@@ -18,7 +18,7 @@ import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
-import { defaultImg } from '@/utilities/defaultImg';
+import { imageUrl } from '@/utilities/constants';
 import { CurrencyExchange } from '@mui/icons-material';
 
 
@@ -204,7 +204,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 >
                   <div style={{
                     ...sizedImage,
-                    backgroundImage: `url("${entity?.image || defaultImg}")`,
+                    backgroundImage: `url("${imageUrl(entity?.id || '')}")`,
                     backgroundSize: 'cover',
                     maxWidth:'95vw',
                   }}>
