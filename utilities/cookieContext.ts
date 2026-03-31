@@ -50,8 +50,8 @@ export const setCookieContext = (state:NnStore) => {
   }
   const stringState = JSON.stringify(state);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
-  Cookies.remove('nnContext', { domain: '.neonav.net' }); 
-  Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net' });
+  Cookies.remove('nnContext', { domain: '.neonav.net' });
+  Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net', expires: 30 });
 };
 
 export const getCookieContext = () => {
@@ -80,7 +80,7 @@ export const setCookieUnread = (newUnread:string) => {
   unreadArr.push(newUnread);
   const unreadString = unreadArr.join(',');
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
+  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net', expires: 30 });
 }
 
 export const filterCookieUnread = (newUnread:string) => {
@@ -88,7 +88,7 @@ export const filterCookieUnread = (newUnread:string) => {
   unreadArr.filter((unread:string) => { return unread !== newUnread});
   const unreadString = unreadArr.join(',');
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
+  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net', expires: 30 });
 }
 
 export const clearCookieUnread = () => {
@@ -98,7 +98,7 @@ export const clearCookieUnread = () => {
 
 export const setCookieToken = (newToken:string) => {
   Cookies.remove('accessToken', { domain: '.neonav.net' });
-  Cookies.set('accessToken', newToken, { domain: '.neonav.net' });
+  Cookies.set('accessToken', newToken, { domain: '.neonav.net', expires: 30 });
 }
 
 //TODO: update functions to use same set of set / update collection functions
@@ -119,5 +119,5 @@ export const setCookieClipboard = (clipboardEntity:nnEntity) => {
   clipboardArr.push(simpleEntity);
   const unreadString = JSON.stringify(clipboardArr);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnClipboard', encodedStringState, { domain: '.neonav.net' });
+  Cookies.set('nnClipboard', encodedStringState, { domain: '.neonav.net', expires: 30 });
 };
