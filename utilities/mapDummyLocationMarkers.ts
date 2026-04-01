@@ -7,9 +7,9 @@ import SimCardIcon from "@mui/icons-material/SimCard";
 
 export function createDummyLocationMarkers(params: {
   hours: any[];
-  rows: any[];
+  prettyhours: any[];
 }): any[] {
-  const { hours, rows } = params;
+  const { hours, prettyhours } = params;
 
   // Keep colors aligned with `components/mapApp.tsx` map styling.
   const cyberGreen = "#009E73";
@@ -46,7 +46,7 @@ export function createDummyLocationMarkers(params: {
         },
       ],
       ownername: "[REDADCTED]",
-      prettyhours: rows,
+      prettyhours,
       showtooltip: true,
       // Needed in api or calculated by venuetype
       icon: React.createElement(AdjustIcon, { style: { color: cyberYellow } }),
@@ -63,7 +63,7 @@ export function createDummyLocationMarkers(params: {
       hours,
       reviews: [],
       ownername: "",
-      prettyhours: rows,
+      prettyhours,
       showtooltip: true,
       icon: React.createElement(RamenDiningIcon, { style: { color: cyberYellow } }),
       color: cyberGreen,
@@ -79,7 +79,7 @@ export function createDummyLocationMarkers(params: {
       hours,
       reviews: [],
       ownername: "",
-      prettyhours: rows,
+      prettyhours,
       showtooltip: true,
       icon: React.createElement(LocalBarIcon, { style: { color: cyberYellow } }),
       color: cyberGreen,
@@ -95,7 +95,7 @@ export function createDummyLocationMarkers(params: {
       hours,
       reviews: [],
       ownername: "",
-      prettyhours: rows,
+      prettyhours,
       showtooltip: true,
       icon: React.createElement(SimCardIcon, { style: { color: cyberOrange } }),
       color: cyberBlueLight,
