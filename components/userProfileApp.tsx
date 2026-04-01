@@ -5,6 +5,9 @@ import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, nnEntity } from './context/nnTypes';
+import { imageUrl } from '../utilities/constants';
+import executeAPI from '../utilities/executeApi';
+import { getCookieToken } from '../utilities/cookieContext';
 import SimpleScrollContainer from './simpleScrollContainer';
 import FooterNav from './footerNav';
 import { 
@@ -26,8 +29,6 @@ import { use100vh } from 'react-div-100vh';
 interface UserProfileAppProps {};
 
 type Form = {
-  avatar?: string;
-  thumbnail?: string;
   username?: string;
   firstname?: string;
   lastname?: string;
@@ -35,19 +36,7 @@ type Form = {
   occupation?: string;
   bio?: string;
 }
-type FormKey = 
-'avatar' | 
-'thumbnail' | 
-'username' | 
-'firstname' | 
-'lastname' | 
-'skills' | 
-'occupation' | 
-'bio';
-
 const defaultForm = {
-  avatar: '',
-  thumbnail: '',
   username: '',
   firstname: '',
   lastname: '',
@@ -97,11 +86,12 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
     return state?.network?.entity?.profile || {};
   }, [state]);
   const accountId = state?.network?.selected?.account || '';
+  const userId = state?.user?.profile?.auth?.userid || '';
   const isAdmin = accountId === profile.id;
   const [ profileFetched, setProfileFetched ] = useState(false);
   const [ editMode, setEditMode ] = useState(false);
   const [ form, setForm ] = useState<Form>(defaultForm);
-  const { avatar, username, firstname, lastname, skills, occupation, bio } = form;
+  const { username, firstname, lastname, skills, occupation, bio } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
 
   const goFetchProfile = useCallback(() => {
@@ -121,7 +111,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
 
   useEffect(() => {
     goFetchProfile();
-  }, [goFetchProfile, profile]);
+  }, [goFetchProfile]);
 
   useEffect(() => {
     if (profileFetched && Object.keys(profile).length === 0) {
@@ -135,7 +125,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
     }
   }, [profile]);
 
-  const resizeFile = (file:File, field:FormKey, size:number) => {
+  const resizeFile = (file:File, size:number) => {
     Resizer.imageFileResizer(
       file,
       size,
@@ -144,9 +134,8 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
       100,
       0,
       (uri) => {
-        console.log('field', field);
-        setForm({...form, [field]:uri } );
-        field !== 'thumbnail' && setPhoto(uri as string);
+        setPhoto(uri as string);
+        executeAPI('updateImage', { image: uri, token: getCookieToken() }, null, null);
       },
       "base64"
     );
@@ -159,8 +148,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
 
   const uploadHandler = async (event:React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event?.currentTarget;
-    files && resizeFile(files[0], 'avatar', 600);
-    files && setPhoto(avatar as string);
+    files && resizeFile(files[0], 600);
   }
 
   const saveProfileChanges = () => {
@@ -174,7 +162,6 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const bigButtonAction = ()=> {
     if (editMode) {
       saveProfileChanges();
-      setPhoto(avatar);
       patchUserToken();
     } else {
       goFetchProfile(); //get latest before editing
@@ -205,7 +192,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
                         >
                           {editMode ? (
                             <Stack spacing={1} >
-                              <img src={photo || avatar} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%', maxHeight: 400}} />
+                              <img src={photo || imageUrl(userId)} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%', maxHeight: 400}} />
                               <Button variant="contained" component="label" endIcon={<PhotoCameraIcon />}>
                                 Upload
                                 <input hidden multiple type="file" onChange={uploadHandler} accept="image/png, image/jpeg" />
@@ -213,7 +200,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
                             </Stack>
                           ) : (
                             <>
-                              <Avatar src={avatar} alt="its you in the future" style={{width: 200, minHeight: 200}} />
+                              <Avatar src={imageUrl(userId)} alt="its you in the future" style={{width: 200, minHeight: 200}} />
                             </>
                           )}
                         </Box>

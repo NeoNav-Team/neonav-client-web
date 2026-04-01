@@ -1,9 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Resizer from "react-image-file-resizer";
 import styles from '../styles/generic.module.css';
 import { isJsonStringValid } from '@/utilities/json';
+import { imageUrl } from '@/utilities/constants';
+import executeAPI from '@/utilities/executeApi';
+import { getCookieToken } from '@/utilities/cookieContext';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, nnEntity, NnContact, NnStatus } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
@@ -37,22 +40,13 @@ interface FactionProfileAppProps {
 
 type Form = {
   name?: string;
-  image?: string;
   tagline?: string;
   description?: string;
 }
-type FormKey = 
-  'name' | 
-  'image' | 
-  'tagline' | 
-  'description';
-
 const defaultProfile = {
   id: '',
   name: '',
   tagline: '',
-  image: '',
-  thumbnail: '',
   description: '',
   admin: [],
   members: [],
@@ -112,20 +106,18 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const reps = profile && profile?.reps;
   const isAdmin = profile && userId === admin?.userid;
   const isRep = isAdmin || (reps && reps.filter((user:NnContact) => user.id === userId).length >= 1);
-  const [ profileFetched, setProfileFetched ] = useState(false);
+  const fetchedRef = useRef(false);
   const [ editMode, setEditMode ] = useState(false);
   const [ form, setForm ] = useState<Form>(defaultProfile);
-  const { name, image, tagline, description } = form;
+  const { name, tagline, description } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
   const [ completeProfile, setCompleteProfile ] = useState(defaultProfile);
   const isRecentEntity = profile.id === factionId;
 
   const goFetchFactionProfile = useCallback(() => {
-    if (!profileFetched) {
-      fetchFactionDetails(accountId);
-      fetchFactionStatuses(accountId);
-    }
-  }, [profileFetched, fetchFactionDetails, accountId, fetchFactionStatuses]);
+    fetchFactionDetails(accountId);
+    fetchFactionStatuses(accountId);
+  }, [fetchFactionDetails, accountId, fetchFactionStatuses]);
 
   const updateDefaultForm = (profile:nnEntity) => {
     let updatedDefaultForm:Form = JSON.parse(JSON.stringify(defaultProfile));
@@ -138,8 +130,11 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   }
 
   useEffect(() => {
-    goFetchFactionProfile();
-  }, [accountId, goFetchFactionProfile, profile]);
+    if (!fetchedRef.current) {
+      fetchedRef.current = true;
+      goFetchFactionProfile();
+    }
+  }, [accountId, goFetchFactionProfile]);
 
   useEffect(() => {
     if (Object.keys(profile).length >= 3) {
@@ -153,11 +148,10 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       const clonedDefaultForm:Form = JSON.parse(JSON.stringify(defaultProfile));
       const completeProfile =  {...clonedDefaultForm, ...clonedProfile};
       setCompleteProfile(completeProfile);
-      setProfileFetched(true);
     }
   }, [isRecentEntity, profile]);
 
-  const resizeFile = (file:File, field:FormKey, size:number) => {
+  const resizeFile = (file:File, size:number) => {
     Resizer.imageFileResizer(
       file,
       size,
@@ -166,8 +160,8 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       100,
       0,
       (uri) => {
-        setForm({...form, [field]:uri } );
         setPhoto(uri as string);
+        executeAPI('updateFactionImage', { faction: factionId, image: uri, token: getCookieToken() }, null, null);
       },
       "base64"
     );
@@ -180,7 +174,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
 
   const uploadHandler = async (event:React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event?.currentTarget;
-    files && resizeFile(files[0], 'image', 600);
+    files && resizeFile(files[0], 600);
   }
 
 
@@ -190,12 +184,12 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       _rev: state?.network?.entity?._rev,
     }
     updateFactionProfile(accountId, doc, form);
-  } 
+  }
 
   const editButtonAction = ()=> {
     if (editMode) {
       saveProfileChanges();
-      setPhoto(image);
+      setPhoto(undefined);
     } else {
       goFetchFactionProfile(); //get latest before editing
     }
@@ -215,7 +209,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
-            {(profileFetched && isRecentEntity) ? (
+            {isRecentEntity ? (
               profile && Object.keys(profile).length !== 0 ?(
                 <SimpleScrollContainer>
                   <Box sx={{minWidth: '100%', minHeight: '100%'}}>
@@ -228,7 +222,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                         >
                           {editMode ? (
                             <Stack spacing={2} >
-                              <img src={photo || image} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%', maxHeight: 400}} />
+                              <img src={photo || imageUrl(factionId)} alt="Please upload an image" style={{minWidth: 200, minHeight: 200, maxWidth: '95%', maxHeight: 400}} />
                               <Button variant="contained" component="label" endIcon={<PhotoCameraIcon />}>
                                 Upload
                                 <input hidden multiple type="file" onChange={uploadHandler} accept="image/png, image/jpeg" />
@@ -239,7 +233,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                             </Stack>
                           ) : (
                             <>
-                              <SubheaderFaction title={completeProfile.name} subtitle={completeProfile.tagline} photo={completeProfile.image}/>
+                              <SubheaderFaction title={completeProfile.name} subtitle={completeProfile.tagline} photo={imageUrl(factionId)}/>
                             </>
                           )}
                         </Box>
