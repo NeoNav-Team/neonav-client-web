@@ -75,7 +75,8 @@ import { renderLocationsToLeafletLayers } from "@/utilities/mapLeafletLocationsR
 interface PageContainerProps {
 }
 
-const MAP_FILE = "/neomap_mobile_north.png"
+const LARGE_MAP_FILE = "/2026_map_large_north.png"
+const ZOOMED_MAP_FILE = "/2026_map_zoomed_north.png"
 
 class CustomTileLayer extends L.TileLayer {
   constructor(options?: L.TileLayerOptions) {
@@ -625,7 +626,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       custom({maxZoom: 22,}).addTo(mymap);
 
       // Map overlay - Have to hand adjust bounds to fit static map image onto tiles. Once done set opacity to 1
-      L.imageOverlay(MAP_FILE, L.latLngBounds([[35.0805174, -117.8235055], [35.0785843, -117.8215258]]), {
+      L.imageOverlay(LARGE_MAP_FILE, L.latLngBounds([[35.083254, -117.824501], [35.078358, -117.820043]]), {
+        opacity: 0.9,
+      }).addTo(mymap);
+      
+      L.imageOverlay(ZOOMED_MAP_FILE, L.latLngBounds([[35.080537, -117.823547], [35.077797, -117.821157]]), {
         opacity: 0.9,
       }).addTo(mymap);
 
@@ -662,6 +667,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           showtooltip: true,
           lat: "35.080166",
           long: "-117.822973",
+          venuetype: "dev",
+        },
+        {
+          name: "Gamma & Main",
+          showtooltip: true,
+          lat: "35.082013",
+          long: "-117.822247",
           venuetype: "dev",
         },
         {
@@ -840,8 +852,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         .on('dragend', (e) => {
           console.log(devMarker.getLatLng().lat + ", " + devMarker.getLatLng().lng);
         });
-      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[3].lat), parseFloat(devMarkers[3].long)), L.latLng(parseFloat(devMarkers[4].lat), parseFloat(devMarkers[4].long)))).addTo(devLayer);
-      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[5].lat), parseFloat(devMarkers[5].long)), L.latLng(parseFloat(devMarkers[6].lat), parseFloat(devMarkers[6].long)))).addTo(devLayer);
+      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[4].lat), parseFloat(devMarkers[4].long)), L.latLng(parseFloat(devMarkers[5].lat), parseFloat(devMarkers[5].long)))).addTo(devLayer);
+      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[6].lat), parseFloat(devMarkers[6].long)), L.latLng(parseFloat(devMarkers[7].lat), parseFloat(devMarkers[7].long)))).addTo(devLayer);
       layerData.set("devLayer", devLayer);
 
       // Set up listeners/hooks
