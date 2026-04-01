@@ -10,7 +10,6 @@ export interface LeafletLocationsRendererParams {
   factions?: any[];
   getVenueIconAndColor: (venuetype: string) => { icon: any; color: string };
   getDivIcon: (materialIcon: any, color: string) => any;
-  compressHoursAcrossMidnight: (hoursData: any[]) => any[];
   onMarkerClick: (leafletMarker: L.Marker) => void;
 }
 
@@ -24,7 +23,6 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     factions,
     getVenueIconAndColor,
     getDivIcon,
-    compressHoursAcrossMidnight,
     onMarkerClick,
   } = params;
 
