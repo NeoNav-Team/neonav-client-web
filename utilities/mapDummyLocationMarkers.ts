@@ -1,22 +1,8 @@
-import React from "react";
-import AdjustIcon from "@mui/icons-material/Adjust";
-import GamepadIcon from "@mui/icons-material/Gamepad";
-import RamenDiningIcon from "@mui/icons-material/RamenDining";
-import LocalBarIcon from "@mui/icons-material/LocalBar";
-import SimCardIcon from "@mui/icons-material/SimCard";
-
 export function createDummyLocationMarkers(params: {
   hours: any[];
   prettyhours: any[];
 }): any[] {
   const { hours, prettyhours } = params;
-
-  // Keep colors aligned with `components/mapApp.tsx` map styling.
-  const cyberGreen = "#009E73";
-  const cyberOrange = "#D55E00";
-  const cyberBlueDark = "#0072B2";
-  const cyberBlueLight = "#56B4E9";
-  const cyberYellow = "#F0E442";
 
   return [
     {
@@ -54,8 +40,8 @@ export function createDummyLocationMarkers(params: {
       owner: "",
       venuetype: "Food Stall",
       verified: true,
-      lat: "35.079789",
-      long: "-117.822615",
+      lat: "35.080417",
+      long: "-117.822331",
       hours,
       reviews: [],
       ownername: "",
@@ -124,7 +110,7 @@ export function createDummyLocationMarkers(params: {
       venuetype: "dev",
     },
     {
-      id: "L000000000",
+      id: "L333333333",
       name: "Megamall NW",
       owner: "",
       verified: true,
@@ -133,7 +119,7 @@ export function createDummyLocationMarkers(params: {
       venuetype: "dev",
     },
     {
-      id: "L000000000",
+      id: "L444444444",
       name: "Megamall SE",
       owner: "",
       verified: true,
@@ -142,7 +128,7 @@ export function createDummyLocationMarkers(params: {
       venuetype: "dev",
     },
     {
-      id: "L000000000",
+      id: "L111111111",
       name: "Megablock NW",
       owner: "",
       verified: true,
@@ -151,7 +137,7 @@ export function createDummyLocationMarkers(params: {
       venuetype: "dev",
     },
     {
-      id: "L000000000",
+      id: "L222222222",
       name: "Megablock SE",
       owner: "",
       verified: true,
@@ -174,8 +160,8 @@ export function createDummyLocationMarkers(params: {
       owner: "C231465509",
       venuetype: "medical",
       verified: true,
-      lat: "35.079713",
-      long: "-117.822826",
+      lat: "35.080022",
+      long: "-117.822758",
       ownername: "Neo City Admin",
     },
     {
@@ -187,6 +173,24 @@ export function createDummyLocationMarkers(params: {
       lat: "35.079938",
       long: "-117.821790",
       ownername: "Neo City Admin",
+    },
+    {
+      id: "L888888888",
+      name: "Megablock 01",
+      owner: "",
+      venuetype: "megablock",
+      verified: true,
+      lat: "35.079167",
+      long: "-117.822400"
+    },
+    {
+      id: "L777777777",
+      name: "Megablock 01",
+      owner: "",
+      venuetype: "megamall",
+      verified: true,
+      lat: "35.079522",
+      long: "-117.821980"
     },
   ];
 }
