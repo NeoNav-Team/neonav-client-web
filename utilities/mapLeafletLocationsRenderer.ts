@@ -30,9 +30,10 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
   const locationMarkersLayer = layerData.get("locationMarkersLayer") as LayerGroup | undefined;
   if (!locationMarkersLayer) return;
 
-  const megablockLocations = layerData.get("megablockLocations") as LayerGroup | undefined;
-  const megamallLocations = layerData.get("megamallLocations") as LayerGroup | undefined;
-  const megablockAndMegamallLocations = layerData.get("megablockAndMegamallLocations") as LayerGroup | undefined;
+  // TODO: the two mega* locations down _need_ separate layers, maybe we should rename these and consolidate
+  const megablockLocations = layerData.get("megablockLocations") as LayerGroup | undefined;   // These are hidden unless zoomed in
+  const megamallLocations = layerData.get("megamallLocations") as LayerGroup | undefined;   // These are hidden unless zoomed in
+  const megablockAndMegamallLocations = layerData.get("megablockAndMegamallLocations") as LayerGroup | undefined;   // These are hidden unless zoomed out
   if (!megablockLocations || !megamallLocations || !megablockAndMegamallLocations) return;
 
   const devLayer = layerData.get("devLayer") as LayerGroup | undefined;
@@ -69,7 +70,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     L.latLng(35.079321, -117.821962),
   );
 
-  // Create megablock meta icon
+  // Create megablock meta icon (This will come from DB)
   const megablockLoc = {
     id: "L000000000",
     name: "Megablock 01",
@@ -88,7 +89,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     });
   megablockMarker.bindTooltip(megablockLoc.name, { permanent: true, direction: "right" });
 
-  // Create megamall meta icon
+  // Create megamall meta icon (This will come from DB)
   const megamallLoc = {
     id: "L000000000",
     name: "Megamall",
@@ -106,6 +107,9 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
       mymap.flyTo(megamallMarker.getLatLng());
     });
   megamallMarker.bindTooltip(megamallLoc.name, { permanent: true, direction: "right" });
+
+  L.rectangle(megablockRect).addTo(devLayer);
+  L.rectangle(megamallRect).addTo(devLayer);
 
   allLocations.forEach((loc: any) => {
     const lat = loc.lat;
@@ -140,25 +144,33 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
       }
     }
 
-    // If marker is within megablock or megamall area, add to corresponding layer group so it can be toggled with zoom.
+    
+    // Filter locations into the appropriate layers
+    // Be aware that markers will go into the first layer they match top to bottom in this ifelse block
     let targetLayer: LayerGroup = locationMarkersLayer;
-    if (loc.owner === "C231465509") { // Neo City Admin
-      targetLayer = eventLayer;
-    } else if (loc.owner === "C461879533") { // Neonav Maint.
+    if (!loc.verified && (        // Only add to "My Locations" if it isn't verified, verified locs will always be shown
+        loc.owner === userId ||      // You own it
+        loc.createdby === userId ||     // You created it
+        (factions ?? []).some((faction: any) => faction.id === loc.owner)) // Your faction owns it
+    ) { 
+      targetLayer = myLocationsLayer;
+
+    } else if (!loc.verified) {
+      targetLayer = unverifiedLayer;
+
+    } else if (loc.owner === "C461879533" || loc.venuetype === "dev") { // Neonav Maint.
       targetLayer = devLayer;
-    } else if (megablockRect.contains(latlng)) {
+
+    } else if (megablockRect.contains(latlng)) { // If marker is within megablock or megamall area,
       targetLayer = megablockLocations;
-    } else if (megamallRect.contains(latlng)) {
+
+    } else if (megamallRect.contains(latlng)) {  //add to corresponding layer group so it can be toggled with zoom.
       targetLayer = megamallLocations;
+
+    } else if (loc.owner === "C231465509") { // Neo City Admin
+      targetLayer = eventLayer;
+      
     }
-
-    const canSee =
-      (!!loc.verified) || // Can always see verified locations
-      loc.owner === userId || // Can see locations you own
-      (loc.owner.startsWith("C") &&
-        (factions ?? []).some((faction: any) => faction.id === loc.owner)); // Can see locations your faction owns
-
-    if (!canSee) return;
 
     const leafletMarker = L.marker(latlng, {
       icon: getDivIcon(venueIcon, venueColor),
@@ -166,9 +178,15 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
       .addTo(targetLayer)
       .on("click", () => {
         onMarkerClick(leafletMarker);
+      })
+      .on('dragend', (e) => {
+        console.log(leafletMarker.getLatLng().lat.toFixed(6) + ", " + leafletMarker.getLatLng().lng.toFixed(6));
       });
 
     leafletMarker.bindTooltip(loc.name, { permanent: true, direction: "right" });
+    if (loc.id === "L999999999") { // TODO change this to a real id once it is in the DB
+      leafletMarker.dragging?.enable();
+    }
     (leafletMarker as any).id = loc.id;
   });
 }

@@ -248,6 +248,7 @@ export type NnProviderDispatch = {
     fetchUserWallets: () => void;
     fetchUserContacts: (refresh?:boolean) => void;
     fetchAllLocations: () => void;
+    fetchUnverifiedLocations: () => void;
     fetchLocationById: (_id:string) => void;
     fetchContact: (_userId:string) => void;
     fetchUserChannels: () => void;

@@ -71,6 +71,7 @@ import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapL
 import { createDummyLocationMarkers } from "@/utilities/mapDummyLocationMarkers";
 import { renderLocationsToLeafletLayers } from "@/utilities/mapLeafletLocationsRenderer";
 import next from 'next';
+import { LocalMall } from '@mui/icons-material';
 
 
 interface PageContainerProps {
@@ -184,6 +185,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
   const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [selectedMarker, setSelectedMarker] = useState<L.Marker>();
   const [selectedLocation, setSelectedLocation] = useState({id: "", name: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""});
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalSizeStyle, setInfoModalSizeStyle] = useState(modalStyle_0);
@@ -199,8 +201,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
 
-  const { state, fetchAllLocations = () => {},
-    fetchLocationById = (id: string) => {} }: NnProviderValues = React.useContext(NnContext);
+  const { state,
+    fetchAllLocations = () => {},
+    fetchUnverifiedLocations = () => {},
+    fetchLocationById = (id: string) => {},
+  }: NnProviderValues = React.useContext(NnContext);
 
   const options: L.MapOptions = {
     center: L.latLng(35.0798889, -117.8222298), // Intersection of Main & Alpha
@@ -316,10 +321,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     if (vt.includes('arcade')) return { icon: <GamepadIcon style={{ color: cyberOrange }} />, color: cyberBlueLight };
     if (vt.includes('food') || vt.includes('stall') || vt.includes('restaurant') || vt.includes('dining')) return { icon: <RamenDiningIcon style={{ color: cyberYellow }} />, color: cyberGreen };
     if (vt.includes('megablock') || vt.includes('block')) return { icon: <HiveIcon style={{ color: cyberBlueDark }} />, color: cyberYellow };
+    if (vt.includes('megamall') || vt.includes('block')) return { icon: <LocalMall style={{ color: cyberBlueDark }} />, color: cyberYellow };
     if (vt.includes('dev')) return { icon: <AdjustIcon style={{ color: "#FFFFFF" }} />, color: "#FF0000" };
     if (vt.includes('porto')) return { icon: <WcIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
     if (vt.includes('medical')) return { icon: <HealthAndSafetyIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
     if (vt.includes('security')) return { icon: <LocalPoliceIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
+    if (vt.includes('generic')) return { icon: <TokenOutlinedIcon style={{ color: "#FFFFFF" }} />, color: cyberGreen };
     return { icon: <AdjustIcon style={{ color: cyberYellow }} />, color: cyberBlueDark };
   };
 
@@ -336,7 +343,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       }).addTo(mymap);
       
       L.imageOverlay(ZOOMED_MAP_FILE, L.latLngBounds([[35.080537, -117.823547], [35.077797, -117.821157]]), {
-        opacity: 0.9,
+        opacity: 0.7,
       }).addTo(mymap);
 
       L.control.scale({
@@ -346,156 +353,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       // Default lat-long 35.085124, -117.825341 (main entrance of event space) - use this for testing
 
-      // {name: name, pos: latLng, icon: MaterialIcon, iconColor: color}
-      /*
-       * The first three markers are intersections to align the map.
-       * The next four are used to build bounding boxes for the megamall and megablock areas, which should hide markers contained within them when the user zooms out enough.
-       * Zoom level should be either 21 or 20 where the megamall and megablock markers are visible, but all other markers are not.
-       */
-      const devMarkers = [
-        {
-          name: "Alpha & Main",
-          showtooltip: true,
-          lat: "35.079882",
-          long: "-117.822212",
-          venuetype: "dev"
-        },
-        {
-          name: "Beta & Main",
-          showtooltip: true,
-          lat: "35.080166",
-          long: "-117.822212",
-          venuetype: "dev",
-        },
-        {
-          name: "Beta & First",
-          showtooltip: true,
-          lat: "35.080166",
-          long: "-117.822973",
-          venuetype: "dev",
-        },
-        {
-          name: "Gamma & Main",
-          showtooltip: true,
-          lat: "35.082013",
-          long: "-117.822247",
-          venuetype: "dev",
-        },
-        {
-          name: "Megamall NW",
-          showtooltip: true,
-          lat: "35.079605",
-          long: "-117.822139",
-          venuetype: "dev",
-        },
-        {
-          name: "Megamall SE",
-          showtooltip: true,
-          lat: "35.079321",
-          long: "-117.821962",
-          venuetype: "dev",
-        },
-        {
-          name: "Megablock NW",
-          showtooltip: true,
-          lat: "35.079398",
-          long: "-117.822520",
-          venuetype: "dev",
-        },
-        {
-          name: "Megablock SE",
-          showtooltip: true,
-          lat: "35.079091",
-          long: "-117.822274",
-          venuetype: "dev",
-        },
-      ];
-
-      // TODO: These markers should move to the database, owned by Neotropolis City Council
-      const metaMarkers = [
-        {
-          id: "L000000000",
-          name: "Event Safety",
-          owner: "",
-          venuetype: "security",
-          verified: true,
-          lat: "35.079780",
-          long: "-117.823289",
-          hours: [],
-          reviews: [],
-          ownername: "",
-          prettyhours: [],
-          showtooltip: true
-        },
-        {
-          id: "L000000000",
-          name: "Medical",
-          owner: "",
-          venuetype: "medical",
-          verified: true,
-          lat: "35.079713",
-          long: "-117.822826",
-          hours: [],
-          reviews: [],
-          ownername: "",
-          prettyhours: [],
-          showtooltip: true
-        },
-        {
-          id: "L000000000",
-          name: "Porto",
-          owner: "",
-          venuetype: "porto",
-          verified: true,
-          lat: "35.079938",
-          long: "-117.821790",
-          hours: [],
-          reviews: [],
-          ownername: "",
-          prettyhours: [],
-          showtooltip: false
-        },
-      ];
-
       // Set up structural layers (location markers + zoom-toggled megablock/megamall).
       initStaticLayerGroups(mymap, layerData);
 
-      // Event and dev layers should move to location renderer as these pins will come from the DB
-      const eventMarkerLayer = layerData.get("eventLayer") as LayerGroup | undefined;
-      if (eventMarkerLayer) {
-        metaMarkers.forEach((markerInfo) => {
-          let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
-          let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
-            .addTo(eventMarkerLayer)
-            .on('click', () => {
-              setSelectedLocationId(markerInfo.id);
-              mymap.flyTo(leafletMarker.getLatLng());
-              openInfoModal();
-            }
-            );
-          if (markerInfo.showtooltip) {
-            leafletMarker.bindTooltip(markerInfo.name, {permanent: true, direction: 'right'});
-          }
-          (leafletMarker as any).neonavdata = markerInfo;
-        });
-        layerData.set("eventLayer", eventMarkerLayer);
-      }
-
       const devLayer = layerData.get("devLayer") as LayerGroup | undefined;
       if (devLayer) {
-        // Locator markers for Alpha & Main, Beta & Main, and Beta & First
-        devMarkers.forEach((markerInfo) => {
-          let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
-          let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
-            .addTo(devLayer)
-            .on('click', () => {
-              mymap.flyTo(leafletMarker.getLatLng());
-            }
-            );
-          if (markerInfo.showtooltip) {
-            leafletMarker.bindTooltip(markerInfo.name, {permanent: true, direction: 'right'});
-          }
-        });
         // Extra draggable marker for testing purposes
         let devMarker = L.marker(L.latLng(35.079481, -117.823052), {
           icon: getDivIcon(<AdjustIcon/>, '#ff0000'), draggable: true
@@ -505,8 +367,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           .on('dragend', (e) => {
             console.log(devMarker.getLatLng().lat + ", " + devMarker.getLatLng().lng);
           });
-        L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[4].lat), parseFloat(devMarkers[4].long)), L.latLng(parseFloat(devMarkers[5].lat), parseFloat(devMarkers[5].long)))).addTo(devLayer);
-        L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[6].lat), parseFloat(devMarkers[6].long)), L.latLng(parseFloat(devMarkers[7].lat), parseFloat(devMarkers[7].long)))).addTo(devLayer);
         layerData.set("devLayer", devLayer);
       }
 
@@ -553,8 +413,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   useEffect(() => {
     if (locationsFetchedRef.current) return;
     locationsFetchedRef.current = true;
-    fetchAllLocations();
-  }, [fetchAllLocations]);
+    fetchUnverifiedLocations();
+  }, [fetchUnverifiedLocations]);
 
   useEffect(() => {
     const locations = state?.network?.collections?.locations;
@@ -579,6 +439,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         // `openInfoModal()` reads from `myMapObjects.selectedMarker`.
         fetchLocationById((leafletMarker as any).id);
         setSelectedLocationId((leafletMarker as any).id);
+        setSelectedMarker(leafletMarker);
         mymap.flyTo(leafletMarker.getLatLng());
         openInfoModal();
       },
@@ -586,10 +447,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }, [state?.network?.collections?.locations]);
 
   useEffect(() => {
-    console.log("selectedLocationId: " + selectedLocationId);
+    //console.log("selectedLocationId: " + selectedLocationId);
     let locations = state?.network?.collections?.locations || [];
     let loc = locations.length > 0 && selectedLocationId ? locations.find(loc => loc.id === selectedLocationId) : {};
-    console.log(loc);
+    //console.log(loc);
     setSelectedLocation(loc);
   }, [selectedLocationId, state?.network?.collections?.locations]);
 
@@ -718,7 +579,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                     <LocationCityIcon fontSize="inherit"/>
                     &nbsp;⋅&nbsp;
                     <Link href={`/sites/${selectedLocation.neocities}`}>
-                      {selectedLocation.ownername}
+                      {!!selectedLocation.neocities && selectedLocation.ownername}
                     </Link>
                   </Typography>
                   <Divider color="secondary" flexItem/>

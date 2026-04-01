@@ -70,7 +70,11 @@ import {
   setFactionUserStatus,
   fetchFactionStatuses,
 } from './nnActionsFaction';
-import { fetchAllLocations, fetchLocationById } from './nnActionsLocation';
+import { 
+  fetchAllLocations,
+  fetchUnverifiedLocations,
+  fetchLocationById,
+} from './nnActionsLocation';
 import { nnSchema } from "./nnSchema";
 import {
   getCookieContext,
@@ -256,6 +260,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserContacts,
     fetchUserFactions,
     fetchAllLocations,
+    fetchUnverifiedLocations,
     fetchLocationById,
     fetchUserProfile,
     fetchUserSetStatuses,

@@ -6,7 +6,15 @@ import {
 } from "./nnTypes";
 import { getCookieToken } from "@/utilities/cookieContext";
 
+export const fetchUnverifiedLocations = (dispatch: DispatchFunc) => async () => {
+  fetchLocations(true, dispatch);
+};
+
 export const fetchAllLocations = (dispatch: DispatchFunc) => async () => {
+  fetchLocations(false, dispatch);
+};
+
+const fetchLocations = (unverified: boolean, dispatch: DispatchFunc) => {
   const token = getCookieToken();
   const onSuccess = (response: APIResponse) => {
     const { data } = response;
@@ -24,7 +32,7 @@ export const fetchAllLocations = (dispatch: DispatchFunc) => async () => {
     });
     return err;
   };
-  executeApi('locations', { token }, onSuccess, onError);
+  executeApi('locations', { token, unverified }, onSuccess, onError);
 };
 
 export const fetchLocationById = (dispatch: DispatchFunc) => async (id: string) => {

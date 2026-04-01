@@ -225,7 +225,7 @@ export const authApiEnpoints = {
   },
   locations: {
     method: "get",
-    path: "/api/locations",
+    path: "/api/locations?unverified=$unverified",
   },
   location: {
     method: "get",

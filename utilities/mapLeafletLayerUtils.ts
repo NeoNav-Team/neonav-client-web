@@ -3,6 +3,7 @@ import L from "leaflet";
 /**
  * Initializes the layer groups that are "structural" (location markers + megablock/megamall visibility)
  * and adds the required groups to the map.
+ * Layer names set here that should be togglable must match MapLayersModalLayerId in mapLayersModal.tsx
  */
 export function initStaticLayerGroups(
   mymap: L.Map,
