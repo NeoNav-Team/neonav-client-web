@@ -160,6 +160,7 @@ export type NnNetwork = {
         factions?: NnFaction[] | NnSimpleEntity[],
         statuses?: NnStatus[],
         clipboardEntities?: NnContact[] | NnFaction[] | NnSimpleEntity[],
+        locations?: any[],
     } | undefined,
     entity: nnEntity;
 }
@@ -192,6 +193,7 @@ export type ActionTypes =
   'setUserHiddenStatuses' | 
   'setMessageHistory' |
   'setClipboardEntities' |
+  'setLocations' |
   'removeStatus' |
   'setSelected' |
   'updateMessageHistory' |
@@ -244,6 +246,7 @@ export type NnProviderDispatch = {
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: (refresh?:boolean) => void;
+    fetchMapLocations: () => void;
     fetchContact: (_userId:string) => void;
     fetchUserChannels: () => void;
     fetchUserFactions: () => void;
