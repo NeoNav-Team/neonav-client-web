@@ -226,7 +226,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
               <Box sx={{maxWidth: '100%'}}>
                 <Stack spacing={0} style={{display: 'flex', flexDirection: `${notify ? 'column' : 'column-reverse'}` }}>
                   {messages.map((item, index) => (
-                    <div key={`message-${index}-${item.ts}`} onClick={addUserMention.bind(null, item.from)}>
+                    <div key={`message-${index}-${item.ts}`} onClick={addUserMention.bind(null, item.fromid)}>
                       <ItemMessage
                         key={`${index}-${item.ts}`}
                         date={item.ts}

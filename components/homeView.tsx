@@ -1,15 +1,22 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ReactPlayer from 'react-player';
 import {
   Box,
   Container,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
   Modal,
+  Select,
+  Stack,
   Typography
 } from '@mui/material';
+import { HOTBAR_OPTIONS, HotbarKey } from '../utilities/hotbarOptions';
+import { getHotbarCookie, setHotbarCookie } from '../utilities/cookieContext';
 import MyQRCode from './myQRCode';
 import QrCodeReader from './qrCodeReader';
 import styles from '../styles/generic.module.css';
@@ -35,21 +42,44 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import PolicyIcon from '@mui/icons-material/Policy';
 import Map from './svgr/map';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import Notifications from './svgr/notifications';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
+import Hotbar from './hotbar';
 
 interface HomeViewProps { }
 
-const fixedHeight = '16vh';
+const fixedHeight = 'max(90px, 16vh)';
 const KITTY_VIDEO = 'https://sites.neonav.net/kitty.mp4';
 
-export default function HomeView(props: HomeViewProps): JSX.Element {
+export default function HomeView(_props: HomeViewProps): JSX.Element {
   //TODO: refactor this to dynamically take an array of "app" data -- icon, label, link
 
   const [openModel, setOpenModel] = useState(false);
   const [submenu, setSubmenu] = useState('groupSettings');
+  const [hotbarKeys, setHotbarKeys] = useState<HotbarKey[]>(['map', 'myQRCode', 'qrScanner']);
   const router = useRouter();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setHotbarKeys(getHotbarCookie());
+  }, []);
+
+  const handleHotbarSlotChange = (slotIndex: number, key: HotbarKey) => {
+    const updated = [...hotbarKeys];
+    updated[slotIndex] = key;
+    setHotbarKeys(updated);
+    setHotbarCookie(updated);
+  };
+
+  const handleHotbarAction = (action: string) => {
+    if (action.startsWith('/')) {
+      router.push(action);
+    } else {
+      handleModelOpen(action);
+    }
+  };
   const handleModelOpen = (submenu: string) => {
     setSubmenu(submenu);
     setOpenModel(true);
@@ -60,6 +90,7 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
   }
   const handleIDScan = (result:string) => {
     if (result.length >= 5) {
+      handleModelClose();
       router.push(`/contacts/${result}#scan`);
     }
   }
@@ -82,7 +113,12 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
   }
 
   return (
-    <Container sx={{ marginTop: '64px', minHeight: 'calc(100vh - 128px)' }}>
+    <Container sx={{
+      marginTop: '64px',
+      height: 'calc(100dvh - 64px)',
+      overflowY: 'auto',
+      paddingBottom: 'calc(120px + env(safe-area-inset-bottom, 0px))',
+    }}>
       <Grid container spacing={1}>
         <Grid container item spacing={3}
         >
@@ -428,7 +464,12 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
                     justifyContent="center"
                     alignItems="center"
                     minHeight={fixedHeight}
+                    onClick={() => handleModelOpen('hotbarSettings')}
                   >
+                    <IconFrame
+                      icon={<DashboardCustomizeIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />}
+                      title="HotBar"
+                    />
                   </Box>
                 </Grid>
               </Grid>
@@ -487,12 +528,48 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
               </Grid>
             </div>
           )}
+          {submenu === 'hotbarSettings' && (
+            <div
+              className={styles.submenuPane}
+              data-augmented-ui="tl-clip tr-clip-x  bl-clip br-clip  both"
+            >
+              <Typography sx={modelTitleStyle}>HotBar Settings</Typography>
+              <Stack spacing={2} sx={{ p: 2 }}>
+                {([0, 1, 2] as const).map((slotIndex) => (
+                  <FormControl key={slotIndex} fullWidth size="small">
+                    <InputLabel sx={{ color: 'rgba(67,199,255,0.7)', fontFamily: 'Jura' }}>
+                      Slot {slotIndex + 1}
+                    </InputLabel>
+                    <Select
+                      value={hotbarKeys[slotIndex]}
+                      label={`Slot ${slotIndex + 1}`}
+                      onChange={(e) => handleHotbarSlotChange(slotIndex, e.target.value as HotbarKey)}
+                      MenuProps={{ PaperProps: { className: styles.selectMenu } }}
+                      sx={{
+                        color: '#fff',
+                        fontFamily: 'Jura',
+                        '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(67,199,255,0.35)' },
+                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(67,199,255,0.7)' },
+                        '.MuiSvgIcon-root': { color: 'rgba(67,199,255,0.7)' },
+                      }}
+                    >
+                      {(Object.keys(HOTBAR_OPTIONS) as HotbarKey[]).map((key) => (
+                        <MenuItem key={key} value={key} sx={{ fontFamily: 'Jura' }}>
+                          {HOTBAR_OPTIONS[key].label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                ))}
+              </Stack>
+            </div>
+          )}
           {submenu === 'myQRCode' && (
             <div
               className={styles.qrcodePane}
               data-augmented-ui="tl-clip tr-clip  bl-clip br-clip  both"
             >
-              <MyQRCode size={420} />
+              <MyQRCode />
             </div>
           )}
           {submenu === 'qrCodeScan' && (
@@ -518,6 +595,7 @@ export default function HomeView(props: HomeViewProps): JSX.Element {
           )}
         </Box>
       </Modal>
+      <Hotbar keys={hotbarKeys} onAction={handleHotbarAction} />
     </Container>
   )
 }
