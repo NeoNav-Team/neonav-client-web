@@ -87,5 +87,5 @@ export default function ChatApp(props:ChatAppJoinProps):JSX.Element {
         </div>
       </div>
     </Container>
-)
+  )
 }
