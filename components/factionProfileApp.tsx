@@ -40,22 +40,13 @@ interface FactionProfileAppProps {
 
 type Form = {
   name?: string;
-  image?: string;
   tagline?: string;
   description?: string;
 }
-type FormKey = 
-  'name' | 
-  'image' | 
-  'tagline' | 
-  'description';
-
 const defaultProfile = {
   id: '',
   name: '',
   tagline: '',
-  image: '',
-  thumbnail: '',
   description: '',
   admin: [],
   members: [],
@@ -160,7 +151,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     }
   }, [isRecentEntity, profile]);
 
-  const resizeFile = (file:File, field:FormKey, size:number) => {
+  const resizeFile = (file:File, size:number) => {
     Resizer.imageFileResizer(
       file,
       size,
@@ -169,11 +160,8 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
       100,
       0,
       (uri) => {
-        setForm({...form, [field]:uri } );
-        if (field === 'image') {
-          setPhoto(uri as string);
-          executeAPI('updateFactionImage', { faction: factionId, image: uri, token: getCookieToken() }, null, null);
-        }
+        setPhoto(uri as string);
+        executeAPI('updateFactionImage', { faction: factionId, image: uri, token: getCookieToken() }, null, null);
       },
       "base64"
     );
@@ -186,7 +174,7 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
 
   const uploadHandler = async (event:React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event?.currentTarget;
-    files && resizeFile(files[0], 'image', 600);
+    files && resizeFile(files[0], 600);
   }
 
 

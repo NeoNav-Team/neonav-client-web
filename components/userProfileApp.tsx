@@ -29,8 +29,6 @@ import { use100vh } from 'react-div-100vh';
 interface UserProfileAppProps {};
 
 type Form = {
-  avatar?: string;
-  thumbnail?: string;
   username?: string;
   firstname?: string;
   lastname?: string;
@@ -38,19 +36,7 @@ type Form = {
   occupation?: string;
   bio?: string;
 }
-type FormKey = 
-'avatar' | 
-'thumbnail' | 
-'username' | 
-'firstname' | 
-'lastname' | 
-'skills' | 
-'occupation' | 
-'bio';
-
 const defaultForm = {
-  avatar: '',
-  thumbnail: '',
   username: '',
   firstname: '',
   lastname: '',
@@ -139,7 +125,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
     }
   }, [profile]);
 
-  const resizeFile = (file:File, field:FormKey, size:number) => {
+  const resizeFile = (file:File, size:number) => {
     Resizer.imageFileResizer(
       file,
       size,
@@ -148,11 +134,8 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
       100,
       0,
       (uri) => {
-        setForm({...form, [field]:uri } );
-        if (field === 'avatar') {
-          setPhoto(uri as string);
-          executeAPI('updateImage', { image: uri, token: getCookieToken() }, null, null);
-        }
+        setPhoto(uri as string);
+        executeAPI('updateImage', { image: uri, token: getCookieToken() }, null, null);
       },
       "base64"
     );
@@ -165,7 +148,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
 
   const uploadHandler = async (event:React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event?.currentTarget;
-    files && resizeFile(files[0], 'avatar', 600);
+    files && resizeFile(files[0], 600);
   }
 
   const saveProfileChanges = () => {
@@ -179,7 +162,6 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const bigButtonAction = ()=> {
     if (editMode) {
       saveProfileChanges();
-      setPhoto(undefined);
       patchUserToken();
     } else {
       goFetchProfile(); //get latest before editing
