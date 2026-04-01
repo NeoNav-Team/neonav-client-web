@@ -450,7 +450,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       return date;
     };
 
-    // This whole thing should move to a funciton in util file
+    // TODO: This whole thing should move to a function in util file
     // Find today's row in prettyHours
     const now = new Date();
     const dayOfWeek = now.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
@@ -517,19 +517,14 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       }
     }
 
+    // TODO: We should not set this info on the marker object
+    //  - we should have a separate piece of state for selected location details that we set here and use for the modal,
+    //  instead of relying on the marker object to hold this info.
+    //  This is just a quick hack to get the info into the modal without restructuring too much right now.
     // Set display info on selectedMarker for modal use
     myMapObjects.get("selectedMarker").neonavdata.openState = openState;
     myMapObjects.get("selectedMarker").neonavdata.openStateMsg = nextTimeMsg;
 
-
-    // Do calculations to average rating
-    if (myMapObjects.get("selectedMarker").neonavdata.reviews.length > 0) {
-      let ratingSum = 0;
-      myMapObjects.get("selectedMarker").neonavdata.reviews.forEach((review: any) => {
-        ratingSum += review.rating;
-      });
-      myMapObjects.get("selectedMarker").neonavdata.rating = "Rating: " + ratingSum / myMapObjects.get("selectedMarker").neonavdata.reviews.length;
-    }
 
     setInfoModalSize(10);
     setInfoModalSizeStyle(modalStyle_0);
@@ -615,6 +610,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     if (vt.includes('arcade')) return { icon: <GamepadIcon style={{ color: cyberOrange }} />, color: cyberBlueLight };
     if (vt.includes('food') || vt.includes('stall') || vt.includes('restaurant') || vt.includes('dining')) return { icon: <RamenDiningIcon style={{ color: cyberYellow }} />, color: cyberGreen };
     if (vt.includes('megablock') || vt.includes('block')) return { icon: <HiveIcon style={{ color: cyberBlueDark }} />, color: cyberYellow };
+    if (vt.includes('dev')) return { icon: <AdjustIcon style={{ color: "#FFFFFF" }} />, color: "#FF0000" };
+    if (vt.includes('porto')) return { icon: <WcIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
+    if (vt.includes('medical')) return { icon: <HealthAndSafetyIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
+    if (vt.includes('security')) return { icon: <LocalPoliceIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
     return { icon: <AdjustIcon style={{ color: cyberYellow }} />, color: cyberBlueDark };
   };
 
@@ -649,66 +648,59 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           showtooltip: true,
           lat: "35.079882",
           long: "-117.822212",
-          icon: <AdjustIcon/>,
-          color: "#FF0000"
+          venuetype: "dev"
         },
         {
           name: "Beta & Main",
           showtooltip: true,
           lat: "35.080166",
           long: "-117.822212",
-          icon: <AdjustIcon/>,
-          color: "#FF0000"
+          venuetype: "dev",
         },
         {
           name: "Beta & First",
           showtooltip: true,
           lat: "35.080166",
           long: "-117.822973",
-          icon: <AdjustIcon/>,
-          color: "#FF0000"
+          venuetype: "dev",
         },
         {
           name: "Megamall NW",
           showtooltip: true,
           lat: "35.079605",
           long: "-117.822139",
-          icon: <AdjustIcon/>,
-          color: "#FF0000"
+          venuetype: "dev",
         },
         {
           name: "Megamall SE",
           showtooltip: true,
           lat: "35.079321",
           long: "-117.821962",
-          icon: <AdjustIcon/>,
-          color: "#FF0000"
+          venuetype: "dev",
         },
         {
           name: "Megablock NW",
           showtooltip: true,
           lat: "35.079398",
           long: "-117.822520",
-          icon: <AdjustIcon/>,
-          color: "#FF0000"
+          venuetype: "dev",
         },
         {
           name: "Megablock SE",
           showtooltip: true,
           lat: "35.079091",
           long: "-117.822274",
-          icon: <AdjustIcon/>,
-          color: "#FF0000"
+          venuetype: "dev",
         },
       ];
 
-      // TODO: These markers should move to the database, it is unclear who the owner should be at this time
+      // TODO: These markers should move to the database, owned by Neotropolis City Council
       const metaMarkers = [
         {
           id: "L000000000",
           name: "Neotropolis",
           owner: "",
-          venuetype: "",
+          venuetype: "dev",
           verified: true,
           lat: "35.079882",
           long: "-117.822212",
@@ -716,15 +708,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           reviews: [],
           ownername: "",
           prettyhours: [],
-          showtooltip: true,
-          icon: <AdjustIcon/>,
-          color: cyberOrange
+          showtooltip: true
         },
         {
           id: "L000000000",
           name: "Event Safety",
           owner: "",
-          venuetype: "",
+          venuetype: "security",
           verified: true,
           lat: "35.079780",
           long: "-117.823289",
@@ -732,15 +722,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           reviews: [],
           ownername: "",
           prettyhours: [],
-          showtooltip: true,
-          icon: <LocalPoliceIcon/>,
-          color: cyberOrange
+          showtooltip: true
         },
         {
           id: "L000000000",
           name: "Medical",
           owner: "",
-          venuetype: "",
+          venuetype: "medical",
           verified: true,
           lat: "35.079713",
           long: "-117.822826",
@@ -748,15 +736,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           reviews: [],
           ownername: "",
           prettyhours: [],
-          showtooltip: true,
-          icon: <HealthAndSafetyIcon/>,
-          color: cyberOrange
+          showtooltip: true
         },
         {
           id: "L000000000",
           name: "Porto",
           owner: "",
-          venuetype: "",
+          venuetype: "porto",
           verified: true,
           lat: "35.079938",
           long: "-117.821790",
@@ -764,15 +750,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           reviews: [],
           ownername: "",
           prettyhours: [],
-          showtooltip: false,
-          icon: <WcIcon/>,
-          color: cyberOrange
+          showtooltip: false
         },
         {
           id: "L000000000",
           name: "Porto",
           owner: "",
-          venuetype: "",
+          venuetype: "porto",
           verified: true,
           lat: "35.080499",
           long: "-117.822094",
@@ -780,15 +764,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           reviews: [],
           ownername: "",
           prettyhours: [],
-          showtooltip: false,
-          icon: <WcIcon/>,
-          color: cyberOrange
+          showtooltip: false
         },
         {
           id: "L000000000",
           name: "Porto",
           owner: "",
-          venuetype: "",
+          venuetype: "porto",
           verified: true,
           lat: "35.079939",
           long: "-117.822806",
@@ -796,15 +778,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           reviews: [],
           ownername: "",
           prettyhours: [],
-          showtooltip: false,
-          icon: <WcIcon/>,
-          color: cyberOrange
+          showtooltip: false
         },
         {
           id: "L000000000",
           name: "Porto",
           owner: "",
-          venuetype: "",
+          venuetype: "porto",
           verified: true,
           lat: "35.078660",
           long: "-117.822000",
@@ -812,9 +792,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           reviews: [],
           ownername: "",
           prettyhours: [],
-          showtooltip: false,
-          icon: <WcIcon/>,
-          color: cyberOrange
+          showtooltip: false
         },
       ];
 
@@ -823,7 +801,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       const eventMarkerLayer = L.layerGroup();
       metaMarkers.forEach((markerInfo) => {
-        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(markerInfo.icon, markerInfo.color)})
+        let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
+        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
           .addTo(eventMarkerLayer)
           .on('click', () => {
             myMapObjects.set("selectedMarker", leafletMarker);
@@ -841,7 +820,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       const devLayer = L.layerGroup();
       // Locator markers for Alpha & Main, Beta & Main, and Beta & First
       devMarkers.forEach((markerInfo) => {
-        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(markerInfo.icon, markerInfo.color)})
+        let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
+        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
           .addTo(devLayer)
           .on('click', () => {
             mymap.flyTo(leafletMarker.getLatLng());
@@ -942,6 +922,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   // Search bar over map -- optional
   // <div><TextField style={{position: 'absolute', top: '12px', left: '54px', zIndex: '1100', backgroundColor: '#120458', width:'calc(100% - 108px'}}/></div>
 
+  const locations = state?.network?.collections?.locations || [];
+  const selectedLocation = locations.length > 0 && myMapObjects.get("selectedMarker") ? locations.find(loc => loc.id === myMapObjects.get("selectedMarker").neonavdata.id) : {};
+
   return (
     <Container disableGutters style={{
       height: 'calc(100% - 64px)',
@@ -973,7 +956,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   alignItems="center"
                 >
                   <Typography sx={modalTitleStyle} onClick={expandModalFrom10}>
-                    {myMapObjects.get("selectedMarker").neonavdata.name}
+                    {selectedLocation.name}
                   </Typography>
                   <IconButton
                     onClick={expandModalFrom10}
@@ -984,7 +967,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   </IconButton>
                 </Stack>
                 <Typography sx={modalBodyStyle} component="p">
-                  {myMapObjects.get("selectedMarker").neonavdata.venuetype}
+                  {selectedLocation.venuetype}
                 </Typography>
                 <Typography sx={modalBodyStyle} component="p">
                   {myMapObjects.get("selectedMarker").neonavdata.openState} ⋅ {myMapObjects.get("selectedMarker").neonavdata.openStateMsg}
@@ -1000,7 +983,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   alignItems="center"
                 >
                   <Typography sx={modalTitleStyle} onClick={colapseModalFrom90}>
-                    {myMapObjects.get("selectedMarker").neonavdata.name}
+                    {selectedLocation.name}
                   </Typography>
                   <IconButton
                     onClick={colapseModalFrom90}
@@ -1016,23 +999,23 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   alignItems="flex-start"
                 >
                   <Typography sx={modalBodyStyle} component="p">
-                    [{myMapObjects.get("selectedMarker").neonavdata.id}]
+                    [{selectedLocation.id}]
                   </Typography>
                   <Typography sx={modalBodyStyle} component="p">
-                    {myMapObjects.get("selectedMarker").neonavdata.rating}
+                    {selectedLocation.rating}
                   </Typography>
                   <Typography sx={modalBodyStyle} component="p">
-                    {myMapObjects.get("selectedMarker").neonavdata.venuetype}
+                    {selectedLocation.venuetype}
                   </Typography>
                   <Typography sx={modalBodyStyle} component="p">{myMapObjects.get("selectedMarker").neonavdata.openState} ⋅ {myMapObjects.get("selectedMarker").neonavdata.openStateMsg}</Typography>
                   <Divider color="secondary" flexItem/>
                   <Typography sx={modalBodyStyle} component="p">
-                    {(myMapObjects.get("selectedMarker").neonavdata.ownerisfaction ?
+                    {(selectedLocation.ownerisfaction ?
                       <CastleIcon fontSize="inherit"/> : <PersonIcon />)}
                     &nbsp;⋅&nbsp;
                     <Link
-                      href={`/${myMapObjects.get("selectedMarker").neonavdata.owner.includes('C') ? 'factions' : 'contacts'}/${myMapObjects.get("selectedMarker").neonavdata.owner}`}>
-                      {myMapObjects.get("selectedMarker").neonavdata.ownername}
+                      href={`${selectedLocation.ownerlink}`}>
+                      {selectedLocation.ownername}
                     </Link>
                   </Typography>
                   <Divider color="secondary" flexItem/>
@@ -1040,7 +1023,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   <TableContainer component={Paper} style={{padding: '1vh'}}>
                     <Table aria-label="simple table">
                       <TableBody>
-                        {myMapObjects.get("selectedMarker").neonavdata.prettyhours.map((row: any) => (
+                        {selectedLocation.prettyhours.map((row: any) => (
                           <TableRow
                             key={row.day}
                             sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -1065,13 +1048,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   <Typography sx={modalBodyStyle} component="p">
                     <LocationCityIcon fontSize="inherit"/>
                     &nbsp;⋅&nbsp;
-                    <Link href={`/sites/${myMapObjects.get("selectedMarker").neonavdata.neocities}`}>
-                      {myMapObjects.get("selectedMarker").neonavdata.neocitiesname}
+                    <Link href={`/sites/${selectedLocation.neocities}`}>
+                      {selectedLocation.neocitiesname}
                     </Link>
                   </Typography>
                   <Divider color="secondary" flexItem/>
                   <Typography sx={modalBodyStyle} component="p">
-                    {myMapObjects.get("selectedMarker").neonavdata.rating}
+                    {selectedLocation.rating}
                   </Typography>
                 </Stack>
                 <SimpleScrollContainer>
@@ -1083,11 +1066,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                         flexDirection: "column-reverse",
                       }}
                     >
-                      {myMapObjects.get("selectedMarker").neonavdata.reviews.length === 0 && (
+                      <div key="spacer"><Box sx={{height: "110px"}}/></div>
+                      {!selectedLocation.reviews || selectedLocation.reviews?.length === 0 && (
                         <Typography sx={modalBodyStyle} component="p">Be the first to leave a review!</Typography>
                       )}
-                      {myMapObjects.get("selectedMarker").neonavdata.reviews.length >= 1 &&
-                        myMapObjects.get("selectedMarker").neonavdata.reviews.map((reviewItem: any) => {
+                      {selectedLocation.reviews?.length >= 1 &&
+                        selectedLocation.reviews.map((reviewItem: any) => {
                           const {reviewer, ts, reviewerName, rating, review} = reviewItem;
                           return (
                             <div key={`${ts}-container`}>

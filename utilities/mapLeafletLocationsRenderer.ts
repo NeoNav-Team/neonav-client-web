@@ -109,14 +109,42 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
       venuetype: loc.venuetype ?? "",
       verified: !!loc.verified,
       pos: L.latLng(lat, long), 
-      hours: loc.hours ?? [],           // This field is only retreived from a second api call this should move to a second call
+      hours: loc.hours ?? [],           // This field is only retreived from a second api call
       reviews: loc.reviews ?? [],                                 // Also this one
       ownername: loc.ownername ?? "",                             // And this one 
-      prettyhours: compressHoursAcrossMidnight(loc.hours ?? []),  // And technically this one
+      rating: "No reviews",                                       // Computed from second api call data
+      prettyhours: compressHoursAcrossMidnight(loc.hours ?? []),  // Computed from second api call data
+      openState: "Closed",                                        // Computed from second api call data
+      openStateMsg: "",                                           // Computed from second api call data
       showtooltip: true,
       icon: venueIcon,
       color: venueColor,
+      ownerisfaction: loc.owner.startsWith("C"),
+      ownerlink: loc.owner.startsWith("C")  ? '/faction/' + loc.owner : '/contacts/' + loc.owner,
     };
+
+    // This if should go away once we get rid of "allLocations" because everything is in the database
+    if (locations.find(location => loc.id === location.id)) {
+      const thisloc = locations.find(location => loc.id === location.id);
+
+      thisloc.ownerisfaction = loc.owner.startsWith("C");
+      thisloc.ownerlink = thisloc.ownerisfaction  ? '/factions/' + loc.owner : '/contacts/' + loc.owner;
+
+      thisloc.prettyhours = compressHoursAcrossMidnight(loc.hours ?? []);
+
+      // Do calculations to average rating
+      thisloc.rating = "No reviews";
+      if (thisloc.reviews?.length > 0) {
+        let ratingSum = 0;
+        thisloc.reviews.forEach((review: any) => {
+          ratingSum += review.rating;
+        });
+        thisloc.rating = "Rating: " + ratingSum / thisloc.reviews.length;
+      }
+
+      thisloc.openState = "Closed";
+      thisloc.openStateMsg = ""; 
+    }
 
     // If marker is within megablock or megamall area, add to corresponding layer group so it can be toggled with zoom.
     let targetLayer: LayerGroup = locationMarkersLayer;
