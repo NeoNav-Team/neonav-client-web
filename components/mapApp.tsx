@@ -2,7 +2,7 @@
 
 import 'styles/leaflet.css';
 import styles from "@/styles/generic.module.css";
-import React, {useEffect, useRef, useState, useMemo, useCallback} from "react";
+import React, {useEffect, useRef, useState, useMemo, useCallback, use} from "react";
 import ReactDOMServer from 'react-dom/server';
 import L, { LayerGroup } from 'leaflet';
 import {
@@ -70,6 +70,7 @@ import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
 import { createDummyLocationMarkers } from "@/utilities/mapDummyLocationMarkers";
 import { renderLocationsToLeafletLayers } from "@/utilities/mapLeafletLocationsRenderer";
+import next from 'next';
 
 
 interface PageContainerProps {
@@ -182,6 +183,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const mapRef = useRef(null);
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
+  const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState({id: "", name: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""});
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalSizeStyle, setInfoModalSizeStyle] = useState(modalStyle_0);
   const [infoModalSize, setInfoModalSize] = useState(0);
@@ -190,14 +193,14 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [layerStates, setLayerStates] = useState<Record<string, boolean>>({
     eventLayer: false,
     devLayer: false,
-    testLayer2: false,
-    testLayer3: false,
+    myLocationsLayer: false,
+    unverifiedLayer: false,
   });
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
 
   const { state, fetchAllLocations = () => {},
-   fetchLocationById = (id: string) => {} }: NnProviderValues = React.useContext(NnContext);
+    fetchLocationById = (id: string) => {} }: NnProviderValues = React.useContext(NnContext);
 
   const options: L.MapOptions = {
     center: L.latLng(35.0798889, -117.8222298), // Intersection of Main & Alpha
@@ -229,97 +232,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
 
   const openInfoModal = () => {
-    // Find the open/closed status and next open/close time for the selected location
-    const markerData = myMapObjects.get("selectedMarker")?.neonavdata || {};
-
-    // TODO: move to util file
-    // Function to parse a time string like "10:00AM" or "7:00PM"
-    const parseTimeString = (timeStr: string, refDate: Date) => {
-      const ampm = timeStr.slice(-2);
-      let [hours, minutes] = timeStr.slice(0, -2).split(":").map(Number);
-      if (ampm === "PM" && hours !== 12) hours += 12;
-      if (ampm === "AM" && hours === 12) hours = 0;
-      const date = new Date(refDate);
-      date.setHours(hours, minutes, 0, 0);
-      return date;
-    };
-
-    // TODO: This whole thing should move to a function in util file
-    // Find today's row in prettyHours
-    const now = new Date();
-    const dayOfWeek = now.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
-    let todayRow = markerData.prettyhours.find((row: any) => row.day.toLowerCase() === dayOfWeek);
-    // Fallback if not found - possible capitalisation error
-    if (!todayRow && markerData.prettyhours.length) {
-      todayRow = markerData.prettyhours.find((row: any) => row.day.toLowerCase().startsWith(dayOfWeek.substring(0, 3)));
-    }
-    let openState = "Closed";
-    let nextTimeMsg = "";
-    if (todayRow && Array.isArray(todayRow.hours)) {
-      // E.g. ["10:00AM - 7:00PM", ...] or ["Closed"]
-      for (let i = 0; i < todayRow.hours.length; i++) {
-        const hoursString = todayRow.hours[i];
-        if (hoursString === "Closed") continue;
-
-        // Split into open/close time
-        const [openStr, closeStr] = hoursString.split(" - ");
-        if (!openStr || !closeStr) continue;
-
-        // Construct today's open and close Date objects
-        const openTime = parseTimeString(openStr, now);
-        let closeTime = parseTimeString(closeStr, now);
-
-        // If close time is <= open time, must run into tomorrow
-        if (closeTime <= openTime) {
-          closeTime.setDate(closeTime.getDate() + 1);
-        }
-
-        // Are we open right now?
-        if (now >= openTime && now < closeTime) {
-          openState = "Open";
-          // Show closes at...
-          nextTimeMsg = `Closes ${closeStr}`;
-          break;
-        } else if (now < openTime) {
-          // Not yet open today, show "Opens at..."
-          openState = "Closed";
-          nextTimeMsg = `Opens ${openStr}`;
-          break;
-        }
-        // else, keep looking (could have multiple periods)
-      }
-      if (openState === "Closed" && !nextTimeMsg) {
-        // Check tomorrow's hours for next opening
-        const tomorrow = new Date(now);
-        tomorrow.setDate(now.getDate() + 1);
-        const tomorrowDay = tomorrow.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
-        let tomorrowRow = markerData.prettyHours.find((row: any) => row.day.toLowerCase() === tomorrowDay);
-        if (!tomorrowRow && markerData.prettyHours.length) {
-          tomorrowRow = markerData.prettyHours.find((row: any) => row.day.toLowerCase().startsWith(tomorrowDay.substring(0, 3)));
-        }
-        if (tomorrowRow && Array.isArray(tomorrowRow.hours)) {
-          for (let i = 0; i < tomorrowRow.hours.length; i++) {
-            const hoursString = tomorrowRow.hours[i];
-            if (hoursString === "Closed") continue;
-            const [openStr] = hoursString.split(" - ");
-            if (openStr) {
-              nextTimeMsg = `Opens ${openStr} ${tomorrowRow.day}`;
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    // TODO: We should not set this info on the marker object
-    //  - we should have a separate piece of state for selected location details that we set here and use for the modal,
-    //  instead of relying on the marker object to hold this info.
-    //  This is just a quick hack to get the info into the modal without restructuring too much right now.
-    // Set display info on selectedMarker for modal use
-    myMapObjects.get("selectedMarker").neonavdata.openState = openState;
-    myMapObjects.get("selectedMarker").neonavdata.openStateMsg = nextTimeMsg;
-
-
     setInfoModalSize(10);
     setInfoModalSizeStyle(modalStyle_0);
     setFooterStyle(flexFooterHidden);
@@ -398,7 +310,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const cyberYellow = "#F0E442"; // Downtown
 
   // TODO: More robust venue type detection and icon/color assignment
-  
+  // TODO: Move to location renderer or other util file
   const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
     const vt = (venuetype || '').toLowerCase();
     if (vt.includes('arcade')) return { icon: <GamepadIcon style={{ color: cyberOrange }} />, color: cyberBlueLight };
@@ -548,51 +460,57 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       // Set up structural layers (location markers + zoom-toggled megablock/megamall).
       initStaticLayerGroups(mymap, layerData);
 
-      const eventMarkerLayer = L.layerGroup();
-      metaMarkers.forEach((markerInfo) => {
-        let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
-        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
-          .addTo(eventMarkerLayer)
-          .on('click', () => {
-            myMapObjects.set("selectedMarker", leafletMarker);
-            mymap.flyTo(leafletMarker.getLatLng());
-            openInfoModal();
+      // Event and dev layers should move to location renderer as these pins will come from the DB
+      const eventMarkerLayer = layerData.get("eventLayer") as LayerGroup | undefined;
+      if (eventMarkerLayer) {
+        metaMarkers.forEach((markerInfo) => {
+          let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
+          let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
+            .addTo(eventMarkerLayer)
+            .on('click', () => {
+              setSelectedLocationId(markerInfo.id);
+              mymap.flyTo(leafletMarker.getLatLng());
+              openInfoModal();
+            }
+            );
+          if (markerInfo.showtooltip) {
+            leafletMarker.bindTooltip(markerInfo.name, {permanent: true, direction: 'right'});
           }
-          );
-        if (markerInfo.showtooltip) {
-          leafletMarker.bindTooltip(markerInfo.name, {permanent: true, direction: 'right'});
-        }
-        (leafletMarker as any).neonavdata = markerInfo;
-      });
-      layerData.set("eventLayer", eventMarkerLayer);
-
-      const devLayer = L.layerGroup();
-      // Locator markers for Alpha & Main, Beta & Main, and Beta & First
-      devMarkers.forEach((markerInfo) => {
-        let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
-        let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
-          .addTo(devLayer)
-          .on('click', () => {
-            mymap.flyTo(leafletMarker.getLatLng());
-          }
-          );
-        if (markerInfo.showtooltip) {
-          leafletMarker.bindTooltip(markerInfo.name, {permanent: true, direction: 'right'});
-        }
-      });
-      // Extra draggable marker for testing purposes
-      let devMarker = L.marker(L.latLng(35.079481, -117.823052), {
-        icon: getDivIcon(<AdjustIcon/>, '#ff0000'), draggable: true
-      })
-        .addTo(devLayer)
-        .bindTooltip("Locator", {permanent: true, direction: 'right'})
-        .on('dragend', (e) => {
-          console.log(devMarker.getLatLng().lat + ", " + devMarker.getLatLng().lng);
+          (leafletMarker as any).neonavdata = markerInfo;
         });
-      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[4].lat), parseFloat(devMarkers[4].long)), L.latLng(parseFloat(devMarkers[5].lat), parseFloat(devMarkers[5].long)))).addTo(devLayer);
-      L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[6].lat), parseFloat(devMarkers[6].long)), L.latLng(parseFloat(devMarkers[7].lat), parseFloat(devMarkers[7].long)))).addTo(devLayer);
-      layerData.set("devLayer", devLayer);
+        layerData.set("eventLayer", eventMarkerLayer);
+      }
 
+      const devLayer = layerData.get("devLayer") as LayerGroup | undefined;
+      if (devLayer) {
+        // Locator markers for Alpha & Main, Beta & Main, and Beta & First
+        devMarkers.forEach((markerInfo) => {
+          let {icon, color} = getVenueIconAndColor(markerInfo.venuetype);
+          let leafletMarker = L.marker(L.latLng(parseFloat(markerInfo.lat), parseFloat(markerInfo.long)), {icon: getDivIcon(icon, color)})
+            .addTo(devLayer)
+            .on('click', () => {
+              mymap.flyTo(leafletMarker.getLatLng());
+            }
+            );
+          if (markerInfo.showtooltip) {
+            leafletMarker.bindTooltip(markerInfo.name, {permanent: true, direction: 'right'});
+          }
+        });
+        // Extra draggable marker for testing purposes
+        let devMarker = L.marker(L.latLng(35.079481, -117.823052), {
+          icon: getDivIcon(<AdjustIcon/>, '#ff0000'), draggable: true
+        })
+          .addTo(devLayer)
+          .bindTooltip("Locator", {permanent: true, direction: 'right'})
+          .on('dragend', (e) => {
+            console.log(devMarker.getLatLng().lat + ", " + devMarker.getLatLng().lng);
+          });
+        L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[4].lat), parseFloat(devMarkers[4].long)), L.latLng(parseFloat(devMarkers[5].lat), parseFloat(devMarkers[5].long)))).addTo(devLayer);
+        L.rectangle(L.latLngBounds(L.latLng(parseFloat(devMarkers[6].lat), parseFloat(devMarkers[6].long)), L.latLng(parseFloat(devMarkers[7].lat), parseFloat(devMarkers[7].long)))).addTo(devLayer);
+        layerData.set("devLayer", devLayer);
+      }
+
+      // TODO Move this to dedicated layer not on the mapobject
       // Set up listeners/hooks
       mymap.on('locationfound', (e) => {
         console.log("Location found:", e);
@@ -659,19 +577,24 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       getDivIcon,
       onMarkerClick: (leafletMarker) => {
         // `openInfoModal()` reads from `myMapObjects.selectedMarker`.
-        fetchLocationById((leafletMarker as any).neonavdata.id);
-        myMapObjects.set("selectedMarker", leafletMarker);
+        fetchLocationById((leafletMarker as any).id);
+        setSelectedLocationId((leafletMarker as any).id);
         mymap.flyTo(leafletMarker.getLatLng());
         openInfoModal();
       },
     });
   }, [state?.network?.collections?.locations]);
 
+  useEffect(() => {
+    console.log("selectedLocationId: " + selectedLocationId);
+    let locations = state?.network?.collections?.locations || [];
+    let loc = locations.length > 0 && selectedLocationId ? locations.find(loc => loc.id === selectedLocationId) : {};
+    console.log(loc);
+    setSelectedLocation(loc);
+  }, [selectedLocationId, state?.network?.collections?.locations]);
+
   // Search bar over map -- optional
   // <div><TextField style={{position: 'absolute', top: '12px', left: '54px', zIndex: '1100', backgroundColor: '#120458', width:'calc(100% - 108px'}}/></div>
-
-  const locations = state?.network?.collections?.locations || [];
-  const selectedLocation = locations.length > 0 && myMapObjects.get("selectedMarker") ? locations.find(loc => loc.id === myMapObjects.get("selectedMarker").neonavdata.id) : {};
 
   return (
     <Container disableGutters style={{
@@ -717,9 +640,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                 <Typography sx={modalBodyStyle} component="p">
                   {selectedLocation.venuetype}
                 </Typography>
-                <Typography sx={modalBodyStyle} component="p">
-                  {myMapObjects.get("selectedMarker").neonavdata.openState} ⋅ {myMapObjects.get("selectedMarker").neonavdata.openStateMsg}
-                </Typography>
+                <Typography sx={modalBodyStyle} component="p">{selectedLocation.openState} ⋅ {selectedLocation.nextTimeMsg}</Typography>
               </Box>
             )}
           {(infoModalSize === 90) &&
@@ -755,7 +676,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                   <Typography sx={modalBodyStyle} component="p">
                     {selectedLocation.venuetype}
                   </Typography>
-                  <Typography sx={modalBodyStyle} component="p">{myMapObjects.get("selectedMarker").neonavdata.openState} ⋅ {myMapObjects.get("selectedMarker").neonavdata.openStateMsg}</Typography>
+                  <Typography sx={modalBodyStyle} component="p">{selectedLocation.openState} ⋅ {selectedLocation.nextTimeMsg}</Typography>
                   <Divider color="secondary" flexItem/>
                   <Typography sx={modalBodyStyle} component="p">
                     {(selectedLocation.ownerisfaction ?
@@ -767,7 +688,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                     </Link>
                   </Typography>
                   <Divider color="secondary" flexItem/>
-                  <Typography sx={modalBodyStyle} component="p"><QueryBuilderIcon fontSize="inherit"/>&nbsp;{myMapObjects.get("selectedMarker").neonavdata.openState}</Typography>
+                  <Typography sx={modalBodyStyle} component="p"><QueryBuilderIcon fontSize="inherit"/>&nbsp;{selectedLocation.openState}</Typography>
                   <TableContainer component={Paper} style={{padding: '1vh'}}>
                     <Table aria-label="simple table">
                       <TableBody>
@@ -797,7 +718,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                     <LocationCityIcon fontSize="inherit"/>
                     &nbsp;⋅&nbsp;
                     <Link href={`/sites/${selectedLocation.neocities}`}>
-                      {selectedLocation.neocitiesname}
+                      {selectedLocation.ownername}
                     </Link>
                   </Typography>
                   <Divider color="secondary" flexItem/>

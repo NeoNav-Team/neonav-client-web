@@ -1,5 +1,6 @@
 import L from "leaflet";
 import type { LayerGroup } from "leaflet";
+import { compressHoursAcrossMidnight, generateOpenMessages } from "@/utilities/mapTimeUtils";
 
 export interface LeafletLocationsRendererParams {
   mymap: L.Map;
@@ -31,17 +32,30 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
   const megablockLocations = layerData.get("megablockLocations") as LayerGroup | undefined;
   const megamallLocations = layerData.get("megamallLocations") as LayerGroup | undefined;
-  const megablockAndMegamallLocations = layerData.get(
-    "megablockAndMegamallLocations",
-  ) as LayerGroup | undefined;
-
+  const megablockAndMegamallLocations = layerData.get("megablockAndMegamallLocations") as LayerGroup | undefined;
   if (!megablockLocations || !megamallLocations || !megablockAndMegamallLocations) return;
+
+  const devLayer = layerData.get("devLayer") as LayerGroup | undefined;
+  if (!devLayer) return;
+
+  const eventLayer = layerData.get("eventLayer") as LayerGroup | undefined;
+  if (!eventLayer) return;
+
+  const myLocationsLayer = layerData.get("mylocations") as LayerGroup | undefined;
+  if (!myLocationsLayer) return;
+
+  const unverifiedLayer = layerData.get("unverified") as LayerGroup | undefined;
+  if(!unverifiedLayer) return;
 
   // Clear to avoid marker duplication across refreshes.
   locationMarkersLayer.clearLayers();
   megablockLocations.clearLayers();
   megamallLocations.clearLayers();
   megablockAndMegamallLocations.clearLayers();
+  devLayer.clearLayers();
+  eventLayer.clearLayers();
+  myLocationsLayer.clearLayers();
+  unverifiedLayer.clearLayers();
 
   const allLocations = locations.concat(extraMarkers ?? []);
 
@@ -62,7 +76,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     owner: "",
     venuetype: "megablock",
     verified: true,
-    pos: megablockRect.getCenter(),
+    pos: megablockRect.getCenter(), // This marker will be at the entrance to the megablock, so it will pull pos from DB
   };
   const { icon: megablockIcon, color: megablockColor } = getVenueIconAndColor(megablockLoc.venuetype);
   const megablockMarker = L.marker(megablockLoc.pos, {
@@ -81,7 +95,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     owner: "",
     venuetype: "megablock",
     verified: true,
-    pos: megamallRect.getCenter(),
+    pos: megamallRect.getCenter(), // This marker will be at the entrance to the megamall, so it will pull pos from DB
   };
   const { icon: megamallIcon, color: megamallColor } = getVenueIconAndColor(megamallLoc.venuetype);
   const megamallMarker = L.marker(megamallLoc.pos, {
@@ -98,30 +112,11 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     const long = loc.long;
     if (lat == null || long == null) return;
 
+    const latlng = L.latLng(lat, long);
+
     const { icon: venueIcon, color: venueColor } = getVenueIconAndColor(loc.venuetype ?? "");
 
-    const markerInfo = {
-      id: loc.id,
-      name: loc.name ?? "",
-      owner: loc.owner ?? "",
-      venuetype: loc.venuetype ?? "",
-      verified: !!loc.verified,
-      pos: L.latLng(lat, long), 
-      hours: loc.hours ?? [],           // This field is only retreived from a second api call
-      reviews: loc.reviews ?? [],                                 // Also this one
-      ownername: loc.ownername ?? "",                             // And this one 
-      rating: "No reviews",                                       // Computed from second api call data
-      prettyhours: compressHoursAcrossMidnight(loc.hours ?? []),  // Computed from second api call data
-      openState: "Closed",                                        // Computed from second api call data
-      openStateMsg: "",                                           // Computed from second api call data
-      showtooltip: true,
-      icon: venueIcon,
-      color: venueColor,
-      ownerisfaction: loc.owner.startsWith("C"),
-      ownerlink: loc.owner.startsWith("C")  ? '/faction/' + loc.owner : '/contacts/' + loc.owner,
-    };
-
-    // This if should go away once we get rid of "allLocations" because everything is in the database
+    // This if check should go away once we get rid of "allLocations" because everything is in the database
     if (locations.find(location => loc.id === location.id)) {
       const thisloc = locations.find(location => loc.id === location.id);
 
@@ -129,6 +124,10 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
       thisloc.ownerlink = thisloc.ownerisfaction  ? '/factions/' + loc.owner : '/contacts/' + loc.owner;
 
       thisloc.prettyhours = compressHoursAcrossMidnight(loc.hours ?? []);
+
+      const {openState, nextTimeMsg} = generateOpenMessages(thisloc.prettyhours);
+      thisloc.openState = openState ? openState : "Closed";
+      thisloc.nextTimeMsg = nextTimeMsg ? nextTimeMsg : "";
 
       // Do calculations to average rating
       thisloc.rating = "No reviews";
@@ -139,37 +138,38 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
         });
         thisloc.rating = "Rating: " + ratingSum / thisloc.reviews.length;
       }
-
-      thisloc.openState = "Closed";
-      thisloc.openStateMsg = ""; 
     }
 
     // If marker is within megablock or megamall area, add to corresponding layer group so it can be toggled with zoom.
     let targetLayer: LayerGroup = locationMarkersLayer;
-    if (megablockRect.contains(markerInfo.pos)) {
+    if (loc.owner === "C231465509") { // Neo City Admin
+      targetLayer = eventLayer;
+    } else if (loc.owner === "C461879533") { // Neonav Maint.
+      targetLayer = devLayer;
+    } else if (megablockRect.contains(latlng)) {
       targetLayer = megablockLocations;
-    } else if (megamallRect.contains(markerInfo.pos)) {
+    } else if (megamallRect.contains(latlng)) {
       targetLayer = megamallLocations;
     }
 
     const canSee =
-      markerInfo.verified ||
-      markerInfo.owner === userId ||
-      (markerInfo.owner.startsWith("C") &&
-        (factions ?? []).some((faction: any) => faction.id === markerInfo.owner));
+      (!!loc.verified) || // Can always see verified locations
+      loc.owner === userId || // Can see locations you own
+      (loc.owner.startsWith("C") &&
+        (factions ?? []).some((faction: any) => faction.id === loc.owner)); // Can see locations your faction owns
 
     if (!canSee) return;
 
-    const leafletMarker = L.marker(markerInfo.pos, {
-      icon: getDivIcon(markerInfo.icon, markerInfo.color),
+    const leafletMarker = L.marker(latlng, {
+      icon: getDivIcon(venueIcon, venueColor),
     })
       .addTo(targetLayer)
       .on("click", () => {
         onMarkerClick(leafletMarker);
       });
 
-    leafletMarker.bindTooltip(markerInfo.name, { permanent: true, direction: "right" });
-    (leafletMarker as any).neonavdata = markerInfo;
+    leafletMarker.bindTooltip(loc.name, { permanent: true, direction: "right" });
+    (leafletMarker as any).id = loc.id;
   });
 }
 

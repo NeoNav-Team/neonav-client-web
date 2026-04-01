@@ -12,6 +12,12 @@ export function initStaticLayerGroups(
   layerData.set("locationMarkersLayer", L.layerGroup());
   mymap.addLayer(layerData.get("locationMarkersLayer")!);
 
+  // Dev location markers used by maintainance staff
+  layerData.set("devLayer", L.layerGroup());
+
+  // Event location markers not owned by a guest faction
+  layerData.set("eventLayer", L.layerGroup());
+
   // These are toggled based on zoom level.
   layerData.set("megablockLocations", L.layerGroup());
   layerData.set("megamallLocations", L.layerGroup());
@@ -21,8 +27,8 @@ export function initStaticLayerGroups(
   mymap.addLayer(layerData.get("megablockAndMegamallLocations")!);
 
   // Placeholders used by the Layers modal.
-  layerData.set("testLayer2", L.layerGroup());
-  layerData.set("testLayer3", L.layerGroup());
+  layerData.set("mylocations", L.layerGroup());
+  layerData.set("unverified", L.layerGroup());
 }
 
 /**
