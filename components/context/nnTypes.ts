@@ -194,6 +194,7 @@ export type ActionTypes =
   'setMessageHistory' |
   'setClipboardEntities' |
   'setLocations' |
+  'setLocation' |
   'removeStatus' |
   'setSelected' |
   'updateMessageHistory' |
@@ -203,8 +204,7 @@ export type ActionTypes =
   'setUnreadCount' |
   'clearUnreadCountByType' |
   'clearAllUnreadCounts' |
-  'initContext' |
-  'setAccessToken';
+  'initContext';
 
 export interface Action {
     type: ActionTypes,
@@ -246,7 +246,8 @@ export type NnProviderDispatch = {
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: (refresh?:boolean) => void;
-    fetchMapLocations: () => void;
+    fetchAllLocations: () => void;
+    fetchLocationById: (_id:string) => void;
     fetchContact: (_userId:string) => void;
     fetchUserChannels: () => void;
     fetchUserFactions: () => void;
@@ -258,7 +259,6 @@ export type NnProviderDispatch = {
     fetchFactionDetails: (_factionId:string) => void;
     fetchFactionStatuses: (_factionId:string) => void;
     fetchUserProfile: () => void;
-    patchUserToken: () => void;
     fetchUnreadCount: () => void;
     updateUserProfile: (_document:any, _update:any) => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
