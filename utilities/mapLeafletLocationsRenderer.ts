@@ -2,6 +2,12 @@ import L from "leaflet";
 import type { LayerGroup } from "leaflet";
 import { enrichLocation, getTargetLayer } from "@/utilities/mapLocationUtils";
 
+const MEGABLOCK_NW = "L111111111";
+const MEGABLOCK_SE = "L222222222";
+const MEGAMALL_NW = "L333333333";
+const MEGAMALL_SE = "L444444444";
+const LOCATOR = "L999999999";
+
 
 export interface LeafletLocationsRendererParams {
   mymap: L.Map;
@@ -42,10 +48,10 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
   // 2. Constants & Bounds (Consider moving these to a config file)
   // Find corners of mega structures for bounding boxes
-  const megablockNW = allLocations.find(loc => loc.id === "L111111111");
-  const megablockSE = allLocations.find(loc => loc.id === "L222222222");
-  const megamallNW = allLocations.find(loc => loc.id === "L333333333");
-  const megamallSE = allLocations.find(loc => loc.id === "L444444444");
+  const megablockNW = allLocations.find(loc => loc.id === MEGABLOCK_NW);
+  const megablockSE = allLocations.find(loc => loc.id === MEGABLOCK_SE);
+  const megamallNW = allLocations.find(loc => loc.id === MEGAMALL_NW);
+  const megamallSE = allLocations.find(loc => loc.id === MEGAMALL_SE);
 
   const megablockRect = L.latLngBounds(
     L.latLng(megablockNW.lat, megablockNW.long),
@@ -95,7 +101,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     (leafletMarker as any).id = loc.id;
 
     // Dev features
-    if (loc.id === "L999999999") {
+    if (loc.id === LOCATOR) {
       leafletMarker.options.draggable = true;
       leafletMarker.on('dragend', () => {
         const { lat, lng } = leafletMarker.getLatLng();

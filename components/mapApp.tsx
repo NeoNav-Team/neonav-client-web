@@ -296,6 +296,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     if (!myMap || !targetLayer) return;
 
     if (event.target.checked && !myMap.hasLayer(targetLayer)) {
+      fetchUnverifiedLocations();
       myMap.addLayer(targetLayer);
     } else if (!event.target.checked && myMap.hasLayer(targetLayer)) {
       myMap.removeLayer(targetLayer);
@@ -398,8 +399,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   useEffect(() => {
     if (locationsFetchedRef.current) return;
     locationsFetchedRef.current = true;
-    fetchUnverifiedLocations();
-  }, [fetchUnverifiedLocations]);
+    fetchAllLocations();
+  }, [fetchAllLocations]);
 
   useEffect(() => {
     const locations = state?.network?.collections?.locations;
