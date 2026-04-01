@@ -1,5 +1,8 @@
 import { NnStore, nnEntity, NnSimpleEntity } from "@/components/context/nnTypes";
 import Cookies from "js-cookie";
+import { HotbarKey } from "./hotbarOptions";
+
+const DEFAULT_HOTBAR_KEYS: HotbarKey[] = ['map', 'myQRCode', 'qrScanner'];
 
 const MAX_UNREAD_COUNTED = 1000;
 const MAX_CLIPBOARD_ITEMS = 50;
@@ -50,8 +53,8 @@ export const setCookieContext = (state:NnStore) => {
   }
   const stringState = JSON.stringify(state);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
-  Cookies.remove('nnContext', { domain: '.neonav.net' }); 
-  Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net' });
+  Cookies.remove('nnContext', { domain: '.neonav.net' });
+  Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net', expires: 30 });
 };
 
 export const getCookieContext = () => {
@@ -80,7 +83,7 @@ export const setCookieUnread = (newUnread:string) => {
   unreadArr.push(newUnread);
   const unreadString = unreadArr.join(',');
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
+  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net', expires: 30 });
 }
 
 export const filterCookieUnread = (newUnread:string) => {
@@ -88,7 +91,7 @@ export const filterCookieUnread = (newUnread:string) => {
   unreadArr.filter((unread:string) => { return unread !== newUnread});
   const unreadString = unreadArr.join(',');
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net' });
+  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net', expires: 30 });
 }
 
 export const clearCookieUnread = () => {
@@ -98,7 +101,7 @@ export const clearCookieUnread = () => {
 
 export const setCookieToken = (newToken:string) => {
   Cookies.remove('accessToken', { domain: '.neonav.net' });
-  Cookies.set('accessToken', newToken, { domain: '.neonav.net' });
+  Cookies.set('accessToken', newToken, { domain: '.neonav.net', expires: 30 });
 }
 
 //TODO: update functions to use same set of set / update collection functions
@@ -110,6 +113,20 @@ export const getCookieClipboard = (): nnEntity[] => {
   return clipboardEntitiesArr;
 }
 
+export const getHotbarCookie = (): HotbarKey[] => {
+  const value = Cookies.get('nnHotbar');
+  if (!value) return [...DEFAULT_HOTBAR_KEYS];
+  try {
+    return JSON.parse(value) as HotbarKey[];
+  } catch {
+    return [...DEFAULT_HOTBAR_KEYS];
+  }
+};
+
+export const setHotbarCookie = (keys: HotbarKey[]) => {
+  Cookies.set('nnHotbar', JSON.stringify(keys), { domain: '.neonav.net', expires: 365 });
+};
+
 export const setCookieClipboard = (clipboardEntity:nnEntity) => {
   const clipboardArr = getCookieClipboard();
   const simpleEntity = setSimpleEntity(clipboardEntity);
@@ -119,5 +136,5 @@ export const setCookieClipboard = (clipboardEntity:nnEntity) => {
   clipboardArr.push(simpleEntity);
   const unreadString = JSON.stringify(clipboardArr);
   const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnClipboard', encodedStringState, { domain: '.neonav.net' });
+  Cookies.set('nnClipboard', encodedStringState, { domain: '.neonav.net', expires: 30 });
 };

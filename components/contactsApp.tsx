@@ -9,6 +9,7 @@ import React, {
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnContact, nnEntity } from './context/nnTypes';
+import { imageUrl } from '../utilities/constants';
 import SimpleScrollContainer from './simpleScrollContainer';
 import QrCodeReader from './qrCodeReader';
 import ItemContact from './itemContact';
@@ -211,7 +212,7 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
                           key={`${item.id}`}
                           id={item.id || ''}
                           username={displayname}
-                          thumbnail={item.thumbnail}
+                          thumbnail={imageUrl(item.id || '', true)}
                         />
                       </div> 
                     )

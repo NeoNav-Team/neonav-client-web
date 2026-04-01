@@ -7,9 +7,12 @@ export const globalChannel = "22c6fec7b63257ca0d7b74394605813e";
 
 export const apiUrl = {
   protocol: "https",
-  hostname: process.env.API_DOMAIN || "devapi.neonav.net",
+  hostname: process.env.API_DOMAIN || "api.neonav.net",
   port: "",
 };
+
+export const imageUrl = (userId: string, thumbnail = false) =>
+  `${apiUrl.protocol}://${apiUrl.hostname}/api/image/${userId}${thumbnail ? '/thumbnail' : ''}`;
 
 export const authApiEnpoints = {
   login: {
@@ -223,5 +226,13 @@ export const authApiEnpoints = {
   location: {
     method: "get",
     path: "/api/locations/$id",
-  }
+  },
+  updateImage: {
+    method: "put",
+    path: "/api/image",
+  },
+  updateFactionImage: {
+    method: "put",
+    path: "/api/image/faction/$faction",
+  },
 };

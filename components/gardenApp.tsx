@@ -11,6 +11,7 @@ import { Context as NnContext } from "./context/nnContext";
 import { NnProviderValues, NnStatus, nnEntity } from "./context/nnTypes";
 import SimpleScrollContainer from "./simpleScrollContainer";
 import { isJsonStringValid } from "@/utilities/json";
+import { imageUrl } from "@/utilities/constants";
 import SubheaderGarden from "./subheaderEntity";
 import ItemStatus from "./itemStatus";
 import FooterNav from "./footerNav";
@@ -142,7 +143,7 @@ export default function GardenApp(props: GardenAppProps): JSX.Element {
           }}
         >
           <SubheaderGarden
-            photo={entity.image}
+            photo={imageUrl(entity.id || '')}
             title={entity.name}
             id={entity.id}
           />

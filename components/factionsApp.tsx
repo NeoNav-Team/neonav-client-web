@@ -3,6 +3,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProviderValues, NnFaction, NnSimpleEntity } from './context/nnTypes';
+import { imageUrl } from '../utilities/constants';
 import SimpleScrollContainer from './simpleScrollContainer';
 import ItemContact from './itemContact';
 import FooterNav from './footerNav';
@@ -107,7 +108,7 @@ export default function FactionsApp(props: FactionsAppProps):JSX.Element {
                             key={`${item.id}`}
                             id={item.id || ''}
                             username={item.name}
-                            thumbnail={item.thumbnail}
+                            thumbnail={imageUrl(item.id || '', true)}
                             collection="factions/admin"
                           />
                         </div> 
@@ -127,7 +128,7 @@ export default function FactionsApp(props: FactionsAppProps):JSX.Element {
                             key={`${item.id}`}
                             id={item.id || ''}
                             username={item.name}
-                            thumbnail={item.thumbnail}
+                            thumbnail={imageUrl(item.id || '', true)}
                             collection="factions/admin"
                           />
                         </div> 

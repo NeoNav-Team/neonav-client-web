@@ -46,6 +46,14 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     setAnchorEl(null);
   };
 
+  const handleMenuItemClick = (event: MouseEvent<HTMLButtonElement>, index: number) => {
+    setSelectedFaction(index);
+    const filteredFactions = reppedFactions(factions);
+    const factionId = filteredFactions[index]?.id || userId;
+    setSelected('account', factionId);
+    handleClose();
+  }
+
   const reppedFactions = (faction:NnFaction[]): NnFaction[] => {
     let reppedFactions: NnFaction[]  = [];
     faction.map( faction => {
@@ -57,12 +65,9 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
     return reppedFactions;
   }
 
-  const handleMenuItemClick = (event: MouseEvent<HTMLButtonElement>, index: number) => {
-    setSelectedFaction(index);
-    const filteredFactions = reppedFactions(factions);
-    const factionId = filteredFactions[index]?.id || userId;
-    setSelected('account', factionId);
-    handleClose();
+  const selectableFactions = reppedFactions(factions);
+  if (selectableFactions.length === 0) {
+    return <></>;
   }
 
   return (
@@ -81,7 +86,7 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
           onClose={handleClose}
           sx={{maxWidth: '300px'}}
         >
-          <MenuItem 
+          <MenuItem
             onClick={(event:any) => handleMenuItemClick(event, -1)}
             selected={selected === -1}
           >
@@ -90,8 +95,8 @@ export default function SelectFaction(props:SelectFactionProps):JSX.Element {
             </ListItemIcon>
             {user}
           </MenuItem>
-          {reppedFactions(factions).map((faction, index) => (
-            <MenuItem 
+          {selectableFactions.map((faction, index) => (
+            <MenuItem
               onClick={(event:any) => handleMenuItemClick(event, index)}
               key={faction?.id}
               selected={selected === index}
