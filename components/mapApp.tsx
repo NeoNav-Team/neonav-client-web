@@ -155,20 +155,20 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }
   const flexFooter = {
     position: 'absolute',
-    top: 'calc(100vh - 174px)',
+    top: 'calc(100dvh - 174px)',
     width: '100%',
     transition: 'all 0.3s ease-in-out',
   };
   const flexFooterFront = {
     position: 'absolute',
-    top: 'calc(100vh - 174px)',
+    top: 'calc(100dvh - 174px)',
     width: '100%',
     transition: 'all 0.3s ease-in-out',
     zIndex: '2000',
   };
   const flexFooterHidden = {
     position: 'absolute',
-    top: 'calc(100vh - 64px)',
+    top: 'calc(100dvh - 64px)',
     width: '100%',
     transition: 'all 0.1s ease-in-out',
   };
