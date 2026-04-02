@@ -39,7 +39,7 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import PersonIcon from '@mui/icons-material/Person';
-import NavigationIcon from '@mui/icons-material/Navigation';
+import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
 
 
 // Map Icons
@@ -428,16 +428,19 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       // TODO Move this to dedicated layer not on the mapobject
       // Set up listeners/hooks
       mymap.on('locationfound', (e) => {
-        console.log("Location found:", e);
         setUserLocationKnown(true);
         setLastKnownLocation(e.latlng);
         var radius = e.accuracy;
+        // TODO add user location via location pin api
         L.marker(e.latlng, {icon: getDivIcon('', '#5191ff')}).addTo(mymap);
         L.circle(e.latlng, {radius}).addTo(mymap);
       });
 
+      
       mymap.on('locationerror', (e) => {
         setUserLocationKnown(false);
+
+        // This is mostly for debugging, I doubt we want to pop this alert every time location hiccoughs
         alert("Location access denied.");
       });
 
@@ -449,7 +452,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       });
 
       if (typeof window !== 'undefined' && window?.isSecureContext) {
-        mymap.locate({watch: true, maximumAge: 15000});
+        mymap.locate({
+          watch: true, // starts continuous watching of location changes
+          maximumAge: 15000 // Return cached location if less than this amount of milliseconds passed since last geolocation response
+        });
       }
     }
 
@@ -709,23 +715,26 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <ShareLocationIcon/>,
+            tooltipText: "Share This Location",
             // TODO: Create sharable link that is either knownLocation or custom dragable pin on map
           }}
           secondHexProps={{
-            icon: <RateReviewIcon/>
+            icon: <RateReviewIcon/>,
+            tooltipText: "Add A Review",
             // TODO: Dialog to add review
           }}
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
+            tooltipText: "Edit Location",
             // TODO: Switch to edit modal and begin editing
           }}
           thirdHexProps={{
             icon: <EventIcon/>,
+            tooltipText: "See Events",
             // TODO: View events associated with location
           }}
           fourthHexProps={{
-            icon: userLocationKnown ? <MyLocationIcon/> : <LocationSearchingIcon/>,
-            disabled: typeof window === 'undefined' || !window?.isSecureContext,
+            disabled: true,
           }}
         />
       </Box>
@@ -733,19 +742,22 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <PersonPinCircleIcon/>,
+            tooltipText: "Share Your Location",
             // TODO: Create sharable link that is either knownLocation or custom dragable pin on map
           }}
           secondHexProps={{
             icon: <AddLocationIcon/>,
+            tooltipText: "Add A Location",
             // TODO: Link to admin page to generate new location
           }}
           bigHexProps={{
             icon: <FilterListIcon/>,
+            tooltipText: "Layers",
             handleAction: openLayerModal,
           }}
-          thirdHexProps={{}}
-          fourthHexProps={{
+          thirdHexProps={{
             icon: userLocationKnown ? <MyLocationIcon/> : <LocationSearchingIcon/>,
+            tooltipText: userLocationKnown ? "Show Your Location" : "Location Unavailable",
             // TODO: Move this to a function
             handleAction: () => {
               if (mapRef.current) {
@@ -753,11 +765,17 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                 if (userLocationKnown) {
                   myMap.flyTo(lastKnownLocation);
                 } else {
+                  // If the user clicks the location button but we don't know where they are, try kicking off locate again 
                   myMap.locate({watch: true, maximumAge: 15000});
                 }
               }
             },
             disabled: typeof window === 'undefined' || !window?.isSecureContext,
+          }}
+          fourthHexProps={{
+            icon: <LocationDisabledIcon/>,
+            tooltipText: "Delete Your Shared Locations"
+            // TODO: Call to delete location
           }}
         />
       </Box>

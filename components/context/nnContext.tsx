@@ -71,9 +71,19 @@ import {
   fetchFactionStatuses,
 } from './nnActionsFaction';
 import { 
+  addLocationPin,
+  addLocationReview,
+  createFactionLocation,
+  createLocation,
+  deleteLocationPins,
+  deleteLocationReview,
   fetchAllLocations,
-  fetchUnverifiedLocations,
   fetchLocationById,
+  fetchLocationPins,
+  fetchUnverifiedLocations,
+  updateFactionLocation,
+  updateLocation,
+  verifyLocation,
 } from './nnActionsLocation';
 import { nnSchema } from "./nnSchema";
 import {
@@ -132,11 +142,14 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setLocations':
       clonedState.network.collections.locations = payload;
       break;
-    case 'setLocation':
+    case 'updateLocation':
       const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
       if (location) {
         clonedState.network.collections.locations = clonedState.network.collections.locations.map((l:any) => l.id === (payload as any)?.id ? payload as any : l);
       }
+      break;
+    case 'setLocationPins':
+      clonedState.network.collections.locationPins = payload;
       break;
     case 'updateClipboardEntities':
       let clipboardEntities = clonedState.network.collections.clipboardEntities;
@@ -237,6 +250,8 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
 export const { Context, Provider } = DataContextCreator(
   nnReducer,
   { 
+    addLocationReview,
+    addLocationPin,
     addRecentScan,
     addRepToFaction,
     addUserToFaction,
@@ -245,8 +260,13 @@ export const { Context, Provider } = DataContextCreator(
     clearUnreadCountByType,
     closeAlert,
     closeAnnouncement,
+    createFactionLocation,
+    createLocation,
     createNewChannel,
+    deleteLocationPins,
+    deleteLocationReview,
     fetchAllFactions,
+    fetchAllLocations,
     fetchChannelDetails,
     fetchChannelHistory,
     fetchChannelUsers,
@@ -254,14 +274,14 @@ export const { Context, Provider } = DataContextCreator(
     fetchClipboardEntities,
     fetchFactionDetails,
     fetchFactionStatuses,
+    fetchLocationPins,
     fetchNetworkStatus,
     fetchUnreadCount,
     fetchUserChannels,
     fetchUserContacts,
     fetchUserFactions,
-    fetchAllLocations,
-    fetchUnverifiedLocations,
     fetchLocationById,
+    fetchUnverifiedLocations,
     fetchUserProfile,
     fetchUserSetStatuses,
     fetchUserStatuses,
@@ -290,9 +310,12 @@ export const { Context, Provider } = DataContextCreator(
     toggleChannelScope,
     toggleStatusClass,
     unfriend,
+    updateFactionLocation,
     updateFactionProfile,
+    updateLocation,
     updateUserProfile,
     userSearch,
+    verifyLocation,
   },
   defaultNnContext,
 );

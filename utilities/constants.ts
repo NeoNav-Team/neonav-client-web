@@ -231,6 +231,46 @@ export const authApiEnpoints = {
     method: "get",
     path: "/api/locations/$id",
   },
+  createFactionLocation: {
+    method: "post",
+    path: "/api/factions/$faction/locations",
+  },
+  createLocation: {
+    method: "post",
+    path: "/api/locations",
+  },
+  updateFactionLocation: {
+    method: "patch",
+    path: "/api/factions/$faction/locations/$id",
+  },
+  updateLocation: {
+    method: "patch",
+    path: "/api/locations/$id",
+  },
+  verifyLocation: {
+    method: "patch",
+    path: "/api/locations/$id/verify",
+  },
+  addLocationReview: {
+    method: "post",
+    path: "/api/locations/:location/reviews",
+  },
+  deleteLocationReview: {
+    method: "delete",
+    path: "/api/locations/:location/reviews/:something",
+  },
+  addLocationPin: {
+    method: "post",
+    path: "/api/locations/pins",
+  },
+  getLocationPin: {
+    method: "get",
+    path: "/api/locations/pins/:user",
+  },
+  deleteLocationPins: {
+    method: "delete",
+    path: "/api/locations/pins",
+  },
   updateImage: {
     method: "put",
     path: "/api/image",
