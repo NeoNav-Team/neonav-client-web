@@ -111,7 +111,7 @@ const layerData = new Map<string, L.LayerGroup>();
 export default function MapApp(props: PageContainerProps): JSX.Element {
   const modalStyle_0 = {
     position: 'absolute' as 'absolute',
-    top: '100vh',
+    top: '100dvh',
     height: '0vh',
     left: '0%',
     width: '100%',
@@ -120,7 +120,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
   const modalStyle_10 = {
     position: 'absolute' as 'absolute',
-    top: '90vh',
+    top: '90dvh',
     height: '10vh',
     left: '0%',
     width: '100%',
@@ -129,7 +129,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
   const modalStyle_30 = {
     position: 'absolute' as 'absolute',
-    top: '70vh',
+    top: '70dvh',
     height: '30vh',
     left: '0%',
     width: '100%',
@@ -138,7 +138,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
   const modalStyle_90 = {
     position: 'absolute' as 'absolute',
-    top: '10vh',
+    top: '10dvh',
     height: '90vh',
     left: '0%',
     width: '100%',
