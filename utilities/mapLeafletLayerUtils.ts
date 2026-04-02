@@ -16,8 +16,8 @@ export function initStaticLayerGroups(
   // Dev location markers used by maintainance staff
   layerData.set("devLayer", L.layerGroup());
 
-  // Event location markers not owned by a guest faction
-  layerData.set("eventLayer", L.layerGroup());
+  // Personal location pin markers
+  layerData.set("pinsLayer", L.layerGroup());
 
   // These are toggled based on zoom level.
   layerData.set("megablockLocations", L.layerGroup());

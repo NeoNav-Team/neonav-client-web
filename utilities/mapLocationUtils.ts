@@ -1,10 +1,9 @@
 import L from "leaflet";
 import { compressHoursAcrossMidnight, generateOpenMessages } from "./mapTimeUtils";
 
-const NEO_CITY_ADMIN = "C231465509";
 const NEONAV_MAINT = "C461879533";
-const MEGABLOCK_META = "L888888888";
-const MEGAMALL_META = "L777777777";
+const MEGABLOCK_META = "L229118014";
+const MEGAMALL_META = "L128533982";
 
 /** 
  * Enriches raw location data with display-ready strings and metadata.
@@ -59,9 +58,6 @@ export function getTargetLayer(
   // 4. Spatial Layers (Mega Structures)
   if (megablockRect.contains(latlng)) return layers.get("megablockLocations")!;
   if (megamallRect.contains(latlng)) return layers.get("megamallLocations")!;
-
-  // 5. Event specific markers
-  if (loc.owner === NEO_CITY_ADMIN) return layers.get("eventLayer")!;
 
   // 6. Default
   return layers.get("locationMarkersLayer")!;

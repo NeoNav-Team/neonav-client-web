@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import styles from "@/styles/generic.module.css";
 
-export type MapLayersModalLayerId = "eventLayer" | "devLayer" | "mylocations" | "unverified";
+export type MapLayersModalLayerId = "pinsLayer" | "devLayer" | "mylocations" | "unverified";
 
 export interface MapLayersModalProps {
   open: boolean;
@@ -19,17 +19,20 @@ export interface MapLayersModalProps {
   layerModalSizeStyle: any;
   layerStates: Record<string, boolean>;
   onToggle: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  showDev: boolean;
 }
 
 export default function MapLayersModal(props: MapLayersModalProps): JSX.Element {
-  const { open, onClose, layerModalSizeStyle, layerStates, onToggle } = props;
+  const { open, onClose, layerModalSizeStyle, layerStates, onToggle, showDev } = props;
 
-  const layerIds: MapLayersModalLayerId[] = ["eventLayer", "mylocations", "unverified", "devLayer", ];
+  const layerIds: MapLayersModalLayerId[] = ["pinsLayer", "mylocations", "unverified", ];
+  if (showDev) layerIds.push("devLayer");
+  
   const labels: Record<MapLayersModalLayerId, string> = {
-    eventLayer: "Event Locations",
-    devLayer: "Dev Layer",
+    pinsLayer: "Location Pins",
     mylocations: "My Locations",
     unverified: "Unverified Locations",
+    devLayer: "Dev Layer",
   };
 
   return (

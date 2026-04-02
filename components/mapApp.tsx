@@ -4,7 +4,7 @@ import 'styles/leaflet.css';
 import styles from "@/styles/generic.module.css";
 import React, {useEffect, useRef, useState, useMemo, useCallback, use} from "react";
 import ReactDOMServer from 'react-dom/server';
-import L, { LayerGroup } from 'leaflet';
+import L from 'leaflet';
 import {
   Box,
   Container,
@@ -56,6 +56,7 @@ import NightlifeIcon from '@mui/icons-material/Nightlife';
 import HiveIcon from '@mui/icons-material/Hive';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import SimCardIcon from '@mui/icons-material/SimCard';
+import SpeakerIcon from '@mui/icons-material/Speaker';
 // Allegiance Icons
 // https://www.iconarchive.com/show/material-icons-by-pictogrammers/dna-icon.html // Helix
 import ControlCameraIcon from '@mui/icons-material/ControlCamera'; // Endline
@@ -68,17 +69,20 @@ import { Context as NnContext } from "@/components/context/nnContext";
 import { NnProviderValues } from "@/components/context/nnTypes";
 import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
-import { createDummyLocationMarkers } from "@/utilities/mapDummyLocationMarkers";
 import { renderLocationsToLeafletLayers } from "@/utilities/mapLeafletLocationsRenderer";
 import next from 'next';
 import { LocalMall } from '@mui/icons-material';
 
 
 interface PageContainerProps {
+  params?: {
+    id: string;
+  }
 }
 
 const LARGE_MAP_FILE = "/2026_map_large_north.png"
 const ZOOMED_MAP_FILE = "/2026_map_zoomed_north.png"
+const NEONAV_MAINT = "C461879533";
 
 class CustomTileLayer extends L.TileLayer {
   constructor(options?: L.TileLayerOptions) {
@@ -185,7 +189,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
   const [selectedLocationId, setSelectedLocationId] = useState("");
-  const [selectedMarker, setSelectedMarker] = useState<L.Marker>();
   const [selectedLocation, setSelectedLocation] = useState({id: "", name: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""});
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalSizeStyle, setInfoModalSizeStyle] = useState(modalStyle_0);
@@ -321,11 +324,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     const vt = (venuetype || '').toLowerCase();
     if (vt.includes('arcade')) return { icon: <GamepadIcon style={{ color: cyberOrange }} />, color: cyberBlueLight };
     if (vt.includes('food') || vt.includes('stall') || vt.includes('restaurant') || vt.includes('dining')) return { icon: <RamenDiningIcon style={{ color: cyberYellow }} />, color: cyberGreen };
+    if (vt.includes('entertainment') || vt.includes('music')) return { icon: <SpeakerIcon style={{ color: cyberGreen }} />, color: cyberYellow };
     if (vt.includes('megablock') || vt.includes('block')) return { icon: <HiveIcon style={{ color: cyberBlueDark }} />, color: cyberYellow };
     if (vt.includes('megamall') || vt.includes('block')) return { icon: <LocalMall style={{ color: cyberBlueDark }} />, color: cyberYellow };
     if (vt.includes('dev')) return { icon: <AdjustIcon style={{ color: "#FFFFFF" }} />, color: "#FF0000" };
     if (vt.includes('porto')) return { icon: <WcIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
-    if (vt.includes('medical')) return { icon: <HealthAndSafetyIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
+    if (vt.includes('medical')) return { icon: <HealthAndSafetyIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };6
     if (vt.includes('security')) return { icon: <LocalPoliceIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
     return { icon: <AdjustIcon style={{ color: cyberYellow }} />, color: cyberBlueDark };
   };
@@ -410,26 +414,41 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     const locationMarkersLayer = layerData.get("locationMarkersLayer") as L.LayerGroup | undefined;
     if (!mymap || !locationMarkersLayer) return;
 
-    const markers = createDummyLocationMarkers({ hours: [], prettyhours: [] });
-
     renderLocationsToLeafletLayers({
-      mymap,
       layerData,
       locations,
-      extraMarkers: markers,
       userId: state?.user?.profile?.auth?.userid,
       factions: state?.user?.factions,
       getVenueIconAndColor,
       getDivIcon,
       onMarkerClick: (leafletMarker) => {
-        // `openInfoModal()` reads from `myMapObjects.selectedMarker`.
-        fetchLocationById((leafletMarker as any).id);
         setSelectedLocationId((leafletMarker as any).id);
-        setSelectedMarker(leafletMarker);
+        fetchLocationById((leafletMarker as any).id);
         mymap.flyTo(leafletMarker.getLatLng());
         openInfoModal();
       },
     });
+
+    // We are setting all the markers into this myMapObjects then using it immediately below, but we will need to do this search elsewhere
+    myMapObjects.set("allMarkers", []);
+
+    mymap.eachLayer(function (layer) {
+      if (layer instanceof L.Marker) {
+        myMapObjects.get("allMarkers").push(layer);
+      }
+    });
+
+    // If we passed in a location ID, open it up
+    if (!selectedLocationId && props?.params?.id) {
+      setSelectedLocationId(props?.params?.id);
+      fetchLocationById(props?.params?.id);
+      let allMarkers: L.Marker[] = myMapObjects.get("allMarkers") || [];
+      let leafletMarker = allMarkers.find((marker: any) => marker.id === props?.params?.id);
+      if (leafletMarker) {
+        mymap.flyTo(leafletMarker.getLatLng());
+        openInfoModal();
+      }
+    }
   }, [state?.network?.collections?.locations]);
 
   useEffect(() => {
@@ -619,6 +638,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         layerModalSizeStyle={layerModalSizeStyle}
         layerStates={layerStates}
         onToggle={handleLayerSwitch}
+        showDev={state?.user?.factions?.some(f => f.id === NEONAV_MAINT) ?? false} // ew
       />
       <Box sx={footerStyle} hidden={!showInfoModal}>
         <FooterNav
