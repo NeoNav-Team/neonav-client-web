@@ -350,6 +350,20 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	color: #FF00A0;
 	}
 
+/* This ensures the plugin cannot hide the control via inline styles */
+.leaflet-control-rotate {
+	display: block !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+}
+
+.leaflet-control-rotate-arrow {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23FF00A0'%3E%3Cpath d='M10.5 14l4-8 4 8h-8z'/%3E%3Cpath d='M10.5 16l4 8 4-8h-8z' fill='%23ccc'/%3E%3C/svg%3E") !important;
+}
+
+.leaflet-control-rotate-toggle {
+  background-color: transparent !important;
+}
 
 /* layers control */
 

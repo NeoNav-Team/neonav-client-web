@@ -4,7 +4,8 @@ import 'styles/leaflet.css';
 import styles from "@/styles/generic.module.css";
 import React, {useEffect, useRef, useState, useMemo, useCallback, use} from "react";
 import ReactDOMServer from 'react-dom/server';
-import L from 'leaflet';
+import L, { map } from 'leaflet';
+import 'leaflet-rotate';
 import {
   Box,
   Container,
@@ -38,6 +39,7 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import PersonIcon from '@mui/icons-material/Person';
+import NavigationIcon from '@mui/icons-material/Navigation';
 
 
 // Map Icons
@@ -80,6 +82,14 @@ interface PageContainerProps {
   }
 }
 
+interface RotateControl extends L.Control {
+  _arrow: HTMLElement;
+  _map: L.Map;
+  _update(): void;
+  _reset(e: L.LeafletEvent): void;
+  getContainer(): HTMLElement;
+}
+
 const LARGE_MAP_FILE = "/2026_map_large_north.png"
 const ZOOMED_MAP_FILE = "/2026_map_zoomed_north.png"
 const NEONAV_MAINT = "C461879533";
@@ -99,6 +109,7 @@ class CustomTileLayer extends L.TileLayer {
     return tiles.get(key)?.valueOf() ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEABIABABYgdoOhwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+kGFwAcDSfXW4wAAAMtSURBVHja7d2xbcMwEIZRK2DrQkAGyQych8N6EHYZgKkCBNcpEPwXfK9Uk1AHfKDc3NHPsR7Alj68AhAAQACAnbT64PU93/oPfD0/3/43//7txJnT5/89d2rm5p87f529GwD4BAAEABAAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEALjF0c+xvAbYk+WgD8tBLQe1HBTwGwAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIAXGQ9OLgBADtq9UFiV7398DNy7tTMzT93/jp7NwDwCQAIACAAgAAAAgAIACAAgAAAAgAIACAAgAAAAgAIACAAgAAAAgAIACAAgAAAAgAIACAAgAAAAgAIACAAgAAAAgBcdfRzLK8B9tTqg8SuevvhZ+TcqZmbf+78dfY+AcBvAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAAAIACAAgAIAAALewHBTcAAABAAQA2EOrDxK76u2Hn5Fzp2Zu/rnz19m7AYBPAEAAAAEABAAQAEAAAAEABAAQAEAAAAEABAAQAEAAAAEABAAQAEAAAAEABAAQAEAAAAEABAAQAEAAAAEABAAQAOCqo59jeQ2wp1YfJHbV2w8/I+dOzdz8c+evs/cJAH4DAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAIB/sh4c3ACAHbX6ILGr3n74GTl3aubmnzt/nb0bAPgEAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAAQAEABAAAABAK46+jmW1wB7avVBYle9/fAzcu7UzM0/d/46e58A4DcAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEABAAQAAAAQAEABAA4E52A4IbACAAgAAAe/gBFkfRtvZXmQcAAAAASUVORK5CYII='.valueOf();
   }
 }
+
 
 const custom = function (options?: L.TileLayerOptions): CustomTileLayer {
   return new CustomTileLayer(options);
@@ -216,6 +227,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     minZoom: 18,
     maxZoom: 22,
     zoomSnap: 0.5,
+    rotate: true,
+    bearing: 0,
     maxBounds: L.latLng(35.0798889, -117.8222298).toBounds(1400),
   };
 
@@ -334,12 +347,64 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     return { icon: <AdjustIcon style={{ color: cyberYellow }} />, color: cyberBlueDark };
   };
 
+
+  const handleRotate = (() => {
+    const headingA = 0;
+    const headingB = -90;
+
+    const rotateControl = (myMapObjects.get("map") as any).rotateControl as RotateControl;
+
+    if (rotateControl && rotateControl._arrow) {
+      const oldArrow = rotateControl._arrow;
+
+      // Clone the arrow to strip ALL hidden plugin listeners
+      const newArrow = oldArrow.cloneNode(true) as HTMLElement;
+      if (oldArrow.parentNode) {
+        oldArrow.parentNode.replaceChild(newArrow, oldArrow);
+      }
+      // Update the reference in the control object
+      rotateControl._arrow = newArrow;
+
+      // Attach your custom toggle listener
+      L.DomEvent.on(newArrow, 'click', (e) => {
+        L.DomEvent.stop(e);
+
+        const current = (myMapObjects.get("map") as any).getBearing();
+        const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
+        
+        (myMapObjects.get("map") as any).setBearing(next);
+      });
+
+
+      // Override _update to prevent the button from being hidden at 0 degrees
+      rotateControl._update = function (this: RotateControl) {
+        const bearing = this._map.getBearing();
+        const container = this.getContainer();
+
+        if (container) {
+          container.style.display = 'block'; // Force visibility every update
+        }
+
+        // The original plugin logic often sets display: none here if bearing is 0.
+        // We override it to only update the visual rotation of the arrow.
+        if (this._arrow) {
+          this._arrow.style.transform = `rotate(${bearing}deg)`;
+        }
+      };
+      
+      // Initial sync
+      rotateControl._update();
+    }
+  });
+
   useEffect(() => {
     if (mapRef.current && !myMapObjects.has("map")) {
       const mymap = L.map(mapRef?.current, options);
       myMapObjects.set("map", mymap);
 
       custom({maxZoom: 22,}).addTo(mymap);
+
+      handleRotate();
 
       // Map overlay - Have to hand adjust bounds to fit static map image onto tiles. Once done set opacity to 1
       L.imageOverlay(LARGE_MAP_FILE, L.latLngBounds([[35.083254, -117.824501], [35.078358, -117.820043]]), {
