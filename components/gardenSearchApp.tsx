@@ -152,6 +152,7 @@ export default function GardenSearchApp(
                 dialog: "Search for a User",
                 handleAction: searchForContact,
                 useInput: true,
+                tooltipText: "Search For User",
               }}
               thirdHexProps={{
                 disabled: true,
@@ -159,6 +160,7 @@ export default function GardenSearchApp(
               fourthHexProps={{
                 icon: <LocalFloristIcon />,
                 link: `/garden`,
+                tooltipText: "Jaden/Garden",
               }}
             />
           </Box>

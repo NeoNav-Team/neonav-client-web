@@ -332,7 +332,8 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
               firstHexProps={{
                 icon: <NoMeetingRoomIcon />,
                 handleAction: goLeaveFaction,
-                dialog: "Leave this faction?"
+                dialog: "Leave this faction?",
+                tooltipText: "Leave Faction",
               }}
               secondHexProps={{
                 disabled: true,
@@ -341,6 +342,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
                 icon: <ManageAccountsIcon />,
                 disabled: !isAdmin,
                 handleAction: handleBigAction,
+                tooltipText: "Manage Faction",
               }}
               thirdHexProps={{
                 disabled: true,
@@ -348,6 +350,7 @@ export default function FactionAdminApp(props: FactionAdminAppProps):JSX.Element
               fourthHexProps={{
                 icon: <TocIcon />,
                 link: '/factions',
+                tooltipText: "All Factions",
               }}
             />
           </Box>

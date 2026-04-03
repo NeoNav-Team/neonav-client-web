@@ -304,16 +304,19 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
                 disabled: !isAdmin,
                 dialog: dialogForAction(requestValue),
                 handleAction: handleBigAction,
+                tooltipText: requests.find(req => req.value === requestValue)?.label + " User",
               }}
               thirdHexProps={{
                 icon: <NoMeetingRoomIcon />,
                 handleAction: goLeaveChannel,
-                dialog: "Leave this channel?"
+                dialog: "Leave this channel?",
+                tooltipText: "Leave Channel",
               }}
               fourthHexProps={{
                 icon: scope == 'group' ? <LockOpenIcon /> : <LockIcon />,
                 disabled: !isAdmin,
                 handleAction: goSetChannelScope,
+                tooltipText: scope == 'group' ? "Make Channel Public" : "Make Channel Private",
               }}
             />
           </Box>

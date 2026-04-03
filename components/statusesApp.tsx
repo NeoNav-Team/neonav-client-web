@@ -185,10 +185,12 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
               thirdHexProps={{
                 icon: outbound ? <OutboxIcon /> : <MoveToInboxIcon />,
                 link: boxLink(),
+                tooltipText: outbound ? "Outbox" : "Inbox",
               }}
               fourthHexProps={{
                 icon: <ListIcon />,
-                link: factionId ? `/factions/${factionId}` : '/garden'
+                link: factionId ? `/factions/${factionId}` : '/garden',
+                tooltipText: factionId ? "Faction" : "Jaden/Garden",
               }}
             />
           </Box>
