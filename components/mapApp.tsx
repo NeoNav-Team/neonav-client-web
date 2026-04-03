@@ -715,22 +715,22 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <ShareLocationIcon/>,
-            tooltipText: "Share This Location",
+            // tooltipText: "Share This Location",
             // TODO: Create sharable link that is either knownLocation or custom dragable pin on map
           }}
           secondHexProps={{
             icon: <RateReviewIcon/>,
-            tooltipText: "Add A Review",
+            // tooltipText: "Add A Review",
             // TODO: Dialog to add review
           }}
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
-            tooltipText: "Edit Location",
+            // tooltipText: "Edit Location",
             // TODO: Switch to edit modal and begin editing
           }}
           thirdHexProps={{
             icon: <EventIcon/>,
-            tooltipText: "See Events",
+            // tooltipText: "See Events",
             // TODO: View events associated with location
           }}
           fourthHexProps={{
@@ -742,22 +742,22 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <PersonPinCircleIcon/>,
-            tooltipText: "Share Your Location",
+            // tooltipText: "Share Your Location",
             // TODO: Create sharable link that is either knownLocation or custom dragable pin on map
           }}
           secondHexProps={{
             icon: <AddLocationIcon/>,
-            tooltipText: "Add A Location",
+            // tooltipText: "Add A Location",
             // TODO: Link to admin page to generate new location
           }}
           bigHexProps={{
             icon: <FilterListIcon/>,
-            tooltipText: "Layers",
+            // tooltipText: "Layers",
             handleAction: openLayerModal,
           }}
           thirdHexProps={{
             icon: userLocationKnown ? <MyLocationIcon/> : <LocationSearchingIcon/>,
-            tooltipText: userLocationKnown ? "Show Your Location" : "Location Unavailable",
+            // tooltipText: userLocationKnown ? "Show Your Location" : "Location Unavailable",
             // TODO: Move this to a function
             handleAction: () => {
               if (mapRef.current) {
@@ -774,7 +774,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           fourthHexProps={{
             icon: <LocationDisabledIcon/>,
-            tooltipText: "Delete Your Shared Locations"
+            // tooltipText: "Delete Your Shared Locations"
             // TODO: Call to delete location
           }}
         />
