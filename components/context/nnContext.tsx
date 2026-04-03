@@ -70,7 +70,7 @@ import {
   setFactionUserStatus,
   fetchFactionStatuses,
 } from './nnActionsFaction';
-import { 
+import {
   addLocationPin,
   addLocationReview,
   createFactionLocation,
@@ -85,6 +85,13 @@ import {
   updateLocation,
   verifyLocation,
 } from './nnActionsLocation';
+import {
+  fetchAllEvents,
+  fetchUserEventsAttending,
+  fetchUserEventsMine,
+  fetchLocationEvents,
+  rsvpEvent,
+} from './nnActionsEvent';
 import { nnSchema } from "./nnSchema";
 import {
   getCookieContext,
@@ -141,6 +148,9 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setLocations':
       clonedState.network.collections.locations = payload;
+      break;
+    case 'setEvents':
+      clonedState.network.collections.events = payload;
       break;
     case 'updateLocation':
       const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
@@ -316,6 +326,11 @@ export const { Context, Provider } = DataContextCreator(
     updateUserProfile,
     userSearch,
     verifyLocation,
+    fetchAllEvents,
+    fetchUserEventsAttending,
+    fetchUserEventsMine,
+    fetchLocationEvents,
+    rsvpEvent,
   },
   defaultNnContext,
 );
