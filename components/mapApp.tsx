@@ -174,7 +174,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
   const [selectedLocationId, setSelectedLocationId] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState({id: "", name: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""});
+  const [selectedLocation, setSelectedLocation] = useState({id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""});
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalSizeStyle, setInfoModalSizeStyle] = useState(modalStyle_0);
   const [infoModalSize, setInfoModalSize] = useState(0);
@@ -600,6 +600,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                     <Link href={`/sites/${selectedLocation.neocities}`}>
                       {!!selectedLocation.neocities && selectedLocation.ownername}
                     </Link>
+                  </Typography>
+                  {(selectedLocation.description && <Divider color="secondary" flexItem/>)}
+                  <Typography sx={modalBodyStyle} component="p">
+                    {selectedLocation.description}
                   </Typography>
                   <Divider color="secondary" flexItem/>
                   <Typography sx={modalBodyStyle} component="p">
