@@ -19,6 +19,14 @@ export interface LeafletLocationsRendererParams {
   onMarkerClick: (leafletMarker: L.Marker) => void;
 }
 
+export interface LeafletLocationPinsRendererParams {
+  layerData: Map<string, LayerGroup>;
+  pins: any[];
+  getVenueIconAndColor: (venuetype: string) => { icon: any; color: string };
+  getDivIcon: (materialIcon: any, color: string) => any;
+  onMarkerClick: (leafletMarker: L.Marker) => void;
+}
+
 export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererParams): void {
   const {
     layerData,
@@ -40,8 +48,6 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     }
     layer.clearLayers();
   }
-
-
 
   // 2. Constants & Bounds (Consider moving these to a config file)
   // Find corners of mega structures for bounding boxes
@@ -85,7 +91,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
     // Create the marker
     const { icon, color } = getVenueIconAndColor(loc.venuetype ?? "");
-    const leafletMarker: L.Marker = L.marker(latlng, { icon: getDivIcon(icon, color) })
+    const leafletMarker: L.Marker = L.marker(latlng, { icon: getDivIcon(icon, color), autoPan: true })
       .addTo(targetLayer)
       .on("click", () => onMarkerClick(leafletMarker)
     );
@@ -105,3 +111,43 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     }
   });
 }
+
+export function renderLocationPinsToLeafletLayers(params: LeafletLocationPinsRendererParams): void {
+  const {
+    layerData,
+    pins,
+    getVenueIconAndColor,
+    getDivIcon,
+    onMarkerClick,
+  } = params;
+
+  const requiredLayers = ["pinsLayer"];
+  for (const key of requiredLayers) {
+    const layer = layerData.get(key);
+    if (!layer) {
+      console.log("Failed to load " + key);
+      return; // Safety check
+    }
+    layer.clearLayers();
+  }
+
+  pins.forEach((pin: any) => {
+    if (pin.lat == null || pin.long == null) return;
+    const latlng = L.latLng(pin.lat, pin.long);
+
+    // Create the marker
+    const { icon, color } = getVenueIconAndColor("location_pin");
+    const leafletMarker: L.Marker = L.marker(latlng, { icon: getDivIcon(icon, color), autoPan: true })
+      .addTo(layerData.get("pinsLayer")!)
+      .on("click", () => onMarkerClick(leafletMarker)
+    );
+
+    const isoString: string = pin.ts;
+    const date: Date = new Date(isoString);
+
+    // Returns a human-readable string based on the user's locale (e.g., "3/20/2024, 8:00:00 AM")
+    const readableDate: string = date.toLocaleString(); 
+
+    leafletMarker.bindTooltip(pin.name + "<br>" + pin.id + "<br>" + readableDate, { permanent: true, direction: "right" });
+  });
+};

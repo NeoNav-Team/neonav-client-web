@@ -590,11 +590,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .leaflet-tooltip {
 	position: absolute;
 	padding: 6px;
+	font-family: "Jura", Jura, Roboto, sans-serif;
+  font-style: normal;
 	background-color: #12045800;
 	border: 1px solid #12045800;
 	border-radius: 3px;
 	color: #FFFFFF;
-	text-shadow: 2px 2px 6px #120458;
+	text-shadow: 2px 2px 8px #120458;
 	white-space: nowrap;
 	-webkit-user-select: none;
 	-moz-user-select: none;
