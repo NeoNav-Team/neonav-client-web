@@ -3,9 +3,8 @@
 import 'styles/leaflet.css';
 import styles from "@/styles/generic.module.css";
 import itemStyles from '../styles/item.module.css';
-import React, {useEffect, useRef, useState, useMemo, useCallback, use} from "react";
-import ReactDOMServer from 'react-dom/server';
-import L, { map } from 'leaflet';
+import React, {useEffect, useRef, useState} from "react";
+import L from 'leaflet';
 import 'leaflet-rotate';
 import {
   Box,
@@ -38,34 +37,9 @@ import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
 import EventIcon from '@mui/icons-material/Event';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import PersonIcon from '@mui/icons-material/Person';
 import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
 
-
-// Map Icons
-import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
-import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
-import WcIcon from '@mui/icons-material/Wc';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import AdjustIcon from '@mui/icons-material/Adjust';
-import GamepadIcon from '@mui/icons-material/Gamepad';
-import RamenDiningIcon from '@mui/icons-material/RamenDining';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-import LocalBarIcon from '@mui/icons-material/LocalBar';
-import ElectricalServicesIcon from '@mui/icons-material/ElectricalServices';
-import NightlifeIcon from '@mui/icons-material/Nightlife';
-import HiveIcon from '@mui/icons-material/Hive';
-import LocalMallIcon from '@mui/icons-material/LocalMall';
-import SimCardIcon from '@mui/icons-material/SimCard';
-import SpeakerIcon from '@mui/icons-material/Speaker';
-// Allegiance Icons
-// https://www.iconarchive.com/show/material-icons-by-pictogrammers/dna-icon.html // Helix
-import ControlCameraIcon from '@mui/icons-material/ControlCamera'; // Endline
-import ViewInArIcon from '@mui/icons-material/ViewInAr'; // Reboot?
-import TokenOutlinedIcon from '@mui/icons-material/TokenOutlined';
-import {isJsonStringValid} from "@/utilities/json";
 import ItemStatus from "@/components/itemStatus";
 import SimpleScrollContainer from "@/components/simpleScrollContainer";
 import { Context as NnContext } from "@/components/context/nnContext";
@@ -73,8 +47,6 @@ import { NnProviderValues } from "@/components/context/nnTypes";
 import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
 import { renderLocationsToLeafletLayers, renderLocationPinsToLeafletLayers } from "@/utilities/mapLeafletLocationsRenderer";
-import next from 'next';
-import { LocalMall } from '@mui/icons-material';
 
 
 interface PageContainerProps {
@@ -237,26 +209,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     maxBounds: L.latLng(35.0798889, -117.8222298).toBounds(1400),
   };
 
-  // This does a little hacking to render a materialUi icon as a leaflet marker
-  const getIconSettings = (materialIcon: any, color: string) => {
-    return {
-      mapIconUrl: '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 149 240"><defs><filter id="f1" x="0" y="0" xmlns="http://www.w3.org/2000/svg"><feGaussianBlur in="SourceGraphic" stdDeviation="7" /></filter></defs><path fill="#ffffff90" filter="url(#f1)" transform="translate(7.5 120) scale(0.9 0.5)" d="M74 0L149 40L144 120L74 240L4 120L4 40z"/><path fill="{mapIconColor}" stroke-width="4px" stroke="#000000" d="M74 0L149 40L144 120L74 240L4 120L4 40z"/><svg version="1" xmlns="http://www.w3.org/2000/svg" width="90%" x="8px" y="-30px">' + (materialIcon ? ReactDOMServer.renderToStaticMarkup(materialIcon) : '') + '</svg></svg>',
-      mapIconColor: color
-    };
-  };
-
-  // maybe this should move to locations render util
-  const getDivIcon = (materialIcon: any, color: string) => {
-    const settings = getIconSettings(materialIcon, color);
-    return L.divIcon({
-      className: "leaflet-data-marker",
-      html: L.Util.template(settings.mapIconUrl, settings),
-      iconAnchor: [15, 48],
-      iconSize: [30, 48],
-      tooltipAnchor: [2, -30]
-    });
-  };
-
   const openInfoModal = () => {
     setInfoModalSize(10);
     setInfoModalSizeStyle(modalStyle_0);
@@ -327,33 +279,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     // Keep the modal switch UI in sync with Leaflet.
     setLayerStates((prev) => ({ ...prev, [event.target.id]: event.target.checked }));
   };
-
-  // Cyberpunk 2077 Blue #5191ff
-  
-  // Colorblind friendly colors (used for map markers)
-  const cyberGreen = "#009E73"; // Food
-  const cyberOrange = "#D55E00"; // Event
-  const cyberBlueDark = "#0072B2"; // Spaceport
-  const cyberBlueLight = "#56B4E9"; // Midtown
-  const cyberYellow = "#F0E442"; // Downtown
-
-  // TODO: More robust venue type detection and icon/color assignment
-  // TODO: Move to location renderer or other util file
-  const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
-    const vt = (venuetype || '').toLowerCase();
-    if (vt.includes('arcade')) return { icon: <GamepadIcon style={{ color: cyberOrange }} />, color: cyberBlueLight };
-    if (vt.includes('food') || vt.includes('stall') || vt.includes('restaurant') || vt.includes('dining')) return { icon: <RamenDiningIcon style={{ color: cyberYellow }} />, color: cyberGreen };
-    if (vt.includes('entertainment') || vt.includes('music')) return { icon: <SpeakerIcon style={{ color: cyberGreen }} />, color: cyberYellow };
-    if (vt.includes('megablock') || vt.includes('block')) return { icon: <HiveIcon style={{ color: cyberBlueDark }} />, color: cyberYellow };
-    if (vt.includes('megamall') || vt.includes('block')) return { icon: <LocalMall style={{ color: cyberBlueDark }} />, color: cyberYellow };
-    if (vt.includes('dev')) return { icon: <AdjustIcon style={{ color: "#FFFFFF" }} />, color: "#FF0000" };
-    if (vt.includes('porto')) return { icon: <WcIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
-    if (vt.includes('medical')) return { icon: <HealthAndSafetyIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
-    if (vt.includes('security')) return { icon: <LocalPoliceIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
-    if (vt.includes('location_pin')) return { icon: <PersonIcon style={{ color: "#FFFFFF" }} />, color: cyberBlueLight };
-    return { icon: <AdjustIcon style={{ color: cyberYellow }} />, color: cyberBlueDark };
-  };
-
 
   const handleRotate = (() => {
     const headingA = 0;
@@ -493,8 +418,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       locations,
       userId: state?.user?.profile?.auth?.userid,
       factions: state?.user?.factions,
-      getVenueIconAndColor,
-      getDivIcon,
       onMarkerClick: (leafletMarker) => {
         setSelectedLocationId((leafletMarker as any).id);
         fetchLocationById((leafletMarker as any).id);
@@ -544,8 +467,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     renderLocationPinsToLeafletLayers({
       layerData,
       pins,
-      getVenueIconAndColor,
-      getDivIcon,
       onMarkerClick: (leafletMarker: L.Marker) => {
         mymap.flyTo(leafletMarker.getLatLng());
       },
@@ -737,6 +658,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <ShareLocationIcon/>,
+            disabled: true,
             // tooltipText: "Share This Location",
             // TODO: Create sharable link that is either knownLocation or custom dragable pin on map
           }}
@@ -747,14 +669,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
-            link: "/events/" + selectedLocationId,
             // tooltipText: "Edit Location",
             // TODO: Switch to edit modal and begin editing
           }}
           thirdHexProps={{
             icon: <EventIcon/>,
+            link: "/events/" + selectedLocationId,
             // tooltipText: "See Events",
-            // TODO: View events associated with location
           }}
           fourthHexProps={{
             disabled: true,
@@ -766,6 +687,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           firstHexProps={{
             icon: <PersonPinCircleIcon/>,
             // tooltipText: userLocationKnown ? "Share Your Location" : "Location Unavailable To Share",
+            dialog: "Broadcast your position? Your coordinates will be shared with your factions and mutual friends.",
             handleAction: () => {
               if (mapRef.current && userLocationKnown) {
                 addLocationPin(lastKnownLocation.lat.toString(), lastKnownLocation.lng.toString());
@@ -776,7 +698,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           secondHexProps={{
             icon: <AddLocationIcon/>,
             // tooltipText: "Add A Location",
-            // TODO: Link to admin page to generate new location
+            // TODO: Create location modal things
           }}
           bigHexProps={{
             icon: <FilterListIcon/>,
@@ -786,7 +708,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           thirdHexProps={{
             icon: userLocationKnown ? <MyLocationIcon/> : <LocationSearchingIcon/>,
             // tooltipText: userLocationKnown ? "Show Your Location" : "Location Unavailable",
-            // TODO: Move this to a function
             handleAction: () => {
               if (mapRef.current) {
                 let myMap = myMapObjects.get("map") as L.Map;
@@ -802,10 +723,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           fourthHexProps={{
             icon: <LocationDisabledIcon/>,
-            // tooltipText: "Delete Your Shared Locations"
+            // tooltipText: "Delete Your Shared Locations",
+            dialog: "Delete all location history? Your previously shared positions will be deleted for everyone. This cannot be undone.",
             handleAction: () => {
               if (mapRef.current) {
-                // TODO: Add confirmation popup
                 deleteLocationPins();
               }
             },

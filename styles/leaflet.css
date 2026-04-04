@@ -592,6 +592,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	padding: 6px;
 	font-family: "Jura", Jura, Roboto, sans-serif;
   font-style: normal;
+	font-size: 16px;
 	background-color: #12045800;
 	border: 1px solid #12045800;
 	border-radius: 3px;

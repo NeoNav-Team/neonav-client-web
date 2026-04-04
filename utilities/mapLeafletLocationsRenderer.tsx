@@ -1,6 +1,33 @@
 import L from "leaflet";
+import ReactDOMServer from 'react-dom/server';
 import type { LayerGroup } from "leaflet";
+import React from "react";
 import { enrichLocation, getTargetLayer } from "@/utilities/mapLocationUtils";
+
+// Map Icons
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
+import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
+import WcIcon from '@mui/icons-material/Wc';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import AdjustIcon from '@mui/icons-material/Adjust';
+import GamepadIcon from '@mui/icons-material/Gamepad';
+import RamenDiningIcon from '@mui/icons-material/RamenDining';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import LocalBarIcon from '@mui/icons-material/LocalBar';
+import ElectricalServicesIcon from '@mui/icons-material/ElectricalServices';
+import NightlifeIcon from '@mui/icons-material/Nightlife';
+import HiveIcon from '@mui/icons-material/Hive';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+import SimCardIcon from '@mui/icons-material/SimCard';
+import SpeakerIcon from '@mui/icons-material/Speaker';
+import LocalMall from '@mui/icons-material/LocalMall';
+import AttributionIcon from '@mui/icons-material/Attribution';
+// Allegiance Icons
+// https://www.iconarchive.com/show/material-icons-by-pictogrammers/dna-icon.html // Helix
+import ControlCameraIcon from '@mui/icons-material/ControlCamera'; // Endline
+import ViewInArIcon from '@mui/icons-material/ViewInAr'; // Reboot?
+import TokenOutlinedIcon from '@mui/icons-material/TokenOutlined';
 
 const MEGABLOCK_NW = "L950362737";
 const MEGABLOCK_SE = "L822128842";
@@ -14,18 +41,63 @@ export interface LeafletLocationsRendererParams {
   locations: any[];
   userId?: string;
   factions?: any[];
-  getVenueIconAndColor: (venuetype: string) => { icon: any; color: string };
-  getDivIcon: (materialIcon: any, color: string) => any;
   onMarkerClick: (leafletMarker: L.Marker) => void;
 }
 
 export interface LeafletLocationPinsRendererParams {
   layerData: Map<string, LayerGroup>;
   pins: any[];
-  getVenueIconAndColor: (venuetype: string) => { icon: any; color: string };
-  getDivIcon: (materialIcon: any, color: string) => any;
   onMarkerClick: (leafletMarker: L.Marker) => void;
 }
+
+// This does a little hacking to render a materialUi icon as a leaflet marker
+const getIconSettings = (materialIcon: any, color: string) => {
+  return {
+    mapIconUrl: '<svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 149 240"><defs><filter id="f1" x="0" y="0" xmlns="http://www.w3.org/2000/svg"><feGaussianBlur in="SourceGraphic" stdDeviation="7" /></filter></defs><path fill="#ffffff90" filter="url(#f1)" transform="translate(7.5 120) scale(0.9 0.5)" d="M74 0L149 40L144 120L74 240L4 120L4 40z"/><path fill="{mapIconColor}" stroke-width="4px" stroke="#000000" d="M74 0L149 40L144 120L74 240L4 120L4 40z"/><svg version="1" xmlns="http://www.w3.org/2000/svg" width="90%" x="8px" y="-30px">' + (materialIcon ? ReactDOMServer.renderToStaticMarkup(materialIcon) : '') + '</svg></svg>',
+    mapIconColor: color
+  };
+};
+
+// maybe this should move to locations render util
+const getDivIcon = (materialIcon: any, color: string) => {
+  const settings = getIconSettings(materialIcon, color);
+  return L.divIcon({
+    className: "leaflet-data-marker",
+    html: L.Util.template(settings.mapIconUrl, settings),
+    iconAnchor: [15, 48],
+    iconSize: [30, 48],
+    tooltipAnchor: [2, -30]
+  });
+};
+
+// Cyberpunk 2077 Blue #5191ff
+
+// Colorblind friendly(ish) colors - used for map markers (comments render color squares in some IDEs)
+const cyberGreen = "#009E73"; // #009E73
+const cyberOrange = "#D55E00"; // #D55E00
+const cyberBlueDark = "#0072B2"; // #0072B2
+const cyberBlueLight = "#56B4E9"; // #56B4E9
+const cyberYellow = "#F0E442"; // #F0E442
+const neoPink = "#D45893"; // #D45893
+const neoOrange = "#FCAC6F"; // #FCAC6F
+const neoGreen = "#47E15D"; // #47E15D
+
+// TODO: More robust venue type detection and icon/color assignment
+// TODO: Move to location renderer or other util file
+const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
+  const vt = (venuetype || '').toLowerCase();
+  if (vt.includes('arcade')) return { icon: <GamepadIcon style={{ color: cyberOrange }} />, color: cyberBlueLight };
+  if (vt.includes('food') || vt.includes('stall') || vt.includes('restaurant') || vt.includes('dining')) return { icon: <RamenDiningIcon style={{ color: cyberYellow }} />, color: cyberGreen };
+  if (vt.includes('entertainment') || vt.includes('music')) return { icon: <SpeakerIcon style={{ color: cyberGreen }} />, color: cyberYellow };
+  if (vt.includes('megablock') || vt.includes('block')) return { icon: <HiveIcon style={{ color: cyberBlueDark }} />, color: cyberYellow };
+  if (vt.includes('megamall') || vt.includes('block')) return { icon: <LocalMall style={{ color: cyberBlueDark }} />, color: cyberYellow };
+  if (vt.includes('dev')) return { icon: <AdjustIcon style={{ color: "#FFFFFF" }} />, color: "#FF0000" };
+  if (vt.includes('porto')) return { icon: <WcIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
+  if (vt.includes('medical')) return { icon: <HealthAndSafetyIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
+  if (vt.includes('security')) return { icon: <LocalPoliceIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
+  if (vt.includes('location_pin')) return { icon: <AttributionIcon style={{ color: "#FFFFFF" }} />, color: cyberGreen };
+  return { icon: <AdjustIcon style={{ color: cyberYellow }} />, color: cyberBlueDark };
+};
 
 export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererParams): void {
   const {
@@ -33,8 +105,6 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     locations,
     userId,
     factions,
-    getVenueIconAndColor,
-    getDivIcon,
     onMarkerClick,
   } = params;
 
@@ -116,8 +186,6 @@ export function renderLocationPinsToLeafletLayers(params: LeafletLocationPinsRen
   const {
     layerData,
     pins,
-    getVenueIconAndColor,
-    getDivIcon,
     onMarkerClick,
   } = params;
 

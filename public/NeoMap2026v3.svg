@@ -12,24 +12,24 @@
 
       <!-- Downtown Shapes -->
       .st1 {
-        fill: #47E15D;
-	stroke: #0E5819;
+        fill: #47E15D55;
+	stroke: #47E15D;
 	vector-effect: non-scaling-stroke;
 	stroke-width: 2px;
       }
 
       <!-- Midtown Shapes -->
       .st2 {
-        fill: #FCAC6F;
-	stroke: #A04703;
+        fill: #FCAC6F55;
+	stroke: #FCAC6F;
 	vector-effect: non-scaling-stroke;
 	stroke-width: 2px;
       }
 
       <!-- Spaceport Shapes -->
       .st3 {
-        fill: #D45893;
-	stroke: #511532;
+        fill: #D4589355;
+	stroke: #D45893;
 	vector-effect: non-scaling-stroke;
 	stroke-width: 2px;
       }
