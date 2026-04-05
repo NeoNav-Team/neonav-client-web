@@ -27,6 +27,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import FooterNav from "@/components/footerNav";
+import ReviewDialog from '@/components/reviewDialog';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
@@ -188,11 +189,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   });
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
 
   const { state,
     fetchAllLocations = () => {},
     fetchUnverifiedLocations = () => {},
     fetchLocationById = (id: string) => {},
+    addLocationReview = (id: string, review:any) => {},
     addLocationPin = (lat: string, long: string) => {},
     fetchLocationPins = (id: string) => {},
     deleteLocationPins = () => {},
@@ -620,11 +623,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                       }}
                     >
                       <div key="spacer"><Box sx={{height: "110px"}}/></div>
-                      {!selectedLocation.reviews || selectedLocation.reviews?.length === 0 && (
+                      {!selectedLocation.reviews || selectedLocation.reviews.length === 0 && (
                         <Typography sx={modalBodyStyle} component="p">Be the first to leave a review!</Typography>
                       )}
                       {selectedLocation.reviews?.length >= 1 &&
-                        selectedLocation.reviews.map((reviewItem: any) => {
+                        selectedLocation.reviews.filter((reviewItem: any) => !!reviewItem.review).map((reviewItem: any) => {
                           const {reviewer, ts, reviewerName, rating, review} = reviewItem;
                           return (
                             <div key={`${ts}-container`}>
@@ -669,7 +672,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           secondHexProps={{
             icon: <RateReviewIcon/>,
             // tooltipText: "Add A Review",
-            // TODO: Dialog to add review
+            handleAction: () => setReviewDialogOpen(true),
           }}
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
@@ -685,6 +688,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             disabled: true,
           }}
         />
+        <ReviewDialog id={selectedLocationId} open={reviewDialogOpen} handleClose={() => {setReviewDialogOpen(false); fetchLocationById(selectedLocationId);}} addLocationReview={addLocationReview}/>
       </Box>
       <Box sx={footerStyle} hidden={showInfoModal}>
         <FooterNav

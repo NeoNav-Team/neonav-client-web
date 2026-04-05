@@ -253,11 +253,11 @@ export const authApiEnpoints = {
   },
   addLocationReview: {
     method: "post",
-    path: "/api/locations/$location/reviews",
+    path: "/api/locations/$id/reviews",
   },
   deleteLocationReview: {
     method: "delete",
-    path: "/api/locations/$location/reviews/$something",
+    path: "/api/locations/$id/reviews/$reviewid",
   },
   addLocationPin: {
     method: "post",

@@ -152,6 +152,9 @@ export const verifyLocation = (dispatch: DispatchFunc) => async (id:string) => {
 };
 
 export const addLocationReview = (dispatch: DispatchFunc) => async (id:string, review:any) => {
+  console.log("nnActionsLocations: addLocationReview");
+  console.log(id);
+  console.log(review);
   const token = getCookieToken();
   const onSuccess = (response: APIResponse) => {
     dispatch({
