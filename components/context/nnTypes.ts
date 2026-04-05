@@ -256,7 +256,7 @@ export interface APIResponse {
 }
 
 export type NnProviderDispatch = {
-    addLocationPin: () => void;
+    addLocationPin: (_lat:string, _long:string) => void;
     addLocationReview: (_id:string, _review:any) => void;
     adminUserToChannel: (_channelId:string,_userId:string)=> void;
     befriend: (_newFriendId:string) => void;

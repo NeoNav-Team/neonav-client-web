@@ -152,6 +152,9 @@ export const verifyLocation = (dispatch: DispatchFunc) => async (id:string) => {
 };
 
 export const addLocationReview = (dispatch: DispatchFunc) => async (id:string, review:any) => {
+  console.log("nnActionsLocations: addLocationReview");
+  console.log(id);
+  console.log(review);
   const token = getCookieToken();
   const onSuccess = (response: APIResponse) => {
     dispatch({
@@ -213,7 +216,7 @@ export const fetchLocationPins = (dispatch: DispatchFunc) => async (user:string)
   const onSuccess = (response: APIResponse) => {
     const { data } = response;
     dispatch({
-      type: 'setLocations',
+      type: 'setLocationPins',
       payload: data ?? [],
     });
     return data;
@@ -226,7 +229,7 @@ export const fetchLocationPins = (dispatch: DispatchFunc) => async (user:string)
     });
     return err;
   };
-  executeApi('addLocationPin', { user, token }, onSuccess, onError);
+  executeApi('getLocationPins', { user, token }, onSuccess, onError);
 };
 
 export const deleteLocationPins = (dispatch: DispatchFunc) => async () => {
@@ -245,5 +248,5 @@ export const deleteLocationPins = (dispatch: DispatchFunc) => async () => {
     });
     return err;
   };
-  executeApi('addLocationPin', { token }, onSuccess, onError);
+  executeApi('deleteLocationPins', { token }, onSuccess, onError);
 };

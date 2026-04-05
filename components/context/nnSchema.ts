@@ -29,6 +29,7 @@ export const nnSchema:NnStore = {
       clipboardEntities: [],
       locations: [],
       events: [],
+      locationPins: [],
     },
     entity: {},
   },
