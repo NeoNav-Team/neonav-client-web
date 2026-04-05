@@ -82,9 +82,63 @@ export const fetchLocationEvents = (dispatch: DispatchFunc) => async (locationId
   executeApi('locationEvents', { location: locationId, token }, onSuccess, onError);
 };
 
+export const updateEvent = (dispatch: DispatchFunc) => async (eventId: string, payload: { name: string; description: string; open: string; close: string }) => {
+  const token = getCookieToken();
+  const onSuccess = (_response: APIResponse) => {
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'success', message: 'Event updated', show: true },
+    });
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Update failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+  };
+  executeApi('updateEvent', { id: eventId, ...payload, token }, onSuccess, onError);
+};
+
+export const createEvent = (dispatch: DispatchFunc) => async (locationId: string, payload: { name: string; description: string; open: string; close: string }) => {
+  const token = getCookieToken();
+  const onSuccess = (_response: APIResponse) => {
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'success', message: 'Event created', show: true },
+    });
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Create failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+  };
+  executeApi('createEvent', { location: locationId, ...payload, token }, onSuccess, onError);
+};
+
+export const cancelEvent = (dispatch: DispatchFunc) => async (eventId: string, payload: { name: string; description: string; open: string; close: string }) => {
+  const token = getCookieToken();
+  const onSuccess = (_response: APIResponse) => {
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'success', message: 'Event cancelled', show: true },
+    });
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Cancel failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+  };
+  executeApi('updateEvent', { id: eventId, ...payload, cancelled: true, token }, onSuccess, onError);
+};
+
 export const rsvpEvent = (dispatch: DispatchFunc) => async (eventId: string) => {
   const token = getCookieToken();
-  const onSuccess = (response: APIResponse) => {
+  const onSuccess = (_response: APIResponse) => {
     dispatch({
       type: 'setAlert',
       payload: { severity: 'success', message: 'RSVP updated', show: true },

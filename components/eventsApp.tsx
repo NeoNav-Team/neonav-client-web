@@ -19,16 +19,25 @@ import {
   CircularProgress,
   Container,
   IconButton,
+  MenuItem,
   Modal,
+  Select,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { use100vh } from 'react-div-100vh';
+import { imageUrl } from '../utilities/constants';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 type EventView = 'events' | 'plan' | 'locations' | 'manage';
 
@@ -92,10 +101,10 @@ const modalStyle = {
 };
 
 const VIEW_LABELS: Record<EventView, string> = {
-  events: 'Events',
-  plan: 'My Plan',
-  locations: 'Locations',
-  manage: 'Manage',
+  events: 'EVENTS',
+  plan: 'MY PLAN',
+  locations: 'LOCATIONS',
+  manage: 'MANAGE',
 };
 
 // Returns the day's 4AM–4AM bounds in local time
@@ -120,13 +129,17 @@ const formatDate = (date: Date): string =>
 
 const formatTime = (iso: string): string => {
   try {
-    return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }).replace(' AM', 'AM').replace(' PM', 'PM');
   } catch {
     return iso;
   }
 };
 
-export default function EventsApp(): JSX.Element {
+interface EventsAppProps {
+  initialLocationId?: string;
+}
+
+export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const TOOLBAR_HEIGHT = 76;
@@ -140,9 +153,13 @@ export default function EventsApp(): JSX.Element {
     fetchLocationEvents = (_id: string) => {},
     fetchAllLocations = () => {},
     rsvpEvent = (_id: string) => {},
+    updateEvent = (_id: string, _payload: any) => {},
+    createEvent = (_locationId: string, _payload: any) => {},
+    cancelEvent = (_id: string, _payload: any) => {},
   }: NnProviderValues = useContext(NnContext);
 
   const userId = state?.user?.profile?.auth?.userid || '';
+  const accountId = state?.network?.selected?.account || userId;
   const contextEvents: NnEvent[] = useMemo(
     () => (state?.network?.collections?.events as NnEvent[]) || [],
     [state?.network?.collections?.events],
@@ -151,15 +168,26 @@ export default function EventsApp(): JSX.Element {
     () => state?.network?.collections?.locations || [],
     [state?.network?.collections?.locations],
   );
+  const factions: any[] = useMemo(
+    () => state?.network?.collections?.factions || [],
+    [state?.network?.collections?.factions],
+  );
 
-  const [view, setView] = useState<EventView>('events');
+  const [view, setView] = useState<EventView>(initialLocationId ? 'locations' : 'events');
   const [selectedDate, setSelectedDate] = useState<Date>(getInitialDate);
-  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(
+    initialLocationId ? { id: initialLocationId, name: initialLocationId } : null,
+  );
   const [fetchedViews, setFetchedViews] = useState<Set<string>>(new Set());
   const [rsvpLoading, setRsvpLoading] = useState<string | null>(null);
   const [rsvpOverrides, setRsvpOverrides] = useState<Record<string, boolean>>({});
   const [modalEvent, setModalEvent] = useState<NnEvent | null>(null);
+  const [editFields, setEditFields] = useState<{ name: string; description: string; open: string; close: string } | null>(null);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createFields, setCreateFields] = useState<{ name: string; description: string; open: string; close: string; locationId: string }>({ name: '', description: '', open: '', close: '', locationId: '' });
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasAutoAdvanced = useRef(false);
+  const pageOpenTime = useRef<Date>(new Date());
 
   const viewKey = view === 'locations' && selectedLocation
     ? `locations_${selectedLocation.id}`
@@ -177,6 +205,15 @@ export default function EventsApp(): JSX.Element {
     if (locations.length === 0) fetchAllLocations();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Once locations load, resolve the real name for an initial location
+  useEffect(() => {
+    if (!initialLocationId || locations.length === 0) return;
+    const loc = locations.find((l: any) => l.id === initialLocationId);
+    if (loc) {
+      setSelectedLocation({ id: initialLocationId, name: loc.name || initialLocationId });
+    }
+  }, [initialLocationId, locations]);
 
   const doFetchForView = useCallback(
     (v: EventView, locId?: string) => {
@@ -217,6 +254,32 @@ export default function EventsApp(): JSX.Element {
       });
     }
   }, [contextEvents, view, selectedLocation]);
+
+  // On initial events load, skip forward to the nearest day that has events
+  useEffect(() => {
+    if (view !== 'events' || hasAutoAdvanced.current || !fetchedViews.has('events') || contextEvents.length === 0) return;
+    hasAutoAdvanced.current = true;
+    const visibleEvents = contextEvents.filter((e) => !e.cancelled);
+    const { start, end } = getDayBounds(selectedDate);
+    const hasEventsToday = visibleEvents.some((e) => {
+      if (!e.open) return false;
+      const t = new Date(e.open);
+      return t >= start && t < end;
+    });
+    if (!hasEventsToday) {
+      const dayStart = new Date(selectedDate);
+      dayStart.setHours(4, 0, 0, 0);
+      const next = visibleEvents
+        .filter((e) => e.open && new Date(e.open) >= dayStart)
+        .sort((a, b) => new Date(a.open!).getTime() - new Date(b.open!).getTime())[0];
+      if (next) {
+        const d = new Date(next.open!);
+        if (d.getHours() < 4) d.setDate(d.getDate() - 1);
+        d.setHours(12, 0, 0, 0);
+        setSelectedDate(d);
+      }
+    }
+  }, [contextEvents, fetchedViews, view, selectedDate]);
 
   const handleViewChange = (newView: EventView) => {
     setView(newView);
@@ -259,8 +322,19 @@ export default function EventsApp(): JSX.Element {
 
   const filteredEvents = useMemo((): NnEvent[] => {
     if (view === 'locations' && !selectedLocation) return [];
+    const now = new Date();
     const sorted = contextEvents
-      .filter((e) => !!e.open)
+      .filter((e) => {
+        if (!e.open) return false;
+        if (e.cancelled) {
+          // cancelled: only show if future AND user has RSVP'd (or is owner)
+          const isFuture = new Date(e.open) > now;
+          const attending = e.attendees?.includes(userId);
+          const isOwner = e.owner === accountId;
+          return isFuture && (attending || isOwner);
+        }
+        return true;
+      })
       .sort((a, b) => {
         const diff = new Date(a.open || '').getTime() - new Date(b.open || '').getTime();
         return diff !== 0 ? diff : (a.location || '').localeCompare(b.location || '');
@@ -274,7 +348,7 @@ export default function EventsApp(): JSX.Element {
       const t = new Date(e.open!);
       return t >= start && t < end;
     });
-  }, [contextEvents, selectedDate, view, selectedLocation]);
+  }, [contextEvents, selectedDate, view, selectedLocation, userId, accountId]);
 
   const showRsvpButton = view !== 'manage';
   const isFetching = fetchedViews.has(viewKey) && contextEvents.length === 0 && view !== 'locations';
@@ -296,12 +370,23 @@ export default function EventsApp(): JSX.Element {
         style={{ padding: '1vh 0', width: '100%' }}
         data-open-ms={event.open ? new Date(event.open).getTime() : 0}
       >
+        {/* Start time header — top left, Garden-style */}
+        <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="flex-start">
+          <Box sx={{ maxWidth: '72%' }}>
+            <div className={itemStyles.subtitleLine} data-augmented-ui="tl-clip both" style={event.cancelled ? { backgroundColor: 'var(--color-danger, #7b0000)' } : undefined}>
+              <div className={itemStyles.name}>{openTime}</div>
+            </div>
+          </Box>
+        </Stack>
         {/* Main content row */}
         <div
           className={itemStyles.statusLine}
           data-augmented-ui="tr-clip inlay"
-          onClick={() => setModalEvent(event)}
-          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setModalEvent(event);
+            setEditFields({ name: event.name || '', description: event.description || '', open: event.open || '', close: event.close || '' });
+          }}
+          style={{ cursor: 'pointer', ...(event.cancelled ? { backgroundColor: 'var(--color-danger, #7b0000)' } : {}) }}
         >
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
             <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -310,31 +395,25 @@ export default function EventsApp(): JSX.Element {
               </Typography>
               <Typography component="div">
                 <span className={itemStyles.action}>{locName}</span>
-                {' 》 '}
+                {'  '}
                 <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
                   {event.ownername || event.owner}
                 </span>
               </Typography>
             </Box>
             {showRsvpButton && (
-              <Box
+              <IconButton
+                size="small"
+                disabled={owner || loading}
+                color={owner ? 'default' : attending ? 'success' : 'primary'}
+                title={owner ? 'Hosting' : attending ? 'Attending — click to leave' : 'RSVP'}
                 onClick={(e) => { e.stopPropagation(); handleRsvp(event); }}
-                sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '2px' }}
+                sx={{ flexShrink: 0, p: '2px' }}
               >
-                <IconButton
-                  size="small"
-                  disabled={owner || loading}
-                  color={owner ? 'default' : attending ? 'success' : 'primary'}
-                  title={owner ? 'Hosting' : attending ? 'Attending — click to leave' : 'RSVP'}
-                >
-                  {owner || attending
-                    ? <CheckCircleIcon fontSize="small" />
-                    : <RadioButtonUncheckedIcon fontSize="small" />}
-                </IconButton>
-                <Typography variant="caption" sx={{ lineHeight: 1, minWidth: 48 }}>
-                  {loading ? '...' : owner ? 'Hosting' : attending ? 'Attending' : 'RSVP'}
-                </Typography>
-              </Box>
+                {owner || attending
+                  ? <CheckCircleIcon fontSize="small" />
+                  : <RadioButtonUncheckedIcon fontSize="small" />}
+              </IconButton>
             )}
           </Stack>
         </div>
@@ -343,9 +422,9 @@ export default function EventsApp(): JSX.Element {
           <Box sx={{ maxWidth: '72%' }}>
             <div className={itemStyles.dateLine} data-augmented-ui="br-clip both">
               <Stack direction="row" spacing={1}>
-                <div className={itemStyles.dateText}>{openTime} – {closeTime}</div>
+                <div className={itemStyles.dateText}>{openTime}–{closeTime}</div>
                 <div className={itemStyles.dateText}>
-                  <span>{attendeeCount} attending</span>
+                  <span>{attendeeCount} going</span>
                 </div>
               </Stack>
             </div>
@@ -419,15 +498,25 @@ export default function EventsApp(): JSX.Element {
                 <IconButton size="small" onClick={handleDatePrev}>
                   <ChevronLeftIcon fontSize="small" />
                 </IconButton>
-                <Typography
-                  variant="caption"
-                  className={itemStyles.dateText}
-                  sx={{ minWidth: 120, textAlign: 'center', fontSize: '0.85rem' }}
-                >
-                  {view === 'locations' && selectedLocation
-                    ? selectedLocation.name
-                    : formatDate(selectedDate)}
-                </Typography>
+                <Box sx={{ minWidth: 120, textAlign: 'center' }}>
+                  <Typography
+                    variant="caption"
+                    className={itemStyles.dateText}
+                    sx={{ fontSize: '1.1rem', display: 'block' }}
+                  >
+                    {formatDate(selectedDate)}
+                  </Typography>
+                  {view === 'locations' && selectedLocation && (
+                    <Typography
+                      variant="caption"
+                      className={itemStyles.dateText}
+                      sx={{ fontSize: '0.7rem', display: 'block', opacity: 0.7 }}
+                      noWrap
+                    >
+                      {selectedLocation.name}
+                    </Typography>
+                  )}
+                </Box>
                 <IconButton size="small" onClick={handleDateNext}>
                   <ChevronRightIcon fontSize="small" />
                 </IconButton>
@@ -446,7 +535,7 @@ export default function EventsApp(): JSX.Element {
                     </Stack>
                   ) : (
                     locations
-                      .filter((l: any) => l.type !== 'dev')
+                      .filter((l: any) => l.venuetype !== 'dev')
                       .sort((a: any, b: any) => (a.name || '').localeCompare(b.name || ''))
                       .map(renderLocationItem)
                   )}
@@ -469,18 +558,63 @@ export default function EventsApp(): JSX.Element {
                         </Typography>
                       </div>
                     </Box>
-                  ) : (
-                    filteredEvents.map(renderEventItem)
-                  )}
+                  ) : (() => {
+                    const now = pageOpenTime.current;
+                    const { start, end } = getDayBounds(selectedDate);
+                    const isToday = now >= start && now < end;
+                    const nowMs = now.getTime();
+                    const items: React.ReactNode[] = [];
+                    let markerInserted = false;
+                    filteredEvents.forEach((event, i) => {
+                      if (isToday && !markerInserted) {
+                        const eventMs = event.open ? new Date(event.open).getTime() : 0;
+                        if (eventMs > nowMs) {
+                          markerInserted = true;
+                          items.push(
+                            <Stack key="now-marker" direction="row" spacing={1} alignItems="flex-start" justifyContent="flex-start">
+                              <Box sx={{ maxWidth: '72%' }}>
+                                <div className={itemStyles.subtitleLine} data-augmented-ui="tl-clip both" style={{ opacity: 0.5 }}>
+                                  <div className={itemStyles.name}>▶ {formatTime(now.toISOString())}</div>
+                                </div>
+                              </Box>
+                            </Stack>
+                          );
+                        }
+                      }
+                      items.push(renderEventItem(event));
+                    });
+                    if (isToday && !markerInserted) {
+                      items.push(
+                        <Stack key="now-marker" direction="row" spacing={1} alignItems="flex-start" justifyContent="flex-start">
+                          <Box sx={{ maxWidth: '72%' }}>
+                            <div className={itemStyles.subtitleLine} data-augmented-ui="tl-clip both" style={{ opacity: 0.5 }}>
+                              <div className={itemStyles.name}>▶ {formatTime(now.toISOString())}</div>
+                            </div>
+                          </Box>
+                        </Stack>
+                      );
+                    }
+                    return items;
+                  })()}
                 </Stack>
               </Box>
             )}
           </Box>
 
           {/* ── Footer ── */}
-          <Box sx={flexFooter}>
-            <FooterNav bigHexProps={{ disabled: true }} />
-          </Box>
+          {view === 'manage' && (
+            <Box sx={flexFooter}>
+              <FooterNav
+                bigHexProps={{
+                  icon: <AddIcon />,
+                  handleAction: () => {
+                    setCreateFields({ name: '', description: '', open: '', close: '', locationId: '' });
+                    setCreateModalOpen(true);
+                  },
+                }}
+              />
+            </Box>
+          )}
         </Box>
       </div>
 
@@ -490,75 +624,317 @@ export default function EventsApp(): JSX.Element {
           <div
             className={styles.darkPane}
             data-augmented-ui="tr-rect br-clip bl-clip both"
-            style={{ padding: '16px' }}
+            style={{ padding: '16px', backgroundColor: 'var(--background-color)' }}
           >
-            {modalEvent && (
-              <Stack spacing={1.5}>
-                {/* Modal header */}
-                <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
-                  <Typography variant="h6" className={itemStyles.name}>
-                    {modalEvent.name}
-                  </Typography>
-                </div>
+            {modalEvent && editFields && (() => {
+              const loc = locations.find((l: any) => l.id === modalEvent.location);
+              const canEdit = !modalEvent.cancelled && (modalEvent.owner === accountId || (accountId !== userId && loc?.owner === accountId));
+              const reloadView = () => {
+                setFetchedViews((prev) => { const next = new Set(prev); next.delete(viewKey); return next; });
+              };
+              const handleSave = () => {
+                updateEvent(modalEvent.dbid!, editFields);
+                setModalEvent(null);
+                reloadView();
+              };
+              const handleCancel = () => {
+                cancelEvent(modalEvent.dbid!, editFields);
+                setModalEvent(null);
+                reloadView();
+              };
+              return (
+                <Stack spacing={1.5}>
+                  {/* Modal header */}
+                  <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
+                    {canEdit ? (
+                      <TextField
+                        variant="standard"
+                        fullWidth
+                        value={editFields.name}
+                        onChange={(e) => setEditFields({ ...editFields, name: e.target.value })}
+                        inputProps={{ className: itemStyles.name }}
+                        sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                      />
+                    ) : (
+                      <Typography variant="h6" className={itemStyles.name}>
+                        {modalEvent.name}
+                      </Typography>
+                    )}
+                  </div>
 
-                {/* Description */}
-                {modalEvent.description && (
+                  {/* Open / Close times */}
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
+                      {canEdit ? (
+                        <DateTimePicker
+                          label="Open"
+                          value={editFields.open ? dayjs(editFields.open) : null}
+                          onChange={(val: Dayjs | null) => setEditFields({ ...editFields, open: val ? val.toISOString() : '' })}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              variant="standard"
+                              fullWidth
+                              inputProps={{ ...params.inputProps, className: itemStyles.dateText }}
+                              sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                            />
+                          )}
+                        />
+                      ) : (
+                        <Typography variant="body2" className={itemStyles.dateText}>
+                          Start: {modalEvent.open ? new Date(modalEvent.open).toLocaleString() : '—'}
+                        </Typography>
+                      )}
+                    </div>
+                    <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
+                      {canEdit ? (
+                        <DateTimePicker
+                          label="Close"
+                          value={editFields.close ? dayjs(editFields.close) : null}
+                          onChange={(val: Dayjs | null) => setEditFields({ ...editFields, close: val ? val.toISOString() : '' })}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              variant="standard"
+                              fullWidth
+                              inputProps={{ ...params.inputProps, className: itemStyles.dateText }}
+                              sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                            />
+                          )}
+                        />
+                      ) : (
+                        <Typography variant="body2" className={itemStyles.dateText}>
+                          Close: {modalEvent.close ? new Date(modalEvent.close).toLocaleString() : '—'}
+                        </Typography>
+                      )}
+                    </div>
+                  </LocalizationProvider>
+
+                  {/* Description */}
+                  {(canEdit || modalEvent.description) && (
+                    <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
+                      {canEdit ? (
+                        <TextField
+                          variant="standard"
+                          fullWidth
+                          multiline
+                          label="Description"
+                          value={editFields.description}
+                          onChange={(e) => setEditFields({ ...editFields, description: e.target.value })}
+                          sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                        />
+                      ) : (
+                        <Typography variant="body2">{modalEvent.description}</Typography>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Details rows */}
                   <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
-                    <Typography variant="body2">{modalEvent.description}</Typography>
+                    <Typography component="div">
+                      <span className={itemStyles.action}>Location</span>
+                      {' 》 '}
+                      <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
+                        {getLocationName(modalEvent.location || '')}
+                      </span>
+                    </Typography>
+                    <Typography component="div">
+                      <span className={itemStyles.action}>Host</span>
+                      {' 》 '}
+                      <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
+                        {modalEvent.ownername || modalEvent.owner}
+                      </span>
+                    </Typography>
+                    <Typography component="div">
+                      <span className={itemStyles.action}>Attendees</span>
+                      {' 》 '}
+                      <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
+                        {modalEvent.attendees?.length ?? 0}
+                      </span>
+                    </Typography>
                   </div>
-                )}
 
-                {/* Details rows */}
-                <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
-                  <Typography component="div">
-                    <span className={itemStyles.action}>Location</span>
-                    {' 》 '}
-                    <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
-                      {getLocationName(modalEvent.location || '')}
-                    </span>
-                  </Typography>
-                  <Typography component="div">
-                    <span className={itemStyles.action}>Host</span>
-                    {' 》 '}
-                    <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
-                      {modalEvent.ownername || modalEvent.owner}
-                    </span>
-                  </Typography>
-                  <Typography component="div">
-                    <span className={itemStyles.action}>Attendees</span>
-                    {' 》 '}
-                    <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
-                      {modalEvent.attendees?.length ?? 0}
-                    </span>
-                  </Typography>
-                </div>
+                  {/* Location panel */}
+                  {loc && (
+                    <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
+                      <Typography component="div">
+                        <span className={itemStyles.action}>Venue</span>
+                        {' 》 '}
+                        <a href={`/map/${modalEvent.location}`} style={{ color: 'inherit' }}>
+                          <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>{loc.name || modalEvent.location}</span>
+                        </a>
+                      </Typography>
+                      {loc.venuetype && (
+                        <Typography component="div">
+                          <span className={itemStyles.action}>Type</span>
+                          {' 》 '}
+                          <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>{loc.venuetype}</span>
+                        </Typography>
+                      )}
+                    </div>
+                  )}
 
-                {/* Time badge */}
-                <Stack direction="row" justifyContent="flex-end">
-                  <div className={itemStyles.dateLine} data-augmented-ui="br-clip both">
-                    <Stack direction="row" spacing={1}>
-                      <div className={itemStyles.dateText}>
-                        {modalEvent.open ? new Date(modalEvent.open).toLocaleString() : '—'}
-                      </div>
-                      <div className={itemStyles.dateText}>
-                        <span>→ {modalEvent.close ? new Date(modalEvent.close).toLocaleString() : '—'}</span>
-                      </div>
-                    </Stack>
-                  </div>
+                  {/* Owner faction panel */}
+                  {loc?.owner && (() => {
+                    const ownerFaction = factions.find((f: any) => f.id === loc.owner);
+                    const ownerName = ownerFaction?.name || loc.owner;
+                    return (
+                      <a href={`/factions/${loc.owner}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay" style={{ cursor: 'pointer' }}>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Box
+                              component="img"
+                              src={imageUrl(loc.owner, true)}
+                              alt={ownerName}
+                              sx={{ width: 32, height: 32, objectFit: 'cover', flexShrink: 0 }}
+                            />
+                            <Typography component="div">
+                              <span className={itemStyles.name}>{ownerName}</span>
+                            </Typography>
+                          </Stack>
+                        </div>
+                      </a>
+                    );
+                  })()}
+
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    {canEdit && !modalEvent.cancelled && (
+                      <Button variant="outlined" size="small" color="error" onClick={handleCancel}>
+                        Cancel Event
+                      </Button>
+                    )}
+                    {canEdit && (
+                      <Button variant="contained" size="small" color="primary" onClick={handleSave}>
+                        Save
+                      </Button>
+                    )}
+                    <Button variant="outlined" size="small" onClick={() => setModalEvent(null)}>
+                      Close
+                    </Button>
+                  </Stack>
                 </Stack>
-
-                {/* Placeholder */}
-                <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay" style={{ opacity: 0.45 }}>
-                  <Typography variant="caption" className={itemStyles.dateText}>
-                    [Location and owner detail panels — coming soon]
-                  </Typography>
-                </div>
-
-                <Button variant="outlined" size="small" onClick={() => setModalEvent(null)}>
-                  Close
-                </Button>
-              </Stack>
-            )}
+              );
+            })()}
+          </div>
+        </Box>
+      </Modal>
+      {/* ── Create event modal ── */}
+      <Modal open={createModalOpen} onClose={() => setCreateModalOpen(false)}>
+        <Box sx={modalStyle}>
+          <div
+            className={styles.darkPane}
+            data-augmented-ui="tr-rect br-clip bl-clip both"
+            style={{ padding: '16px', backgroundColor: 'var(--background-color)' }}
+          >
+            {(() => {
+              const adminFactionId = 'f2e3fab8cba8e58170307c2533089d39';
+              const isAdminFaction = accountId === adminFactionId;
+              const ownedLocations = locations.filter((l: any) =>
+                l.venuetype !== 'dev' && (isAdminFaction || l.owner === accountId)
+              );
+              const handleCreate = () => {
+                if (!createFields.locationId || !createFields.name || !createFields.open || !createFields.close) return;
+                createEvent(createFields.locationId, {
+                  name: createFields.name,
+                  description: createFields.description,
+                  open: createFields.open,
+                  close: createFields.close,
+                });
+                setCreateModalOpen(false);
+              };
+              return (
+                <Stack spacing={1.5}>
+                  <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
+                    <Typography variant="h6" className={itemStyles.name}>New Event</Typography>
+                  </div>
+                  <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
+                    <Select
+                      variant="standard"
+                      fullWidth
+                      displayEmpty
+                      value={createFields.locationId}
+                      onChange={(e) => setCreateFields({ ...createFields, locationId: e.target.value })}
+                      sx={{ color: 'var(--color-1)' }}
+                    >
+                      <MenuItem value="" disabled>Select location</MenuItem>
+                      {ownedLocations.map((l: any) => (
+                        <MenuItem key={l.id} value={l.id}>{l.name || l.id}</MenuItem>
+                      ))}
+                    </Select>
+                  </div>
+                  <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
+                    <TextField
+                      variant="standard"
+                      fullWidth
+                      placeholder="Event name"
+                      value={createFields.name}
+                      onChange={(e) => setCreateFields({ ...createFields, name: e.target.value })}
+                      inputProps={{ className: itemStyles.name }}
+                      sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                    />
+                  </div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
+                      <DateTimePicker
+                        label="Open"
+                        value={createFields.open ? dayjs(createFields.open) : null}
+                        onChange={(val: Dayjs | null) => setCreateFields({ ...createFields, open: val ? val.toISOString() : '' })}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="standard"
+                            fullWidth
+                            inputProps={{ ...params.inputProps, className: itemStyles.dateText }}
+                            sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                          />
+                        )}
+                      />
+                    </div>
+                    <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
+                      <DateTimePicker
+                        label="Close"
+                        value={createFields.close ? dayjs(createFields.close) : null}
+                        onChange={(val: Dayjs | null) => setCreateFields({ ...createFields, close: val ? val.toISOString() : '' })}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="standard"
+                            fullWidth
+                            inputProps={{ ...params.inputProps, className: itemStyles.dateText }}
+                            sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                          />
+                        )}
+                      />
+                    </div>
+                  </LocalizationProvider>
+                  <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
+                    <TextField
+                      variant="standard"
+                      fullWidth
+                      multiline
+                      label="Description"
+                      value={createFields.description}
+                      onChange={(e) => setCreateFields({ ...createFields, description: e.target.value })}
+                      sx={{ '& .MuiInput-underline:before': { borderColor: 'var(--color-2)' } }}
+                    />
+                  </div>
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      disabled={!createFields.locationId || !createFields.name || !createFields.open || !createFields.close}
+                      onClick={handleCreate}
+                    >
+                      Create
+                    </Button>
+                    <Button variant="outlined" size="small" onClick={() => setCreateModalOpen(false)}>
+                      Close
+                    </Button>
+                  </Stack>
+                </Stack>
+              );
+            })()}
           </div>
         </Box>
       </Modal>

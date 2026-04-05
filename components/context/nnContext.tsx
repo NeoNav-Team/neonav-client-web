@@ -91,6 +91,9 @@ import {
   fetchUserEventsMine,
   fetchLocationEvents,
   rsvpEvent,
+  updateEvent,
+  createEvent,
+  cancelEvent,
 } from './nnActionsEvent';
 import { nnSchema } from "./nnSchema";
 import {
@@ -331,6 +334,9 @@ export const { Context, Provider } = DataContextCreator(
     fetchUserEventsMine,
     fetchLocationEvents,
     rsvpEvent,
+    updateEvent,
+    createEvent,
+    cancelEvent,
   },
   defaultNnContext,
 );

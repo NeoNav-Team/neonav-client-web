@@ -299,4 +299,12 @@ export const authApiEnpoints = {
     method: "patch",
     path: "/api/locations/events/$id",
   },
+  updateEvent: {
+    method: "put",
+    path: "/api/locations/events/$id",
+  },
+  createEvent: {
+    method: "post",
+    path: "/api/locations/$location/events",
+  },
 };
