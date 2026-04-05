@@ -104,6 +104,19 @@ export type NnFaction = {
     reps?: string[],
 }
 
+export type NnEvent = {
+    dbid?: string;
+    name?: string;
+    description?: string;
+    owner?: string;
+    ownername?: string;
+    location?: string;
+    open?: string;
+    close?: string;
+    attendees?: string[];
+    cancelled?: boolean;
+}
+
 
 /* Entity is currently a catch-all but realistically should be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
 export type nnEntity = {
@@ -162,6 +175,7 @@ export type NnNetwork = {
         clipboardEntities?: NnContact[] | NnFaction[] | NnSimpleEntity[],
         locations?: any[],
         locationPins?: any[],
+        events?: NnEvent[],
     } | undefined,
     entity: nnEntity;
 }
@@ -197,6 +211,7 @@ export type ActionTypes =
   'setLocationPins' |
   'setLocations' |
   'updateLocation' |
+  'setEvents' |
   'removeStatus' |
   'setSelected' |
   'updateMessageHistory' |
@@ -306,6 +321,14 @@ export type NnProviderDispatch = {
     clearUnreadCountByType: (_channelId:string) => void;
     fetchAllLocations: () => void;
     fetchUnverifiedLocations: () => void;
+    fetchAllEvents: () => void;
+    fetchUserEventsAttending: () => void;
+    fetchUserEventsMine: () => void;
+    fetchLocationEvents: (_locationId: string) => void;
+    rsvpEvent: (_eventId: string) => void;
+    updateEvent: (_eventId: string, _payload: { name: string; description: string; open: string; close: string }) => void;
+    createEvent: (_locationId: string, _payload: { name: string; description: string; open: string; close: string }) => void;
+    cancelEvent: (_eventId: string, _payload: { name: string; description: string; open: string; close: string }) => void;
     fetchLocationById: (_id:string) => void;
     createFactionLocation: (_factionId:string, doc:any) => void;
     createLocation: (doc:any) => void;

@@ -28,6 +28,7 @@ export const nnSchema:NnStore = {
       statuses: [],
       clipboardEntities: [],
       locations: [],
+      events: [],
       locationPins: [],
     },
     entity: {},
