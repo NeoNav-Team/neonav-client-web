@@ -452,11 +452,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }, [state?.network?.collections?.locations]);
 
   useEffect(() => {
-    //console.log("selectedLocationId: " + selectedLocationId);
     let locations = state?.network?.collections?.locations || [];
-    let loc = locations.length > 0 && selectedLocationId ? locations.find(loc => loc.id === selectedLocationId) : {};
-    //console.log(loc);
-    setSelectedLocation(loc);
+    if (locations.length > 0 && selectedLocationId && !!locations.find(loc => loc.id === selectedLocationId)) {
+      setSelectedLocation(locations.find(loc => loc.id === selectedLocationId));
+    }
   }, [selectedLocationId, state?.network?.collections?.locations]);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import Link from 'next/link';
 import { 
   Box,
@@ -13,6 +13,8 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
 import { LooseObject } from './context/nnTypes';
+
+const LOCATION_REGEX = /(@L\d{9}\b)/;
 
 interface itemMessageProps {
     date?: string;
@@ -38,6 +40,15 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
     actionParams.push(buttonAction);
     dialogCallback && dialogCallback(actionParams);
   }
+
+  const getEnrichedText = ():JSX.Element[] => {
+    const textTokens = text.split(LOCATION_REGEX);
+    const textElements = textTokens.map(token => {
+      const path = "/map/" + token.replace("@", "");
+      return (LOCATION_REGEX.test(token)) ? <Link href={path}>{token}</Link> : <Fragment>{token}</Fragment>;
+    });
+    return  textElements.map((element, index) => <Fragment key={index}> { element } </Fragment>) ;
+  }
   
   return (
     <Box style={{padding: '1vh 0', width: '100%'}}>
@@ -58,7 +69,7 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
             <Link href={`/${id.includes('C') ? 'factions' : 'contacts'}/${id}`}>
               <span className={styles.name}>{username}</span>
             </Link>
-             》 {text}</Typography>
+             》 {getEnrichedText()}</Typography>
         </Box>
       </div>
       {hasRequest && (
