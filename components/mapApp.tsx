@@ -342,7 +342,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       handleRotate();
 
-      L.imageOverlay(SVG_MAP_FILE, L.latLngBounds([[35.083329, -117.824404], [35.078559, -117.820037]]), {
+      L.imageOverlay(SVG_MAP_FILE, L.latLngBounds([[35.082950, -117.824404], [35.078739, -117.820037]]), {
         opacity: 1,
       }).addTo(mymap);
 
