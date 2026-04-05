@@ -155,7 +155,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     top: 'calc(100dvh - 174px)',
     width: '100%',
     transition: 'all 0.3s ease-in-out',
-    zIndex: '2000',
+    zIndex: '1400', // We need it to render above modal at 1300
   };
   const flexFooterHidden = {
     position: 'absolute',
@@ -192,6 +192,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
 
   const { state,
+    setAlert = (severity: string, message: string) => {},
     fetchAllLocations = () => {},
     fetchUnverifiedLocations = () => {},
     fetchLocationById = (id: string) => {},
@@ -669,7 +670,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             handleAction: () => {
               if (window.isSecureContext) {
                 navigator.clipboard.writeText("@" + selectedLocationId);
-                //TODO alert that copy worked
+                //TODO need to fix: alert pops under modal
+                setAlert('success', "Copied location to clipboard!");
               }
             },
           }}

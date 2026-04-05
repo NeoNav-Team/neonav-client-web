@@ -216,6 +216,6 @@ export function renderLocationPinsToLeafletLayers(params: LeafletLocationPinsRen
     // Returns a human-readable string based on the user's locale (e.g., "3/20/2024, 8:00:00 AM")
     const readableDate: string = date.toLocaleString(); 
 
-    leafletMarker.bindTooltip(pin.name + "<br>" + pin.id + "<br>" + readableDate, { permanent: true, direction: "right" });
+    leafletMarker.bindTooltip(pin.name + "<br>" + pin.userid + "<br>" + readableDate, { permanent: true, direction: "right" });
   });
 };

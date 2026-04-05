@@ -13,6 +13,7 @@ import {
   closeAnnouncement,
   fetchClipboardEntities,
   fetchNetworkStatus,
+  setAlert,
   setSelected,
 } from './nnActionsNetwork';
 import {
@@ -303,6 +304,7 @@ export const { Context, Provider } = DataContextCreator(
     sendChannelMessage,
     sendFactionPayment,
     sendPayment,
+    setAlert,
     setFactionUserStatus,
     setSelected,
     setUserHiddenStatus,

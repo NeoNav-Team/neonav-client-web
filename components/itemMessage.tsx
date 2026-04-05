@@ -47,7 +47,7 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
       const path = "/map/" + token.replace("@", "");
       return (LOCATION_REGEX.test(token)) ? <Link href={path}>{token}</Link> : <Fragment>{token}</Fragment>;
     });
-    return  textElements.map((element, index) => <Fragment key={index}> { element } </Fragment>) ;
+    return textElements.map((element, index) => <Fragment key={index}> { element } </Fragment>) ;
   }
   
   return (

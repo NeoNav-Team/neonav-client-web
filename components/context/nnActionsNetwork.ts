@@ -5,6 +5,13 @@ import {
   DispatchFunc
 } from "./nnTypes";
 
+export const setAlert = (dispatch: DispatchFunc) => async (severity: string, message: string ) => {
+  dispatch({
+    type: 'setAlert',
+    payload: {severity, message, show: true},
+  })
+};
+
 export const closeAlert = (dispatch: DispatchFunc) => async () => {
   dispatch({
     type: 'setAlert',

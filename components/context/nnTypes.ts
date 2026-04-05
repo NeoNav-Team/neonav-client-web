@@ -312,6 +312,7 @@ export type NnProviderDispatch = {
     updateFactionLocation: (_locationId:string, _factionId:string, doc:any) => void;
     updateLocation: (_locationId:string, _doc:any) => void;
     verifyLocation: (_id:string) => void;
+    setAlert: (_severity:string, _message:string) => void;
 }
 
 export type NnProviderValues = ProviderValues & Partial<NnProviderDispatch>;
