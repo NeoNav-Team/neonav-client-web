@@ -664,9 +664,14 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <ShareLocationIcon/>,
-            disabled: true,
+            //disabled: !window.isSecureContext,
             // tooltipText: "Share This Location",
-            // TODO: Create sharable link that is either knownLocation or custom dragable pin on map
+            handleAction: () => {
+              if (window.isSecureContext) {
+                navigator.clipboard.writeText("@" + selectedLocationId);
+                //TODO alert that copy worked
+              }
+            },
           }}
           secondHexProps={{
             icon: <RateReviewIcon/>,
