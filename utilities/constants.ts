@@ -279,4 +279,32 @@ export const authApiEnpoints = {
     method: "put",
     path: "/api/image/faction/$faction",
   },
+  eventsAll: {
+    method: "get",
+    path: "/api/locations/events/all",
+  },
+  userEventsAttending: {
+    method: "get",
+    path: "/api/user/events",
+  },
+  userEventsMine: {
+    method: "get",
+    path: "/api/user/events/mine",
+  },
+  locationEvents: {
+    method: "get",
+    path: "/api/locations/$location/events",
+  },
+  eventRsvp: {
+    method: "patch",
+    path: "/api/locations/events/$id",
+  },
+  updateEvent: {
+    method: "put",
+    path: "/api/locations/events/$id",
+  },
+  createEvent: {
+    method: "post",
+    path: "/api/locations/$location/events",
+  },
 };
