@@ -173,7 +173,7 @@ export const addLocationReview = (dispatch: DispatchFunc) => async (id:string, r
   executeApi('addLocationReview', { id, ...review, token }, onSuccess, onError);
 };
 
-export const deleteLocationReview = (dispatch: DispatchFunc) => async (something:any) => {
+export const deleteLocationReview = (dispatch: DispatchFunc) => async (id:string, reviewid:string) => {
   const token = getCookieToken();
   const onSuccess = (response: APIResponse) => {
     dispatch({
@@ -189,7 +189,7 @@ export const deleteLocationReview = (dispatch: DispatchFunc) => async (something
     });
     return err;
   };
-  executeApi('deleteLocationReview', { ...something, token }, onSuccess, onError);
+  executeApi('deleteLocationReview', { id, reviewid, token }, onSuccess, onError);
 };
 
 export const addLocationPin = (dispatch: DispatchFunc) => async (lat:string, long:string) => {
