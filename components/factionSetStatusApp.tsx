@@ -450,19 +450,22 @@ export default function FactionSetStatusApp(props: FactionSetStatusAppProps):JSX
               secondHexProps={{
                 icon: <QrCodeScannerIcon />,
                 disabled: true,
+                tooltipText: "Scan QR Code",
               }}
               bigHexProps={{
                 icon: <RateReviewIcon />,
                 handleAction: handleBigAction,
                 disabled: !isRep || loading,
                 loading: loading,
+                tooltipText: "Set Faction Status",
               }}
               thirdHexProps={{
                 disabled: true,
               }}
               fourthHexProps={{
                 icon: <SupervisedUserCircleIcon />,
-                link: `/factions/${accountId}`
+                link: `/factions/${accountId}`,
+                tooltipText: "Go To Faction",
               }}
             />
           </Box>

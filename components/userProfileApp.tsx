@@ -273,6 +273,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
                 icon: editMode ? <SaveIcon /> : <BorderColorIcon />,
                 disabled: isAdmin,
                 handleAction: bigButtonAction,
+                tooltipText: editMode ? "Save Profile" : "Edit Profile",
               }}
             />
           </Box>

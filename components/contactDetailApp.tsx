@@ -245,6 +245,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 {
                   icon: <PersonRemoveIcon />,
                   handleAction: goUnfriend,
+                  tooltipText: "Unfriend",
                 }
                 :
                 {
@@ -254,6 +255,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
               secondHexProps={{
                 icon: <CurrencyExchange />,
                 link: `/cash/${entityId}`,
+                tooltipText: "Pay or Request c±sн",
               }}
               bigHexProps={isFriend ? 
                 {
@@ -263,14 +265,17 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 {
                   icon: <PersonAddIcon />,
                   handleAction: goBefriend,
+                  tooltipText: "Add Friend",
                 }}
               thirdHexProps={{
                 icon: <LocalFloristIcon />,
                 link: `/garden/${entityId}`,
+                tooltipText: "Jaden/Garden",
               }}
               fourthHexProps={{
                 icon: <TocIcon />,
                 link: '/contacts',
+                tooltipText: "Contacts",
               }}
             />
           </Box>
