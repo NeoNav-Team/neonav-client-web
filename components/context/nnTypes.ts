@@ -104,6 +104,19 @@ export type NnFaction = {
     reps?: string[],
 }
 
+export type NnEvent = {
+    dbid?: string;
+    name?: string;
+    description?: string;
+    owner?: string;
+    ownername?: string;
+    location?: string;
+    open?: string;
+    close?: string;
+    attendees?: string[];
+    cancelled?: boolean;
+}
+
 
 /* Entity is currently a catch-all but realistically should be <NnFaction | NnChannel | NnUser | NnProfile | NnProduct> */
 export type nnEntity = {
@@ -160,6 +173,9 @@ export type NnNetwork = {
         factions?: NnFaction[] | NnSimpleEntity[],
         statuses?: NnStatus[],
         clipboardEntities?: NnContact[] | NnFaction[] | NnSimpleEntity[],
+        locations?: any[],
+        locationPins?: any[],
+        events?: NnEvent[],
     } | undefined,
     entity: nnEntity;
 }
@@ -192,6 +208,10 @@ export type ActionTypes =
   'setUserHiddenStatuses' | 
   'setMessageHistory' |
   'setClipboardEntities' |
+  'setLocationPins' |
+  'setLocations' |
+  'updateLocation' |
+  'setEvents' |
   'removeStatus' |
   'setSelected' |
   'updateMessageHistory' |
@@ -236,11 +256,15 @@ export interface APIResponse {
 }
 
 export type NnProviderDispatch = {
+    addLocationPin: (_lat:string, _long:string) => void;
+    addLocationReview: (_id:string, _review:any) => void;
     adminUserToChannel: (_channelId:string,_userId:string)=> void;
     befriend: (_newFriendId:string) => void;
     closeAlert: () => void;
     closeAnnouncement: () => void;
     createNewChannel: (_channelName:string) => void;
+    deleteLocationPins: () => void;
+    deleteLocationReview: (_id:string, _reviewid:string) => void;
     fetchNetworkStatus: () => void;
     fetchUserWallets: () => void;
     fetchUserContacts: (refresh?:boolean) => void;
@@ -254,6 +278,7 @@ export type NnProviderDispatch = {
     fetchChannelUsers: (_channelId:string) => void;
     fetchFactionDetails: (_factionId:string) => void;
     fetchFactionStatuses: (_factionId:string) => void;
+    fetchLocationPins: (_userId:string) => void;
     fetchUserProfile: () => void;
     patchUserToken: () => void;
     fetchUnreadCount: () => void;
@@ -294,6 +319,23 @@ export type NnProviderDispatch = {
     unfriend: (_exFriendId:string) => void;
     setUnreadCount: (_unread:LooseObject) => void;
     clearUnreadCountByType: (_channelId:string) => void;
+    fetchAllLocations: () => void;
+    fetchUnverifiedLocations: () => void;
+    fetchAllEvents: () => void;
+    fetchUserEventsAttending: () => void;
+    fetchUserEventsMine: () => void;
+    fetchLocationEvents: (_locationId: string) => void;
+    rsvpEvent: (_eventId: string) => void;
+    updateEvent: (_eventId: string, _payload: { name: string; description: string; open: string; close: string }) => void;
+    createEvent: (_locationId: string, _payload: { name: string; description: string; open: string; close: string }) => void;
+    cancelEvent: (_eventId: string, _payload: { name: string; description: string; open: string; close: string }) => void;
+    fetchLocationById: (_id:string) => void;
+    createFactionLocation: (_faction:string, _doc:any) => void;
+    createLocation: (doc:any) => void;
+    updateFactionLocation: (_locationId:string, _factionId:string, doc:any) => void;
+    updateLocation: (_locationId:string, _doc:any) => void;
+    verifyLocation: (_id:string) => void;
+    setAlert: (_severity:string, _message:string) => void;
 }
 
 export type NnProviderValues = ProviderValues & Partial<NnProviderDispatch>;

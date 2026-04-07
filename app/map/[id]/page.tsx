@@ -5,6 +5,6 @@ const MapApp = dynamic(() => import('@/components/mapApp'), {
   loading: () => <div>Loading map...</div>
 });
 
-export default function Map() {
-  return (<MapApp />);
+export default function Map({params}: {params: { id: string };}) {
+  return (<MapApp params={params}/>);
 }

@@ -13,6 +13,7 @@ import {
   closeAnnouncement,
   fetchClipboardEntities,
   fetchNetworkStatus,
+  setAlert,
   setSelected,
 } from './nnActionsNetwork';
 import {
@@ -70,6 +71,31 @@ import {
   setFactionUserStatus,
   fetchFactionStatuses,
 } from './nnActionsFaction';
+import {
+  addLocationPin,
+  addLocationReview,
+  createFactionLocation,
+  createLocation,
+  deleteLocationPins,
+  deleteLocationReview,
+  fetchAllLocations,
+  fetchLocationById,
+  fetchLocationPins,
+  fetchUnverifiedLocations,
+  updateFactionLocation,
+  updateLocation,
+  verifyLocation,
+} from './nnActionsLocation';
+import {
+  fetchAllEvents,
+  fetchUserEventsAttending,
+  fetchUserEventsMine,
+  fetchLocationEvents,
+  rsvpEvent,
+  updateEvent,
+  createEvent,
+  cancelEvent,
+} from './nnActionsEvent';
 import { nnSchema } from "./nnSchema";
 import {
   getCookieContext,
@@ -123,6 +149,21 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       break;
     case 'setClipboardEntities':
       clonedState.network.collections.clipboardEntities = payload;
+      break;
+    case 'setLocations':
+      clonedState.network.collections.locations = payload;
+      break;
+    case 'setEvents':
+      clonedState.network.collections.events = payload;
+      break;
+    case 'updateLocation':
+      const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
+      if (location) {
+        clonedState.network.collections.locations = clonedState.network.collections.locations.map((l:any) => l.id === (payload as any)?.id ? payload as any : l);
+      }
+      break;
+    case 'setLocationPins':
+      clonedState.network.collections.locationPins = payload;
       break;
     case 'updateClipboardEntities':
       let clipboardEntities = clonedState.network.collections.clipboardEntities;
@@ -223,6 +264,8 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
 export const { Context, Provider } = DataContextCreator(
   nnReducer,
   { 
+    addLocationReview,
+    addLocationPin,
     addRecentScan,
     addRepToFaction,
     addUserToFaction,
@@ -231,8 +274,13 @@ export const { Context, Provider } = DataContextCreator(
     clearUnreadCountByType,
     closeAlert,
     closeAnnouncement,
+    createFactionLocation,
+    createLocation,
     createNewChannel,
+    deleteLocationPins,
+    deleteLocationReview,
     fetchAllFactions,
+    fetchAllLocations,
     fetchChannelDetails,
     fetchChannelHistory,
     fetchChannelUsers,
@@ -240,11 +288,14 @@ export const { Context, Provider } = DataContextCreator(
     fetchClipboardEntities,
     fetchFactionDetails,
     fetchFactionStatuses,
+    fetchLocationPins,
     fetchNetworkStatus,
     fetchUnreadCount,
     fetchUserChannels,
     fetchUserContacts,
     fetchUserFactions,
+    fetchLocationById,
+    fetchUnverifiedLocations,
     fetchUserProfile,
     fetchUserSetStatuses,
     fetchUserStatuses,
@@ -266,6 +317,7 @@ export const { Context, Provider } = DataContextCreator(
     sendChannelMessage,
     sendFactionPayment,
     sendPayment,
+    setAlert,
     setFactionUserStatus,
     setSelected,
     setUserHiddenStatus,
@@ -273,9 +325,20 @@ export const { Context, Provider } = DataContextCreator(
     toggleChannelScope,
     toggleStatusClass,
     unfriend,
+    updateFactionLocation,
     updateFactionProfile,
+    updateLocation,
     updateUserProfile,
     userSearch,
+    verifyLocation,
+    fetchAllEvents,
+    fetchUserEventsAttending,
+    fetchUserEventsMine,
+    fetchLocationEvents,
+    rsvpEvent,
+    updateEvent,
+    createEvent,
+    cancelEvent,
   },
   defaultNnContext,
 );

@@ -223,6 +223,54 @@ export const authApiEnpoints = {
     method: "post",
     path: "/api/user/search",
   },
+  locations: {
+    method: "get",
+    path: "/api/locations?unverified=$unverified",
+  },
+  location: {
+    method: "get",
+    path: "/api/locations/$id",
+  },
+  createFactionLocation: {
+    method: "post",
+    path: "/api/factions/$faction/locations",
+  },
+  createLocation: {
+    method: "post",
+    path: "/api/locations",
+  },
+  updateFactionLocation: {
+    method: "patch",
+    path: "/api/factions/$faction/locations/$id",
+  },
+  updateLocation: {
+    method: "patch",
+    path: "/api/locations/$id",
+  },
+  verifyLocation: {
+    method: "patch",
+    path: "/api/locations/$id/verify",
+  },
+  addLocationReview: {
+    method: "post",
+    path: "/api/locations/$id/reviews",
+  },
+  deleteLocationReview: {
+    method: "delete",
+    path: "/api/locations/$id/reviews/$reviewid",
+  },
+  addLocationPin: {
+    method: "post",
+    path: "/api/locations/pins",
+  },
+  getLocationPins: {
+    method: "get",
+    path: "/api/locations/pins/$user",
+  },
+  deleteLocationPins: {
+    method: "delete",
+    path: "/api/locations/pins",
+  },
   updateImage: {
     method: "put",
     path: "/api/image",
@@ -230,5 +278,33 @@ export const authApiEnpoints = {
   updateFactionImage: {
     method: "put",
     path: "/api/image/faction/$faction",
+  },
+  eventsAll: {
+    method: "get",
+    path: "/api/locations/events/all",
+  },
+  userEventsAttending: {
+    method: "get",
+    path: "/api/user/events",
+  },
+  userEventsMine: {
+    method: "get",
+    path: "/api/user/events/mine",
+  },
+  locationEvents: {
+    method: "get",
+    path: "/api/locations/$location/events",
+  },
+  eventRsvp: {
+    method: "patch",
+    path: "/api/locations/events/$id",
+  },
+  updateEvent: {
+    method: "put",
+    path: "/api/locations/events/$id",
+  },
+  createEvent: {
+    method: "post",
+    path: "/api/locations/$location/events",
   },
 };

@@ -43,7 +43,7 @@ import PolicyIcon from '@mui/icons-material/Policy';
 import Map from './svgr/map';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
-import Notifications from './svgr/notifications';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
 import Hotbar from './hotbar';
@@ -224,8 +224,8 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <Link href="/notifications">
-                <IconFrame icon={<Notifications fontSize="inherit" />} title="Notifications" />
+              <Link href="/events">
+                <IconFrame icon={<CalendarMonthIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />} title="Events" />
               </Link>
             </Box>
           </Grid>
