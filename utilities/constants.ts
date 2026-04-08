@@ -4,6 +4,7 @@ export const restrictedChannels = [
   "22c6fec7b63257ca0d7b743946090fa9",
 ];
 export const globalChannel = "22c6fec7b63257ca0d7b74394605813e";
+export const NEONAV_MAINT = "C461879533";
 
 export const apiUrl = {
   protocol: "https",

@@ -4,6 +4,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
+import SimpleDialog from './simpleDialog';
+import { useState } from 'react';
 
 interface ItemReviewProps {
   id: string;
@@ -13,7 +15,7 @@ interface ItemReviewProps {
   ts: string;
   rating: number;
   review?: string;
-  isAdmin?: boolean; // Toggle this based on user permissions
+  canDelete?: boolean; // Toggle this based on user permissions
   onDelete?: (id:string, reviewid:string) => void; // Callback for the trash icon
 }
 
@@ -25,9 +27,11 @@ export default function ItemReview({
   ts,
   rating,
   review,
-  isAdmin = false,
+  canDelete = false,
   onDelete
 }: ItemReviewProps): JSX.Element {
+
+  const [open, setOpen] = useState(false);
 
   return (
     <Box style={{ padding: '1vh 0', width: '100%' }}>
@@ -45,18 +49,26 @@ export default function ItemReview({
               </span>
             </Typography>
 
-            {isAdmin && (
+            {canDelete && (
               <IconButton 
                 size="small" 
                 onClick={() => {
-                  // do dialog
-                  onDelete?.(id, reviewid);
+                  setOpen(true);
                 }}
                 sx={{ color: 'rgba(255,255,255,1)', p: 0 }}
               >
                 <DeleteIcon fontSize="small" />
               </IconButton>
             )}
+            <SimpleDialog 
+              open={open}
+              handleClose={() => setOpen(false)}
+              handleAction={() => {
+                onDelete?.(id, reviewid);
+                setOpen(false);
+              }}
+              dialog="Are you sure you want to delete this review? This action cannot be undone."
+            />
           </Stack>
 
           {/* Review Text Body */}

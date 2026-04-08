@@ -1,8 +1,8 @@
 import L from "leaflet";
 import { compressHoursAcrossMidnight, generateOpenMessages } from "./mapTimeUtils";
+import { NEONAV_MAINT } from '@/utilities/constants';
 
-const NEONAV_MAINT = "C461879533";
-const MEGABLOCK_META = "L229118014";
+const MEGABLOCK_META = "L229118014"; // TODO maybe move these to constants file if it makes sense
 const MEGAMALL_META = "L128533982";
 
 /** 

@@ -26,6 +26,7 @@ import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { DeleteForever } from '@mui/icons-material';
 
 import { MapInfoModal } from '@/components/mapInfoModal';
 import { Context as NnContext } from "@/components/context/nnContext";
@@ -34,7 +35,7 @@ import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
 import { renderLocationsToLeafletLayers, renderLocationPinsToLeafletLayers, renderNewLocationPin } from "@/utilities/mapLeafletLocationsRenderer";
 import { verifyLocation } from './context/nnActionsLocation';
-import { DeleteForever } from '@mui/icons-material';
+import { NEONAV_MAINT } from '@/utilities/constants';
 
 
 interface PageContainerProps {
@@ -52,7 +53,6 @@ interface RotateControl extends L.Control {
 }
 
 const SVG_MAP_FILE = "/Winter2026v2.svg"
-const NEONAV_MAINT = "C461879533";
 
 const EMPTY_LOCATION = {id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", creator: "", reviews: [], neosite: "", verified: false};
 

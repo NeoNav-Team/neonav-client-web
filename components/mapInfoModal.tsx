@@ -35,6 +35,7 @@ import { Context as NnContext } from "@/components/context/nnContext";
 import { NnProviderValues } from "@/components/context/nnTypes";
 import ItemReview from "@/components/itemReview";
 import SimpleScrollContainer from "@/components/simpleScrollContainer";
+import { NEONAV_MAINT } from '@/utilities/constants';
 
 const modalTitleStyle = {
   fontFamily: 'Jura',
@@ -108,6 +109,7 @@ const SmallView = ({ location, onExpand }: any) => (
 );
 
 const FullView = ({ location, onCollapse }: any) =>  {
+  const { state, }: NnProviderValues = React.useContext(NnContext);
   const { deleteLocationReview = (reviewid:string) => {}, }: NnProviderValues = React.useContext(NnContext);
   
   return (
@@ -214,7 +216,11 @@ const FullView = ({ location, onCollapse }: any) =>  {
                       ts={ts}
                       review={review}
                       rating={rating}
-                      isAdmin={true}
+                      canDelete={
+                        state?.network?.selected.account === reviewItem.reviewer ||
+                        state?.network?.selected.account === location.owner ||
+                        state?.network?.selected.account === NEONAV_MAINT
+                      }
                       onDelete={deleteLocationReview}
                     />
                   </div>
