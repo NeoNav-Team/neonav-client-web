@@ -43,14 +43,15 @@ export const fetchChannelsLatest = (dispatch: DispatchFunc) => async () => {
     const latestIdbId = await idbGetLatestId(channelId);
 
     if (latestIdbId === latest.id) {
+      // IDB is current — no new messages
       unreadCounts[channelId] = 0;
       return;
     }
 
-    // Fetch messages newer than our latest IDB entry
     const latestIdbTs = await idbGetLatestTs(channelId);
-    const since = encodeURIComponent(latestIdbTs || latest.ts);
-    const histUrl = `${apiUrl.protocol}://${apiUrl.hostname}/api/chat/channels/${channelId}/history?since=${since}`;
+    const histUrl = latestIdbTs
+      ? `${apiUrl.protocol}://${apiUrl.hostname}/api/chat/channels/${channelId}/history?since=${encodeURIComponent(latestIdbTs)}`
+      : `${apiUrl.protocol}://${apiUrl.hostname}/api/chat/channels/${channelId}/history`;
 
     let histRes;
     try {
@@ -66,11 +67,17 @@ export const fetchChannelsLatest = (dispatch: DispatchFunc) => async () => {
       return;
     }
 
-    const userMsgs = newMsgs.filter(m => m.fromid !== '0000000000');
-    unreadCounts[channelId] = userMsgs.length >= MSG_CAP ? MSG_CAP : userMsgs.length;
-
     await idbPutMessages(newMsgs);
     await idbCullChannel(channelId);
+
+    // No prior IDB data means fresh device — treat as no unread baseline
+    if (!latestIdbTs) {
+      unreadCounts[channelId] = 0;
+      return;
+    }
+
+    const userMsgs = newMsgs.filter(m => m.fromid !== '0000000000');
+    unreadCounts[channelId] = userMsgs.length >= MSG_CAP ? MSG_CAP : userMsgs.length;
   }));
 
   dispatch({
