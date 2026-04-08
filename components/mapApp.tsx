@@ -25,6 +25,7 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 import { MapInfoModal } from '@/components/mapInfoModal';
 import { Context as NnContext } from "@/components/context/nnContext";
@@ -32,6 +33,7 @@ import { NnProviderValues } from "@/components/context/nnTypes";
 import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
 import { renderLocationsToLeafletLayers, renderLocationPinsToLeafletLayers, renderNewLocationPin } from "@/utilities/mapLeafletLocationsRenderer";
+import { verifyLocation } from './context/nnActionsLocation';
 
 
 interface PageContainerProps {
@@ -52,7 +54,7 @@ const SVG_MAP_FILE = "/NeoMap2026v3.svg"
 const NEONAV_MAINT = "C461879533";
 const NEOCITY_ADMIN = "C231465509";
 
-const EMPTY_LOCATION = {id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""};
+const EMPTY_LOCATION = {id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", creator: "", reviews: [], neosite: "", verified: false};
 
 class CustomTileLayer extends L.TileLayer {
   constructor(options?: L.TileLayerOptions) {
@@ -183,6 +185,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     fetchLocationById = (id: string) => {},
     createLocation = (doc: any) => {},
     createFactionLocation = (faction: any, doc: any) => {},
+    verifyLocation = (id: string) => {},
     updateLocation = (id: string, doc:any) => {},
     addLocationReview = (id: string, review:any) => {},
     addLocationPin = (lat: string, long: string) => {},
@@ -355,7 +358,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
     if (event.target.checked && !myMap.hasLayer(targetLayer)) {
       fetchUnverifiedLocations(); // TODO this causes us to fetch unverified locations on any layer turning on, should be selective
-      fetchLocationPins(state.user?.profile?.auth?.userid!); // TODO support other people's pins and higher counts
+      fetchLocationPins("all"); // TODO support higher counts
       myMap.addLayer(targetLayer);
     } else if (!event.target.checked && myMap.hasLayer(targetLayer)) {
       myMap.removeLayer(targetLayer);
@@ -768,7 +771,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <ShareLocationIcon/>,
-            //disabled: !window.isSecureContext,
+            disabled: !window.isSecureContext, // Can't affect clipboard on unsecure connection
             tooltipText: "Share This Location",
             handleAction: () => {
               if (window.isSecureContext) {
@@ -786,7 +789,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
             tooltipText: "Edit Location",
-            // disabled: , // TODO: Need to check if the location is editable by the user
+            disabled: 
+              !(state?.user?.factions?.some(f => f.id === NEONAV_MAINT) ||        // User is admin
+              // state?.user?.factions?.some(f => f.id === NEOCITY_ADMIN) ||         // User is event staff?
+              state?.user?.profile?.auth?.userid === selectedLocation.owner ||    // User is owner
+              state?.user?.profile?.auth?.userid === selectedLocation.creator ||  // User is creator
+              state?.user?.factions?.some(f => f.id === selectedLocation.owner)   // User is in faction that owns it
+              ),
             handleAction: () => {
               fetchAllFactions();
               startEditMode();
@@ -795,11 +804,21 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           thirdHexProps={{
             icon: <EventIcon/>,
             link: "/events/" + selectedLocationId,
-            tooltipText: "See Events",
+            tooltipText: "Events",
           }}
-          fourthHexProps={{
-            disabled: true,
-          }}
+          fourthHexProps={
+            // Set up button only if we are admin and the location isn't verified
+            state?.user?.factions?.some(f => f.id === NEONAV_MAINT) && !selectedLocation.verified ? {
+              icon: <CheckCircleOutlineIcon />,
+              dialog: "Verify Location? Ths cannot be undone.",
+              handleAction: () => {
+                verifyLocation(selectedLocationId);
+              },
+              tooltipText: "Verify Location",
+            } : {
+              disabled: true,
+            }
+          }
         />
         <ReviewDialog id={selectedLocationId} open={reviewDialogOpen} handleClose={() => {setReviewDialogOpen(false); fetchLocationById(selectedLocationId);}} addLocationReview={addLocationReview}/>
       </Box>
@@ -826,7 +845,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
               fetchAllFactions();
               startCreateMode();
             },
-            // TODO: Create location modal things
           }}
           bigHexProps={{
             icon: <FilterListIcon/>,

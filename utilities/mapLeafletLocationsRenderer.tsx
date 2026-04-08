@@ -133,7 +133,6 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
   const megablockSE = locations.find(loc => loc.id === MEGABLOCK_SE) ?? {lat: "35.078996", long: "-117.822285"};
   const megamallNW = locations.find(loc => loc.id === MEGAMALL_NW) ?? {lat: "35.079656", long: "-117.822066"};
   const megamallSE = locations.find(loc => loc.id === MEGAMALL_SE) ?? {lat: "35.079379", long: "-117.821903"};
-  // TODO: Add a fallback if we can't find these locations
 
   const megablockRect = L.latLngBounds(
     L.latLng(megablockNW.lat, megablockNW.long),

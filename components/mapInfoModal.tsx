@@ -175,8 +175,8 @@ const FullView = ({ location, onCollapse }: any) =>  {
         <Typography sx={modalBodyStyle} component="p">
           <LocationCityIcon fontSize="inherit"/>
           &nbsp;⋅&nbsp;
-          <Link href={`/sites/${location.neocities}`}>
-            {!!location.neocities && location.ownername}
+          <Link href={`/sites/${location.neosite}`}>
+            {!!location.neosite && location.ownername}
           </Link>
         </Typography>
         {(location.description && <Divider color="secondary" flexItem/>)}
@@ -406,6 +406,10 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
               <TextField 
                 label="Tooltip" name="tooltip" fullWidth 
                 value={formData.tooltip} onChange={setTextFormData} 
+              />
+              <TextField 
+                label="Neosite" name="neosite" fullWidth 
+                value={formData.neosite} onChange={setTextFormData} 
               />
             </>
           )}
