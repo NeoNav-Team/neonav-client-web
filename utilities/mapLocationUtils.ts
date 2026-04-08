@@ -35,27 +35,29 @@ export function getTargetLayer(
   loc: any, 
   latlng: L.LatLng, 
   layers: Map<string, L.LayerGroup>, 
-  context: { userId?: string, factions: any[], megablockRect: L.LatLngBounds, megamallRect: L.LatLngBounds }
+  context: { userId?: string, linkedLocationId:string, megablockRect: L.LatLngBounds, megamallRect: L.LatLngBounds }
 ): L.LayerGroup {
-  const { userId, factions, megablockRect, megamallRect } = context;
+  const { userId, linkedLocationId, megablockRect, megamallRect } = context;
 
-  // 1. User/Faction Owned (Unverified)
+  // 1. Location in page path
+  if (loc.id === linkedLocationId) return layers.get("locationMarkersLayer")!;
+
+  // 2. User/Faction Owned (Unverified)
   if (!loc.verified && (
     loc.owner === userId || 
-    loc.creator === userId || 
-    factions.some(f => f.id === loc.owner)
+    loc.creator === userId
   )) {
     return layers.get("mylocations")!;
   }
 
-  // 2. Unverified General
+  // 3. Unverified General
   if (!loc.verified) return layers.get("unverified")!;
 
-  // 3. System/Dev Layers
-  if (loc.owner === NEONAV_MAINT || loc.venuetype === "dev") return layers.get("devLayer")!;
+  // 4. System/Dev Layers
+  if (loc.owner === NEONAV_MAINT || loc.venuetype === "Dev" || loc.venuetype === "dev") return layers.get("devLayer")!;
   if (loc.id === MEGABLOCK_META || loc.id === MEGAMALL_META) return layers.get("megablockAndMegamallLocations")!;
 
-  // 4. Spatial Layers (Mega Structures)
+  // 5. Spatial Layers (Mega Structures)
   if (megablockRect.contains(latlng)) return layers.get("megablockLocations")!;
   if (megamallRect.contains(latlng)) return layers.get("megamallLocations")!;
 

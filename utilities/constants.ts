@@ -251,6 +251,10 @@ export const authApiEnpoints = {
     method: "patch",
     path: "/api/locations/$id",
   },
+  deleteLocation: {
+    method: "delete",
+    path: "/api/locations/$id",
+  },
   verifyLocation: {
     method: "patch",
     path: "/api/locations/$id/verify",
@@ -261,7 +265,7 @@ export const authApiEnpoints = {
   },
   deleteLocationReview: {
     method: "delete",
-    path: "/api/locations/$id/reviews/$reviewid",
+    path: "/api/locations/review/$reviewid",
   },
   addLocationPin: {
     method: "post",

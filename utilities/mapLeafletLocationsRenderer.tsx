@@ -39,8 +39,8 @@ const LOCATOR = "L401233115";
 export interface LeafletLocationsRendererParams {
   layerData: Map<string, LayerGroup>;
   locations: any[];
-  userId?: string;
-  factions?: any[];
+  userId: string;
+  linkedLocationId: string;
   onMarkerClick: (leafletMarker: L.Marker) => void;
   infoModalState: any;
   selectedLocationId: string;
@@ -109,7 +109,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     layerData,
     locations,
     userId,
-    factions,
+    linkedLocationId,
     onMarkerClick,
     infoModalState,
     selectedLocationId,
@@ -133,7 +133,6 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
   const megablockSE = locations.find(loc => loc.id === MEGABLOCK_SE) ?? {lat: "35.078996", long: "-117.822285"};
   const megamallNW = locations.find(loc => loc.id === MEGAMALL_NW) ?? {lat: "35.079656", long: "-117.822066"};
   const megamallSE = locations.find(loc => loc.id === MEGAMALL_SE) ?? {lat: "35.079379", long: "-117.821903"};
-  // TODO: Add a fallback if we can't find these locations
 
   const megablockRect = L.latLngBounds(
     L.latLng(megablockNW.lat, megablockNW.long),
@@ -165,7 +164,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     loc.rating = enrichedLoc.rating;
     
     // Determine the layer
-    let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, factions: factions ?? [], megablockRect, megamallRect });
+    let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, linkedLocationId, megablockRect, megamallRect });
 
     // Create the marker
     const { icon, color } = getVenueIconAndColor(loc.venuetype ?? "");

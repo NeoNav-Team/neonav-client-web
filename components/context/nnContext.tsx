@@ -77,6 +77,7 @@ import {
   addLocationReview,
   createFactionLocation,
   createLocation,
+  deleteLocation,
   deleteLocationPins,
   deleteLocationReview,
   fetchAllLocations,
@@ -160,6 +161,8 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
       if (location) {
         clonedState.network.collections.locations = clonedState.network.collections.locations.map((l:any) => l.id === (payload as any)?.id ? payload as any : l);
+      } else {
+        clonedState.network.collections.locations.push(payload);
       }
       break;
     case 'setLocationPins':
@@ -284,6 +287,7 @@ export const { Context, Provider } = DataContextCreator(
     createFactionLocation,
     createLocation,
     createNewChannel,
+    deleteLocation,
     deleteLocationPins,
     deleteLocationReview,
     fetchAllFactions,
