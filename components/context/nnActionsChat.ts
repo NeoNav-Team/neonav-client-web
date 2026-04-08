@@ -1,62 +1,96 @@
+import axios from 'axios';
 import executeApi from '@/utilities/executeApi';
 import longPollApi from '@/utilities/longPollApi';
-import isEmpty from '@/utilities/isEmpty';
-import { 
+import {
   APIResponse,
   DispatchFunc,
   netcheckAPIResData,
   NnChatMessage,
   LooseObject
 } from './nnTypes';
+import { getCookieToken } from '@/utilities/cookieContext';
+import { restrictedChannels, apiUrl, authApiEnpoints } from '@/utilities/constants';
+import { clearLocalStorage } from '@/utilities/localStorage';
 import {
-  getCookieToken,
-  setCookieUnread,
-  getCookieUnread,
-  filterCookieUnread,
-} from '@/utilities/cookieContext';
-import { globalChannel, restrictedChannels } from '@/utilities/constants';
-import { storedRecently, getLocalStorage, clearLocalStorage, storeFetched } from '@/utilities/localStorage';
+  idbGetMessages,
+  idbGetLatestTs,
+  idbGetLatestId,
+  idbPutMessages,
+  idbCullChannel,
+  MSG_CAP,
+} from '@/utilities/idbMessages';
 
 const alertChannel = restrictedChannels[1];
 
-// doing this by cookie since we don't have API
+export const fetchChannelsLatest = (dispatch: DispatchFunc) => async () => {
+  const token = getCookieToken();
+  const { path } = (authApiEnpoints as any)['channelsLatest'];
+  const url = `${apiUrl.protocol}://${apiUrl.hostname}${path}`;
 
-export const sortUnread = (unreadArr:string[]) => {
-  var unreadPayload: LooseObject = {};
-  unreadArr.map((unread:string) => {
-    unreadPayload[unread] = unread.length >= 6 && unreadPayload[unread] ? unreadPayload[unread] + 1 : 1;
-  })
-  return unreadPayload;
-}
-  
-export const fetchUnreadCount = (dispatch: DispatchFunc) => async () => {
-  const unreadArr:string[] = getCookieUnread();
-  const unread = sortUnread(unreadArr);
+  let res;
+  try {
+    res = await axios.get(url, { headers: { 'x-access-token': token } });
+  } catch {
+    return;
+  }
+  if (!res?.data) return;
+
+  const latestMessages: any[] = Array.isArray(res.data) ? res.data : [];
+  const unreadCounts: LooseObject = {};
+
+  await Promise.all(latestMessages.map(async (latest: any) => {
+    const channelId = latest.channel;
+    const latestIdbId = await idbGetLatestId(channelId);
+
+    if (latestIdbId === latest.id) {
+      // IDB is current — no new messages
+      unreadCounts[channelId] = 0;
+      return;
+    }
+
+    const latestIdbTs = await idbGetLatestTs(channelId);
+    const histUrl = latestIdbTs
+      ? `${apiUrl.protocol}://${apiUrl.hostname}/api/chat/channels/${channelId}/history?since=${encodeURIComponent(latestIdbTs)}`
+      : `${apiUrl.protocol}://${apiUrl.hostname}/api/chat/channels/${channelId}/history`;
+
+    let histRes;
+    try {
+      histRes = await axios.get(histUrl, { headers: { 'x-access-token': token } });
+    } catch {
+      unreadCounts[channelId] = 0;
+      return;
+    }
+
+    const newMsgs: NnChatMessage[] = Array.isArray(histRes?.data) ? histRes.data : [];
+    if (!newMsgs.length) {
+      unreadCounts[channelId] = 0;
+      return;
+    }
+
+    await idbPutMessages(newMsgs);
+    await idbCullChannel(channelId);
+
+    // No prior IDB data means fresh device — treat as no unread baseline
+    if (!latestIdbTs) {
+      unreadCounts[channelId] = 0;
+      return;
+    }
+
+    const userMsgs = newMsgs.filter(m => m.fromid !== '0000000000');
+    unreadCounts[channelId] = userMsgs.length >= MSG_CAP ? MSG_CAP : userMsgs.length;
+  }));
+
   dispatch({
     type: 'setUnreadCount',
-    payload: unread,
-  })
+    payload: unreadCounts,
+  });
 };
 
-export const setUnreadCount = (dispatch: DispatchFunc) => async (unreadString:string) => {
-  setCookieUnread(unreadString);
-  const unreadArr:string[] = getCookieUnread();
-  const unread = sortUnread(unreadArr);
+export const clearUnreadCountByType = (dispatch: DispatchFunc) => async (channelId: string) => {
   dispatch({
-    type: 'setUnreadCount',
-    payload: {...unread},
-  })
-};
-
-export const clearUnreadCountByType = (dispatch: DispatchFunc) => async (unreadString:string) => {
-  filterCookieUnread(unreadString);
-  const unreadArr:string[] = getCookieUnread();
-  const unread = sortUnread(unreadArr);
-  unread[unreadString] = 0;
-  dispatch({
-    type: 'setUnreadCount',
-    payload: {...unread},
-  })
+    type: 'clearChannelUnread',
+    payload: channelId,
+  });
 };
 
 // Normal channel functions
@@ -82,7 +116,7 @@ export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   executeApi('channels', {token}, onSuccess, onError);
 }
 
-export const fetchChannelDetails = (dispatch: DispatchFunc) => async (id:string) => {
+export const fetchChannelDetails = (_dispatch: DispatchFunc) => async (_id:string) => {
 
 };
 
@@ -111,38 +145,42 @@ export const fetchChannelUsers = (dispatch: DispatchFunc) => async (id:string) =
   executeApi('channelUsers', {id, token}, onSuccess, onError);
 };
 
-export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id:string) => {
-  const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {
-    const { data } = response;
-    storeFetched(id, data);
+export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id: string) => {
+  const cached = await idbGetMessages(id);
+  if (cached.length > 0) {
     dispatch({
       type: 'setMessageHistory',
-      payload: data,
-    })
+      payload: cached,
+    });
+    return;
+  }
+
+  // IDB empty — fall back to API
+  const token = getCookieToken();
+  const onSuccess = async (response: APIResponse) => {
+    const data = response.data as unknown as NnChatMessage[];
+    const msgs = Array.isArray(data) ? data : [];
+    if (msgs.length) {
+      await idbPutMessages(msgs);
+    }
+    dispatch({
+      type: 'setMessageHistory',
+      payload: msgs,
+    });
   };
-  const onError = (err:netcheckAPIResData) => {
+  const onError = (err: netcheckAPIResData) => {
     const { message = 'Chat History failure' } = err;
     dispatch({
       type: 'setAlert',
       payload: {severity: 'error', message, show: true},
-    })
-  };
-
-  if (storedRecently(id)) {
-    const data = getLocalStorage(id);
-    dispatch({
-      type: 'setMessageHistory',
-      payload: data,
     });
-  } else {
-    executeApi('chatHistory', {token, id}, onSuccess, onError);
-  }
+  };
+  executeApi('chatHistory', {token, id}, onSuccess, onError);
 }
 
 export const sendChannelMessage = (dispatch: DispatchFunc) => async (id:string, text: string) => {
   const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {};
+  const onSuccess = (_response:APIResponse) => {};
   const onError = (err:netcheckAPIResData) => {
     const { message = 'Chat Message failure' } = err;
     dispatch({
@@ -153,38 +191,26 @@ export const sendChannelMessage = (dispatch: DispatchFunc) => async (id:string, 
   executeApi('message', {token, text, id}, onSuccess, onError);
 }
 
-export const longPollMessages = (dispatch: DispatchFunc) => async (since:string) => {
+export const longPollMessages = (dispatch: DispatchFunc) => async (since: string = 'now') => {
   const token = getCookieToken();
-  const onSuccess = (message:NnChatMessage) => {
+  const onSuccess = async (message: NnChatMessage) => {
     const id = message?.id || null;
     const channel = message?.channel || null;
-    // add the message to the local storage 
-    if (id !== null && channel !== null) {
-      const messages = getLocalStorage(channel);
-      const selectedChannel = messages && !isEmpty(messages) ? messages[0].channel : globalChannel;
-      if (!messages.some((item:NnChatMessage) => item.id === id)) {
-        messages.push(message);
-        storeFetched(channel, messages);
-        if(channel == selectedChannel) {
-          dispatch({
-            type: 'updateMessageHistory',
-            payload: message,
-          })
-        }
-        if(channel == alertChannel) {
-          dispatch({
-            type: 'setAnnouncement',
-            payload: message,
-          })
-        }
-      }
-      setCookieUnread(channel);
-      const unreadArr:string[] = getCookieUnread();
-      const unread = sortUnread(unreadArr);
+    if (id === null || channel === null) return;
+
+    await idbPutMessages([message]);
+    await idbCullChannel(channel);
+
+    dispatch({
+      type: 'receiveMessage',
+      payload: message,
+    });
+
+    if (channel === alertChannel) {
       dispatch({
-        type: 'setUnreadCount',
-        payload: {...unread},
-      })
+        type: 'setAnnouncement',
+        payload: message,
+      });
     }
   };
   const onError = (err:netcheckAPIResData) => {

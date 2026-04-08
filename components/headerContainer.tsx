@@ -28,33 +28,32 @@ interface PageContainerProps {}
 export default function HeaderContainer(props:PageContainerProps):JSX.Element {
 
   const {
-    state, 
+    state,
     initContext = () => {},
     fetchClipboardEntities = () => {},
     fetchNetworkStatus = () => {},
     fetchUserContacts = () => {},
     fetchUserFactions = () => {},
     fetchUserChannels = () => {},
-    fetchUnreadCount = () => {},
-    longPollMessages = (since:string) => {},
-  }: NnProviderValues = useContext(NnContext);  
+    fetchChannelsLatest = () => {},
+    longPollMessages = () => {},
+  }: NnProviderValues = useContext(NnContext);
   const [ initialized, setInitialized ] = useState(false);
   const unread:LooseObject = useMemo(() => {
     return state?.network?.selected?.unread || {};
   }, [state]);
 
   useEffect(() => {
-    //get initial values on page load
-    if(!initialized) { 
+    if (!initialized) {
       initContext();
       fetchClipboardEntities();
       fetchNetworkStatus();
       fetchUserContacts();
       fetchUserFactions();
       fetchUserChannels();
-      fetchUnreadCount();
+      fetchChannelsLatest();
       setInitialized(true);
-      longPollMessages('now');
+      longPollMessages();
     }
   }, [
     fetchNetworkStatus,
@@ -62,7 +61,7 @@ export default function HeaderContainer(props:PageContainerProps):JSX.Element {
     fetchClipboardEntities,
     fetchUserFactions,
     fetchUserChannels,
-    fetchUnreadCount,
+    fetchChannelsLatest,
     initContext,
     longPollMessages,
     initialized]);

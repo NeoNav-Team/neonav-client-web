@@ -1,9 +1,10 @@
 'use client';
 import merge from 'deepmerge';
 import DataContextCreator from "./dataContextCreator";
-import { 
+import {
   Action,
   DispatchFunc,
+  LooseObject,
   NnChatMessage,
   NnProviderValues,
   NnStore,
@@ -46,13 +47,13 @@ import {
   adminUserToChannel,
   createNewChannel,
   clearUnreadCountByType,
+  fetchChannelsLatest,
   joinUserToChannel,
   inviteUserToChannel,
   fetchUserChannels,
   fetchChannelHistory,
   fetchChannelDetails,
   fetchChannelUsers,
-  fetchUnreadCount,
   longPollMessages,
   sendChannelMessage,
   removeUserFromChannel,
@@ -103,7 +104,6 @@ import {
   setCookieContext,
   setCookieToken,
 } from "@/utilities/cookieContext";
-import { restrictedChannels } from "@/utilities/constants";
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
@@ -185,24 +185,31 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setMessageHistory':
       clonedState.network.collections.messages = payload;
       break;
-    case 'updateMessageHistory':
-      const clonedPayload:NnChatMessage = JSON.parse(JSON.stringify(payload));
-      if (
-        clonedPayload.channel == clonedState.network.selected.channel
-        || clonedPayload.channel == restrictedChannels[1]
-      ){ // if selected channel or announcement
-        clonedState.network.collections.messages.unshift(payload);
-      }
-      break;
     case 'setNetwork':
       clonedState.network.location = payload;
       break;
     case 'setSelected':
       clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
       break;
+    case 'receiveMessage': {
+      const msg:NnChatMessage = JSON.parse(JSON.stringify(payload));
+      const msgChannel = msg.channel as string;
+      if (msgChannel === clonedState.network.selected.channel) {
+        clonedState.network.collections.messages.unshift(msg);
+      }
+      const current: LooseObject = clonedState.network.selected.unread || {};
+      clonedState.network.selected.unread = { ...current, [msgChannel]: (current[msgChannel] || 0) + 1 };
+      break;
+    }
     case 'setUnreadCount':
       clonedState.network.selected.unread = payload;
       break;
+    case 'clearChannelUnread': {
+      const ch = payload as unknown as string;
+      const current: LooseObject = clonedState.network.selected.unread || {};
+      clonedState.network.selected.unread = { ...current, [ch]: 0 };
+      break;
+    }
   }
   newState = {...state, ...clonedState};
   const cookieState = JSON.parse(JSON.stringify(newState));
@@ -284,13 +291,13 @@ export const { Context, Provider } = DataContextCreator(
     fetchChannelDetails,
     fetchChannelHistory,
     fetchChannelUsers,
+    fetchChannelsLatest,
     fetchContact,
     fetchClipboardEntities,
     fetchFactionDetails,
     fetchFactionStatuses,
     fetchLocationPins,
     fetchNetworkStatus,
-    fetchUnreadCount,
     fetchUserChannels,
     fetchUserContacts,
     fetchUserFactions,
