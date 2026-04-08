@@ -108,7 +108,7 @@ const SmallView = ({ location, onExpand }: any) => (
 );
 
 const FullView = ({ location, onCollapse }: any) =>  {
-  const { deleteLocationReview = (id:string, reviewid:string) => {}, }: NnProviderValues = React.useContext(NnContext);
+  const { deleteLocationReview = (reviewid:string) => {}, }: NnProviderValues = React.useContext(NnContext);
   
   return (
     <Box>
@@ -240,7 +240,7 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
   const ownerOptions = React.useMemo(() => {
     const options = new Map();
 
-    const currentUserId = state?.user?.profile?.auth?.userid;
+    const currentUserId = state?.network?.selected?.account;
 
     // Default: Assign to Current User if creating
     if (currentUserId) {
@@ -254,7 +254,9 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
 
     // 3. Factions from Context
     (state?.network?.collections?.factions ?? []).forEach((f: any) => {
-      options.set(f.id, `[${f.id}] ${f.name} [Faction]`);
+      if (f.id != currentUserId) {
+        options.set(f.id, `[${f.id}] ${f.name} [Faction]`);
+      }
     });
 
     return Array.from(options.entries());
@@ -406,10 +408,6 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
               <TextField 
                 label="Tooltip" name="tooltip" fullWidth 
                 value={formData.tooltip} onChange={setTextFormData} 
-              />
-              <TextField 
-                label="Neosite" name="neosite" fullWidth 
-                value={formData.neosite} onChange={setTextFormData} 
               />
             </>
           )}

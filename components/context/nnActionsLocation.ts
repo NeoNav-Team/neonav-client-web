@@ -132,6 +132,25 @@ export const updateLocation = (dispatch: DispatchFunc) => async (id:string, payl
   executeApi('updateLocation', { id, ...payload, token }, onSuccess, onError);
 };
 
+export const deleteLocation = (dispatch: DispatchFunc) => async (id:string) => {
+  const token = getCookieToken();
+  const onSuccess = (response: APIResponse) => {
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'success', message: "Location Deleted", show: true },
+    });
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Location failure' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+    return err;
+  };
+  executeApi('deleteLocation', { id, token }, onSuccess, onError);
+};
+
 export const verifyLocation = (dispatch: DispatchFunc) => async (id:string) => {
   const token = getCookieToken();
   const onSuccess = (response: APIResponse) => {
@@ -173,7 +192,7 @@ export const addLocationReview = (dispatch: DispatchFunc) => async (id:string, r
   executeApi('addLocationReview', { id, ...review, token }, onSuccess, onError);
 };
 
-export const deleteLocationReview = (dispatch: DispatchFunc) => async (id:string, reviewid:string) => {
+export const deleteLocationReview = (dispatch: DispatchFunc) => async (reviewid:string) => {
   const token = getCookieToken();
   const onSuccess = (response: APIResponse) => {
     dispatch({
@@ -189,7 +208,7 @@ export const deleteLocationReview = (dispatch: DispatchFunc) => async (id:string
     });
     return err;
   };
-  executeApi('deleteLocationReview', { id, reviewid, token }, onSuccess, onError);
+  executeApi('deleteLocationReview', { reviewid, token }, onSuccess, onError);
 };
 
 export const addLocationPin = (dispatch: DispatchFunc) => async (lat:string, long:string) => {

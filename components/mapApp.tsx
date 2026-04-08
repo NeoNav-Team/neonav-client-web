@@ -34,6 +34,7 @@ import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
 import { renderLocationsToLeafletLayers, renderLocationPinsToLeafletLayers, renderNewLocationPin } from "@/utilities/mapLeafletLocationsRenderer";
 import { verifyLocation } from './context/nnActionsLocation';
+import { DeleteForever } from '@mui/icons-material';
 
 
 interface PageContainerProps {
@@ -52,7 +53,6 @@ interface RotateControl extends L.Control {
 
 const SVG_MAP_FILE = "/NeoMap2026v3.svg"
 const NEONAV_MAINT = "C461879533";
-const NEOCITY_ADMIN = "C231465509";
 
 const EMPTY_LOCATION = {id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", creator: "", reviews: [], neosite: "", verified: false};
 
@@ -160,6 +160,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
   const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [markerFromLinkShown, setMarkerFromLinkShown] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(EMPTY_LOCATION);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalSizeStyle, setInfoModalSizeStyle] = useState(modalStyle_0);
@@ -187,11 +188,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     createFactionLocation = (faction: any, doc: any) => {},
     verifyLocation = (id: string) => {},
     updateLocation = (id: string, doc:any) => {},
+    deleteLocation = (id: string) => {},
     addLocationReview = (id: string, review:any) => {},
     addLocationPin = (lat: string, long: string) => {},
     fetchLocationPins = (id: string) => {},
     deleteLocationPins = () => {},
     fetchAllFactions = () => {},
+    fetchFactionDetails = (id: string) => {},
   }: NnProviderValues = React.useContext(NnContext);
 
   const options: L.MapOptions = {
@@ -266,7 +269,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       name: "New Location",
       lat: currentUserLocation.lat,
       long: currentUserLocation.lng,
-      owner: state?.user?.profile?.auth?.userid || "",
+      owner: state?.network?.selected?.account || "",
       description: "",
       venuetype: "",
       hours: [], // Hours can't be set during create
@@ -608,10 +611,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     renderLocationsToLeafletLayers({
       layerData,
       locations,
-      userId: state?.user?.profile?.auth?.userid,
-      factions: state?.user?.factions,
+      userId: state?.network?.selected?.account,
       onMarkerClick: (leafletMarker) => {
-        console.log(leafletMarker);
         if (stateRef.current != "view") {
           // Fix access violations due to focus
           if (document.activeElement instanceof HTMLElement) {
@@ -621,6 +622,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         }
         setSelectedLocationId((leafletMarker as any).id);
         fetchLocationById((leafletMarker as any).id);
+        const location = state?.network?.collections?.locations?.find(loc => loc.id === (leafletMarker as any).id);
+        if (location.owner.startsWith("C")) {
+          fetchFactionDetails(location.owner);
+        }
         mymap.flyTo(leafletMarker.getLatLng());
         openInfoModal();
       },
@@ -632,21 +637,21 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     // We are setting all the markers into this myMapObjects then using it immediately below, but we will need to do this search elsewhere
     myMapObjects.set("allMarkers", []);
 
-    mymap.eachLayer(function (layer) {
-      if (layer instanceof L.Marker) {
-        myMapObjects.get("allMarkers").push(layer);
-      }
+    layerData.forEach((layer, layerName) => {
+      layer.eachLayer((layerPart) => {
+        if (layerPart instanceof L.Marker) {
+          myMapObjects.get("allMarkers").push(layerPart);
+        }
+      });
     });
 
     // If we passed in a location ID, open it up
     if (!selectedLocationId && props?.params?.id && props?.params?.id.startsWith("L")) {
       setSelectedLocationId(props?.params?.id);
       fetchLocationById(props?.params?.id);
-      let allMarkers: L.Marker[] = myMapObjects.get("allMarkers") || [];
-      let leafletMarker = allMarkers.find((marker: any) => marker.id === props?.params?.id);
-      if (leafletMarker) {
-        mymap.flyTo(leafletMarker.getLatLng());
-        openInfoModal();
+      const location = state?.network?.collections?.locations?.find(loc => loc.id === selectedLocationId);
+      if (location?.owner.startsWith("C")) {
+        fetchFactionDetails(location.owner);
       }
     }
   }, [state?.network?.collections?.locations]);
@@ -665,6 +670,22 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         venuetype: foundLocation.venuetype || '',
         hours: foundLocation.hours || {},
       })
+    }
+
+    if (props?.params?.id && props?.params?.id.startsWith("L") && !markerFromLinkShown) {
+      const mymap = myMapObjects.get("map") as L.Map | undefined;
+      if (mymap) {
+        let allMarkers: L.Marker[] = myMapObjects.get("allMarkers") || [];
+        let leafletMarker = allMarkers.find((marker: any) => marker.id === props?.params?.id);
+        if (leafletMarker && !mymap.hasLayer(leafletMarker)) {
+          leafletMarker.addTo(mymap);
+        }
+        if (leafletMarker) {
+          mymap.flyTo(leafletMarker.getLatLng());
+          openInfoModal();
+          setMarkerFromLinkShown(true);
+        }
+      }
     }
   }, [selectedLocationId, state?.network?.collections?.locations]);
 
@@ -720,7 +741,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             size={infoModalSize}
             onExpand={expandModalFrom10}
             onCollapse={colapseModalFrom90}
-            isAdmin={state?.user?.factions?.some(f => f.id === NEONAV_MAINT || f.id === NEOCITY_ADMIN) ?? false} // ew
+            isAdmin={state?.network?.selected?.account === NEONAV_MAINT}
             mode={infoModalState} // 'view', 'edit', etc.
             formData={editLocationFormData}
             handlers={{
@@ -739,13 +760,27 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         layerModalSizeStyle={layerModalSizeStyle}
         layerStates={layerStates}
         onToggle={handleLayerSwitch}
-        showDev={state?.user?.factions?.some(f => f.id === NEONAV_MAINT) ?? false} // double ew
+        showDev={state?.network?.selected?.account === NEONAV_MAINT}
       />
       {/* Footer for editing locations */}
       <Box sx={footerStyle} hidden={!showInfoModal || infoModalState === "view"}> 
         <FooterNav
           firstHexProps={{
-            disabled: true,
+            icon: <DeleteForever />,
+            tooltipText: "Delete Location",
+            dialog: "Delete Location? Ths cannot be undone!",
+            disabled: selectedLocation.verified && state?.network?.selected?.account != NEONAV_MAINT,
+            handleAction: () => {
+              deleteLocation(selectedLocationId);
+              stopEditMode();
+              // Do info modal close steps
+              setInfoModalSize(0);
+              setInfoModalSizeStyle(modalStyle_0);
+              setFooterStyle(flexFooter);
+              setTimeout(() => {
+                setShowInfoModal(false);
+              }, 100);
+            }
           }}
           secondHexProps={{
             icon: <CancelIcon />,
@@ -790,11 +825,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             icon: <EditLocationAltIcon/>,
             tooltipText: "Edit Location",
             disabled: 
-              !(state?.user?.factions?.some(f => f.id === NEONAV_MAINT) ||        // User is admin
-              // state?.user?.factions?.some(f => f.id === NEOCITY_ADMIN) ||         // User is event staff?
-              state?.user?.profile?.auth?.userid === selectedLocation.owner ||    // User is owner
-              state?.user?.profile?.auth?.userid === selectedLocation.creator ||  // User is creator
-              state?.user?.factions?.some(f => f.id === selectedLocation.owner)   // User is in faction that owns it
+              !(state?.network?.selected?.account === NEONAV_MAINT ||           // User is admin
+                state?.network?.selected?.account === selectedLocation.owner || // User is owner
+                (state?.network?.selected?.account === selectedLocation.creator && // User is creator
+                 !selectedLocation.verified)
               ),
             handleAction: () => {
               fetchAllFactions();
@@ -808,7 +842,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           fourthHexProps={
             // Set up button only if we are admin and the location isn't verified
-            state?.user?.factions?.some(f => f.id === NEONAV_MAINT) && !selectedLocation.verified ? {
+            state?.network?.selected?.account === NEONAV_MAINT && !selectedLocation.verified ? {
               icon: <CheckCircleOutlineIcon />,
               dialog: "Verify Location? Ths cannot be undone.",
               handleAction: () => {

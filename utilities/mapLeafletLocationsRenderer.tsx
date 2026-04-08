@@ -164,7 +164,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     loc.rating = enrichedLoc.rating;
     
     // Determine the layer
-    let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, factions: factions ?? [], megablockRect, megamallRect });
+    let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, megablockRect, megamallRect });
 
     // Create the marker
     const { icon, color } = getVenueIconAndColor(loc.venuetype ?? "");
