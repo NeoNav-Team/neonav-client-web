@@ -839,7 +839,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                  !selectedLocation.verified)
               ) ||
               Math.abs((myMapObjects.get("map") as any)?.getBearing()) > 1   // Disable edit when rotated
-              ,
+            ,
             handleAction: () => {
               fetchAllFactions();
               startEditMode();
