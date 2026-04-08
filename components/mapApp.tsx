@@ -34,7 +34,6 @@ import { NnProviderValues } from "@/components/context/nnTypes";
 import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
 import { renderLocationsToLeafletLayers, renderLocationPinsToLeafletLayers, renderNewLocationPin } from "@/utilities/mapLeafletLocationsRenderer";
-import { verifyLocation } from './context/nnActionsLocation';
 import { NEONAV_MAINT } from '@/utilities/constants';
 
 
@@ -190,7 +189,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     verifyLocation = (id: string) => {},
     updateLocation = (id: string, doc:any) => {},
     deleteLocation = (id: string) => {},
-    addLocationReview = (id: string, review:any) => {},
     addLocationPin = (lat: string, long: string) => {},
     fetchLocationPins = (id: string) => {},
     deleteLocationPins = () => {},
@@ -807,7 +805,16 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             disabled: true,
           }}
         />
-        <ReviewDialog id={selectedLocationId} open={reviewDialogOpen} handleClose={() => {setReviewDialogOpen(false); fetchLocationById(selectedLocationId);}} addLocationReview={addLocationReview}/>
+        <ReviewDialog
+          id={selectedLocationId}
+          open={reviewDialogOpen}
+          handleClose={() => {
+            setTimeout(() => {
+              fetchLocationById(selectedLocationId); // Pull latest location data after posting review
+            }, 100);
+            setReviewDialogOpen(false);
+          }}
+        />
       </Box>
       {/* Footer for viewing locations */}
       <Box sx={footerStyle} hidden={!showInfoModal || infoModalState != "view"}>
@@ -864,7 +871,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             }
           }
         />
-        <ReviewDialog id={selectedLocationId} open={reviewDialogOpen} handleClose={() => {setReviewDialogOpen(false); fetchLocationById(selectedLocationId);}} addLocationReview={addLocationReview}/>
       </Box>
       {/* Footer for default map view */}
       <Box sx={footerStyle} hidden={showInfoModal}>

@@ -5,7 +5,9 @@ import StarIcon from '@mui/icons-material/Star';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
 import SimpleDialog from './simpleDialog';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { Context as NnContext } from "@/components/context/nnContext";
+import { NnProviderValues } from "@/components/context/nnTypes";
 
 interface ItemReviewProps {
   id: string;
@@ -16,7 +18,6 @@ interface ItemReviewProps {
   rating: number;
   review?: string;
   canDelete?: boolean; // Toggle this based on user permissions
-  onDelete?: (id:string, reviewid:string) => void; // Callback for the trash icon
 }
 
 export default function ItemReview({
@@ -28,9 +29,12 @@ export default function ItemReview({
   rating,
   review,
   canDelete = false,
-  onDelete
 }: ItemReviewProps): JSX.Element {
 
+  const {
+    deleteLocationReview = (reviewid:string) => {},
+    fetchLocationById = (id:string) => {},
+  }: NnProviderValues = useContext(NnContext);
   const [open, setOpen] = useState(false);
 
   return (
@@ -64,7 +68,10 @@ export default function ItemReview({
               open={open}
               handleClose={() => setOpen(false)}
               handleAction={() => {
-                onDelete?.(id, reviewid);
+                deleteLocationReview(reviewid);
+                setTimeout(() => {
+                  fetchLocationById(id); // Pull latest location data after deleting review
+                }, 100);
                 setOpen(false);
               }}
               dialog="Are you sure you want to delete this review? This action cannot be undone."

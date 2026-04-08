@@ -110,7 +110,6 @@ const SmallView = ({ location, onExpand }: any) => (
 
 const FullView = ({ location, onCollapse }: any) =>  {
   const { state, }: NnProviderValues = React.useContext(NnContext);
-  const { deleteLocationReview = (reviewid:string) => {}, }: NnProviderValues = React.useContext(NnContext);
   
   return (
     <Box>
@@ -221,7 +220,6 @@ const FullView = ({ location, onCollapse }: any) =>  {
                         state?.network?.selected.account === location.owner ||
                         state?.network?.selected.account === NEONAV_MAINT
                       }
-                      onDelete={deleteLocationReview}
                     />
                   </div>
                 );

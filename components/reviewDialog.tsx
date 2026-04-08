@@ -8,21 +8,24 @@ import {
   Slider,
   TextField,
 } from '@mui/material';
-import {useRef, useState} from "react";
-import { fetchLocationById } from './context/nnActionsLocation';
+import {useRef, useState, useContext} from "react";
+import { Context as NnContext } from "@/components/context/nnContext";
+import { NnProviderValues } from "@/components/context/nnTypes";
 
 export interface ReviewDialogProps {
   id: string,
   open: boolean,
   handleClose: Function,
-  addLocationReview: Function,
 }
 
 export default function ReviewDialog(props:ReviewDialogProps):JSX.Element {
-  const {id, open, handleClose, addLocationReview} = props;
+  const {id, open, handleClose} = props;
 
   const [ratingSliderValue, setRatingSliderValue] = useState(5);
   const reviewRef = useRef<any>();
+  const { 
+    addLocationReview = (id: string, review:any) => {},
+  }: NnProviderValues = useContext(NnContext);
 
   const handleChange = (event: Event, newValue: number | number[]) => {
     setRatingSliderValue(newValue as number);
