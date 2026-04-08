@@ -51,7 +51,7 @@ interface RotateControl extends L.Control {
   getContainer(): HTMLElement;
 }
 
-const SVG_MAP_FILE = "/NeoMap2026v3.svg"
+const SVG_MAP_FILE = "/Winter2026v2.svg"
 const NEONAV_MAINT = "C461879533";
 
 const EMPTY_LOCATION = {id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", creator: "", reviews: [], neosite: "", verified: false};
@@ -264,7 +264,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     }
     const newMarker = renderNewLocationPin(currentUserLocation, myMapObjects.get("map"), updateField);
     myMapObjects.set("newMarker", newMarker);
-    myMapObjects.get("map").flyTo(currentUserLocation);
+    myMapObjects.get("map").panTo(currentUserLocation);
     
     setEditLocationFormData({
       name: "New Location",
@@ -316,7 +316,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       leafletMarker.setLatLng(L.latLng(location.lat, location.long));
       // Wait for animation to complete before flying to marker
       setTimeout(() => {
-        myMapObjects.get("map").flyTo(leafletMarker?.getLatLng());
+        myMapObjects.get("map").panTo(leafletMarker?.getLatLng());
       }, 400);
     }
     if (!!myMapObjects.get("newMarker")) {
@@ -388,6 +388,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       }
       // Update the reference in the control object
       rotateControl._arrow = newArrow;
+
+      // Block drag rotation
+      L.DomEvent.on(newArrow, 'mousedown touchstart', (e) => {
+        L.DomEvent.stopPropagation(e); 
+      });
 
       // Attach your custom toggle listener
       L.DomEvent.on(newArrow, 'click', (e) => {
@@ -522,10 +527,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       handleRotate();
 
-      // Guess from google maps                     35.083411, -117.824837 ;  35.079076, -117.820043 (it isn't right)
-      L.imageOverlay(SVG_MAP_FILE, L.latLngBounds([[35.082950, -117.824404], [35.078739, -117.820037]]), {
+      L.imageOverlay(SVG_MAP_FILE, L.latLngBounds([[35.081148, -117.823872], [35.078589, -117.820387]]), {
         opacity: 1,
       }).addTo(mymap);
+
+      //L.rectangle(L.latLngBounds([[35.081148, -117.823872], [35.078589, -117.820387]])).addTo(mymap);
 
       L.control.scale({
         position: 'topright',
@@ -551,12 +557,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           circle.addTo(mymap);
         }
         circle.setLatLng(e.latlng);
-      });
-      
-      mymap.on('locationerror', (e) => {
-        setUserLocationKnown(false);
-        // This is mostly for debugging, I doubt we want to pop this alert every time location hiccoughs
-        alert("Location access error.");
       });
 
       // Start location fetching
@@ -640,7 +640,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         if (location.owner.startsWith("C")) {
           fetchFactionDetails(location.owner);
         }
-        mymap.flyTo(leafletMarker.getLatLng());
+        mymap.panTo(leafletMarker.getLatLng());
         openInfoModal();
       },
       infoModalState,
@@ -689,7 +689,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           leafletMarker.addTo(mymap);
         }
         if (leafletMarker) {
-          mymap.flyTo(leafletMarker.getLatLng());
+          mymap.panTo(leafletMarker.getLatLng());
           openInfoModal();
           setMarkerFromLinkShown(true);
         }
@@ -709,7 +709,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       layerData,
       pins,
       onMarkerClick: (leafletMarker: L.Marker) => {
-        mymap.flyTo(leafletMarker.getLatLng());
+        mymap.panTo(leafletMarker.getLatLng());
       },
     });
   }, [state?.network?.collections?.locationPins]);
@@ -831,13 +831,15 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
-            tooltipText: "Edit Location",
+            tooltipText: Math.abs((myMapObjects.get("map") as any)?.getBearing()) > 0.1 ? "Unavailable When Rotated" : "Edit Location",
             disabled: 
               !(state?.network?.selected?.account === NEONAV_MAINT ||           // User is admin
                 state?.network?.selected?.account === selectedLocation.owner || // User is owner
                 (state?.network?.selected?.account === selectedLocation.creator && // User is creator
                  !selectedLocation.verified)
-              ),
+              ) ||
+              Math.abs((myMapObjects.get("map") as any)?.getBearing()) > 1   // Disable edit when rotated
+              ,
             handleAction: () => {
               fetchAllFactions();
               startEditMode();
@@ -900,7 +902,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
               if (mapRef.current) {
                 let myMap = myMapObjects.get("map") as L.Map;
                 if (userLocationKnown) {
-                  myMap.flyTo(lastKnownLocation);
+                  myMap.panTo(lastKnownLocation);
                 } else {
                   // If the user clicks the location button but we don't know where they are, try kicking off locate again 
                   myMap.locate({watch: true, maximumAge: 15000});

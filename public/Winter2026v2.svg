@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1021.68 924.58">
+  <defs>
+    <style>
+      <!-- Road Shapes -->
+      .st0 {
+        fill: #010D38AA;
+        stroke: #006F77;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Downtown Shapes -->
+      .st1 {
+        fill: #47E15D55;
+        stroke: #47E15D;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Midtown Shapes -->
+      .st2 {
+        fill: #FCAC6F55;
+        stroke: #FCAC6F;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Spaceport Shapes -->
+      .st3 {
+        fill: #D4589355;
+        stroke: #D45893;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Generator Shapes -->
+      .st4 {
+        fill: #FCDB5455;
+        stroke: #FCDB54;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Food Vendor Shapes -->
+      .st5 {
+        fill: #FFFFFF55;
+        stroke: #FFFFFF;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Medical Shapes -->
+      .st6 {
+        fill: #FFFFFF88;
+        stroke: #EC1C24;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Porto Shapes -->
+      .st7 {
+        fill: #1BE7FF55;
+        stroke: #1BE7FF;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Security Shapes -->
+      .st8 {
+        fill: #ADF1AA88;
+        stroke: #ADF1AA;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      <!-- Debug style to find elements -->
+      .st9 {
+        fill: #ff00ff;
+      }
+    </style>
+  </defs>
+  <g id="Doesnt_Change" data-name="Doesnt Change">
+    <g id="Layer_18" data-name="Layer 18">
+      <!-- join up missing piece of road near security -->
+      <path class="st0" d="M1021.53,365.91v-20h-294.88V14.15h-30v331.76h-194.79V.15h-35v345.76h-187.74V1.56h-30v344.35h-73.77L28.15,3.15H.15l223,533,21,37v-67l-60.22-140.24h65.18v441.76h.29v10h217.44v73.77h35v-73.77h194.79v28.12h30v-28.12h177.12v-20h-177.12v-431.76h294.88ZM466.85,713.15h-9.7v-55h9.7v55ZM466.85,648.15h-9.7v-10h-50v55.01h-5v39.99h55v-10h9.7v74.53h-187.74v-328h187.74v178.47ZM466.85,449.68h-187.74v-83.76h187.74v83.76ZM501.85,530.55h21.59v48h-21.59v-48ZM696.64,797.68h-194.79v-208.57h21.59v2.44h49.96v-101.13h-49.96v26.23h-21.59v-46.97h104.28v255.93h10.53v-255.93h79.98v328ZM696.64,449.68h-194.79v-83.76h194.79v83.76Z"/>
+    </g>
+  </g>
+  <g id="Misc">
+    <g id="Gaming_Dome" data-name="Gaming Dome">
+      <g id="g486">
+        <path id="path475" class="st1" d="M514.59,793.29c8.56,0,15.5,6.94,15.5,15.5s-6.94,15.5-15.5,15.5c-8.56,0-15.5-6.94-15.5-15.5s6.94-15.5,15.5-15.5Z"/>
+      </g>
+    </g>
+    <g id="Sec">
+      <polygon class="st8" points="142.56 342.62 185.56 455.03 103.56 487.03 106.56 342.62 142.56 342.62"/>
+    </g>
+    <g id="Med" class="st6">
+      <rect id="rect2708" class="st6" x="280.82" y="367.29" width="50.94" height="81.26"/>
+    </g>
+    <g id="Laser_Field" data-name="Laser Field">
+      <rect class="st1" x="421.56" y="792.34" width="30" height="60" transform="translate(1258.9 385.78) rotate(90)"/>
+    </g>
+    <g id="Disc_Combat" data-name="Disc Combat">
+      <rect class="st1" x="424.15" y="822.68" width="10" height="40" transform="translate(1271.83 413.53) rotate(90)"/>
+    </g>
+    <g id="The_Core" data-name="The Core">
+      <g id="Legs">
+        <!-- Make these one path -->
+        <path id="path467" class="st1" d="M493.06,896.82v5h-5v-5h5Z"/>
+        <path id="path460" class="st1" d="M493.13,911.79h-5v-10h5v10Z"/>
+        <path id="path461" class="st1" d="M493.13,921.82h-5v-10h5v10Z"/>
+        <path id="path462" class="st1" d="M478.06,911.82h-5v-10h5v10Z"/>
+        <path id="path463" class="st1" d="M478.06,921.82h-5v-10h5v10Z"/>
+        <path id="path464" class="st1" d="M488.1,896.79v5h-10v-5h10Z"/>
+        <path id="path465" class="st1" d="M503.13,916.82v5h-10v-5h10Z"/>
+        <path id="path466" class="st1" d="M473.08,916.82v5h-10v-5h10Z"/>
+        <path id="path474" class="st1" d="M478.1,896.79v5h-5v-5h5Z"/>
+      </g>
+      <g id="Left_Arm" data-name="Left Arm">
+        <rect class="st1" x="457.58" y="870.17" width="7" height="5" transform="translate(1404.19 1163.71) rotate(135)"/>
+        <rect class="st1" x="469.9" y="858.86" width="5" height="5" transform="translate(1415.51 1136.4) rotate(135)"/>
+        <rect class="st1" x="463.86" y="863.43" width="10" height="10" transform="translate(1414.47 1150.97) rotate(135)"/>
+      </g>
+      <rect id="Lighting_Rig" class="st1" x="488.99" y="870.76" width="40" height="9" transform="translate(789.54 -97.59) rotate(46.27)"/>
+    </g>
+    <g>
+      <rect class="st9" x="529.31" y="814.54" width="20" height="2.53" transform="translate(447.69 -157.85) rotate(28.09)"/>
+      <rect class="st9" x="524.09" y="824.56" width="20" height="2.53" transform="translate(451.8 -154.21) rotate(28.09)"/>
+      <polygon id="Gaming_Dome_Hex" class="st9" points="543.13 819.35 534.3 814.64 527.85 816.12 530.21 822.31 539.03 827.02 545.49 825.53 543.13 819.35"/>
+    </g>
+    <rect id="Kepler_Sky_Control" class="st2" x="503.43" y="496.51" width="20" height="20" transform="translate(1019.94 -6.91) rotate(90)"/>
+    <polygon id="Cycle_Parking" class="st2" points="466.97 557.04 444.14 557.04 421.32 557.04 421.32 568.65 444.14 568.65 466.97 568.65 466.97 557.04"/>
+    <rect class="st4" x="504.14" y="491.22" width="10" height="5"/>
+    <rect class="st4" x="434.15" y="737.15" width="8" height="20" transform="translate(1185.3 309) rotate(90)"/>
+    <circle id="Neodome" class="st2" cx="446.68" cy="591.97" r="22"/>
+    <g id="Sentinel_Outpost" data-name="Sentinel Outpost">
+      <rect id="POD" class="st4" x="504.83" y="825.54" width="7.29" height="11.29" transform="translate(1016.95 1662.37) rotate(-180)"/>
+    </g>
+    <path id="Kaiju_exterior" class="st1" d="M586.94,619.98v100h-85v-100h85Z"/>
+  </g>
+  <g id="Factions_Food_Vendors_Placement" data-name="Factions, Food Vendors Placement">
+    <g id="Factions">
+      <g id="Albatross">
+        <rect class="st1" x="512.95" y="769.38" width="10" height="32" transform="translate(1303.34 267.43) rotate(90)"/>
+      </g>
+      <g id="Freq">
+        <path id="path631" class="st1" d="M551.89,750.1v30s-50,0-50,0v-30s50,0,50,0Z"/>
+      </g>
+      <g id="Atalante">
+        <path id="path710" class="st2" d="M517.11,589.11v27h-14v-27h14Z"/>
+      </g>
+      <g id="Asteroid_Inn" data-name="Asteroid Inn">
+        <rect class="st2" x="512.98" y="568.55" width="10" height="10" transform="translate(1091.53 55.57) rotate(90)"/>
+      </g>
+      <g id="Gentleman_Loser" data-name="Gentleman Loser">
+        <path id="path737" class="st2" d="M522.98,550.55v18h-20v-18h20Z"/>
+      </g>
+      <g id="Kepler_Warcats" data-name="Kepler Warcats">
+        <path id="path833" class="st1" d="M581.85,720.1v30h-80v-30h80Z"/>
+      </g>
+      <g id="Terminal_418" data-name="Terminal 418">
+        <rect class="st2" x="582.32" y="471.41" width="24" height="22" transform="translate(1076.73 -111.91) rotate(90)"/>
+      </g>
+      <g id="Trinity_Star_Traders" data-name="Trinity Star Traders">
+        <path id="path869" class="st2" d="M522.98,530.55v20h-20.71v-20h20.71Z"/>
+      </g>
+      <g id="Beautiful_Chaos" data-name="Beautiful Chaos">
+        <rect class="st2" x="512.76" y="357.79" width="30" height="50" transform="translate(910.55 -144.97) rotate(90)"/>
+      </g>
+      <g id="WCC">
+        <path id="path857" class="st2" d="M466.29,472.42v22.48s-24.19-.25-24.19-.25v13.77h-17.22v-27s-22.59.02-22.59.02v-9s64-.02,64-.02Z"/>
+      </g>
+      <g id="Ray_Cats" data-name="Ray Cats">
+        <rect class="st2" x="429.78" y="518.65" width="24" height="50" transform="translate(985.43 101.86) rotate(90)"/>
+      </g>
+      <g id="TNKR">
+        <rect class="st2" x="372.85" y="472.42" width="30" height="55"/>
+      </g>
+      <g id="Zekes">
+        <rect class="st2" x="532.51" y="440.42" width="20" height="80" transform="translate(1022.93 -62.09) rotate(90)"/>
+      </g>
+      <g id="Dropship">
+        <path id="path570" class="st3" d="M445.37,449.32v-31.23s20.92,0,20.92,0v31.23s-20.92,0-20.92,0Z"/>
+      </g>
+      <g id="Domicile">
+        <path id="path518" class="st3" d="M465.77,367.42v40h-50v-40h50Z"/>
+      </g>
+      <g id="Robotic_Love_Chapel" data-name="Robotic Love Chapel">
+        <path id="path885" class="st3" d="M465.94,284.53v60h-110v-60h110Z"/>
+      </g>
+      <g id="Server_Room_04" data-name="Server Room 04">
+        <path id="path833-2" data-name="path833" class="st2" d="M466.1,510.09v20h-24v-20h24Z"/>
+      </g>
+      <g id="Karen_s_Transient_Resistance" data-name="Karen&amp;apos;s Transient Resistance">
+        <path id="path737-2" data-name="path737" class="st2" d="M651.66,469.97v35h-35v-35h35Z"/>
+      </g>
+      <g id="ExCorp">
+        <polygon class="st2" points="602.15 421.98 606.48 421.98 606.48 380.15 556.76 380.15 556.76 398.77 502.15 398.77 502.15 448.77 602.15 448.77 602.15 421.98"/>
+      </g>
+      <g id="Garden_of_eZen" data-name="Garden of eZen">
+        <rect class="st2" x="568.92" y="417.15" width="25" height="40" transform="translate(144.53 1018.76) rotate(-90.03)"/>
+      </g>
+      <g id="Armitage">
+        <rect class="st3" x="514.15" y="312.65" width="20" height="35" transform="translate(854.3 -194) rotate(90)"/>
+      </g>
+      <g id="Independant_fleet" data-name="Independant fleet">
+        <polygon class="st3" points="434.77 427.91 434.77 407.35 413.34 407.35 413.34 407.35 369.56 407.35 369.56 449.17 434.77 449.17 434.77 427.91"/>
+      </g>
+    </g>
+    <g id="Food_Vendors" data-name="Food Vendors">
+      <g id="Las_Poblanitas" data-name="Las Poblanitas">
+        <rect class="st5" x="439.26" y="238.95" width="20" height="10" transform="translate(412.42 -265.94) rotate(57.37)"/>
+      </g>
+      <g id="Pink_Gorilla" data-name="Pink Gorilla">
+        <rect class="st5" x="427.3" y="199.2" width="30" height="30" transform="translate(656.5 -228.1) rotate(90)"/>
+      </g>
+      <g id="Cay_Sal_s_Pies" data-name="Cay Sal&amp;apos;s Pies">
+        <rect class="st5" x="447.55" y="182.35" width="10" height="10" transform="translate(639.9 -265.19) rotate(90)"/>
+      </g>
+      <g id="Golden_Bamboo" data-name="Golden Bamboo">
+        <rect class="st5" x="428.27" y="250.57" width="20" height="40" transform="translate(708.84 -167.7) rotate(90)"/>
+      </g>
+      <g id="fUEGO_ME_UP" data-name="fUEGO ME UP">
+        <rect id="Tacos_Chewi" data-name="Tacos Chewi" class="st5" x="438.65" y="158.58" width="20" height="10" transform="translate(335.13 -300.27) rotate(56.22)"/>
+      </g>
+    </g>
+  </g>
+  <g id="Kaiju">
+    <g id="Space_Needle" data-name="Space Needle">
+      <rect class="st1" x="502.09" y="633.96" width="10" height="5" transform="translate(1143.55 129.37) rotate(90)"/>
+    </g>
+    <g id="Shooters">
+      <rect class="st1" x="517.09" y="659.96" width="10" height="5" transform="translate(1184.55 140.37) rotate(90)"/>
+    </g>
+    <g id="Kuusi_Pala" data-name="Kuusi Pala">
+      <rect class="st1" x="517.09" y="669.96" width="10" height="5" transform="translate(1194.55 150.37) rotate(90)"/>
+    </g>
+    <g id="Space_Bear_Academy" data-name="Space Bear Academy">
+      <rect class="st1" x="509.59" y="627.46" width="10" height="10" transform="translate(1147.05 117.87) rotate(90)"/>
+      <rect class="st1" x="519.56" y="627.46" width="10" height="10" transform="translate(1157.02 107.9) rotate(90)"/>
+    </g>
+    <g id="Sakura_Falling_Dai" data-name="Sakura Falling/Dai">
+      <rect class="st1" x="509.59" y="687.46" width="10" height="10" transform="translate(1207.05 177.87) rotate(90)"/>
+    </g>
+    <g id="Calamity_Captain_s_Lodge" data-name="Calamity Captain&amp;apos;s Lodge">
+      <rect class="st1" x="542.59" y="703.47" width="20" height="10" transform="translate(1261.06 155.88) rotate(90)"/>
+    </g>
+  </g>
+  <g id="MB1">
+    <g id="pink_Layout" data-name="pink Layout">
+      <rect class="st1" x="452.15" y="733.15" width="10" height="10"/>
+      <rect class="st1" x="457.15" y="628.15" width="5" height="10"/>
+      <rect class="st1" x="462.15" y="648.15" width="5" height="10"/>
+      <rect class="st1" x="462.15" y="713.15" width="5" height="10"/>
+      <rect class="st1" x="457.15" y="723.15" width="5" height="10"/>
+    </g>
+    <g id="Modules_Level_1" data-name="Modules Level 1">
+      <g id="D15_Unit-0">
+        <rect class="st1" x="434.15" y="711.15" width="10" height="14" transform="translate(1157.3 279) rotate(90)"/>
+      </g>
+      <g id="Bastards_Broken_Things" data-name="Bastards &amp;amp; Broken Things">
+        <rect class="st1" x="449.65" y="700.65" width="20" height="5" transform="translate(1162.8 243.5) rotate(90)"/>
+      </g>
+      <g id="B0n3Z0n3">
+        <rect class="st1" x="392.15" y="693.15" width="10" height="10" transform="translate(1095.3 301) rotate(90)"/>
+      </g>
+      <g id="Spacer_s_Landing" data-name="Spacer&amp;apos;s Landing">
+        <rect class="st1" x="392.15" y="703.15" width="10" height="10" transform="translate(1105.3 311) rotate(90)"/>
+      </g>
+      <g id="Haz3">
+        <rect class="st1" x="430.15" y="701.15" width="14" height="10" transform="translate(1143.3 269) rotate(90)"/>
+      </g>
+      <g id="The_13s" data-name="The 13s">
+        <rect class="st1" x="397.15" y="667.97" width="10" height="25.18"/>
+      </g>
+      <g id="Rul3-34">
+        <rect class="st1" x="412.15" y="693.15" width="10" height="10" transform="translate(1115.3 281) rotate(90)"/>
+      </g>
+      <g id="Janet">
+        <rect class="st1" x="412.15" y="713.15" width="10" height="5" transform="translate(834.3 1431.3) rotate(-180)"/>
+      </g>
+      <g id="Aggressive_Top_FL" data-name="Aggressive Top FL">
+        <rect class="st1" x="437.15" y="728.15" width="10" height="20" transform="translate(1180.3 296) rotate(90)"/>
+      </g>
+      <g id="ProtoExpress">
+        <rect class="st1" x="412.15" y="628.15" width="10" height="10" transform="translate(1050.3 216) rotate(90)"/>
+      </g>
+      <g id="Nightcrawlers">
+        <rect class="st1" x="442.15" y="628.15" width="10" height="10" transform="translate(1080.3 186) rotate(90)"/>
+      </g>
+      <g id="CtrlAltRenew">
+        <rect class="st1" x="427.15" y="683.15" width="10" height="10" transform="translate(1120.3 256) rotate(90)"/>
+      </g>
+      <g id="Crux_2" data-name="Crux 2">
+        <rect class="st1" x="437.15" y="648.15" width="10" height="10" transform="translate(1095.3 211) rotate(90)"/>
+      </g>
+      <g id="Diatones">
+        <rect class="st1" x="422.15" y="628.15" width="10" height="10" transform="translate(1060.3 206) rotate(90)"/>
+      </g>
+      <g id="Uranium_Arcadium" data-name="Uranium Arcadium">
+        <rect class="st1" x="452.15" y="673.15" width="15" height="5" transform="translate(1135.3 216) rotate(90)"/>
+      </g>
+      <g id="Extremely_Temp_Agency" data-name="Extremely Temp Agency">
+        <rect class="st1" x="437.15" y="713.15" width="10" height="10" transform="translate(1160.3 276) rotate(90)"/>
+      </g>
+      <g id="Obscurity">
+        <rect class="st1" x="417.15" y="648.15" width="10" height="10" transform="translate(1075.3 231) rotate(90)"/>
+      </g>
+      <g id="Exus">
+        <rect class="st1" x="437.15" y="668.15" width="10" height="10" transform="translate(1115.3 231) rotate(90)"/>
+      </g>
+      <g id="Alleycat_Acquisitions" data-name="Alleycat Acquisitions">
+        <rect class="st1" x="427.15" y="668.15" width="10" height="10" transform="translate(1105.3 241) rotate(90)"/>
+      </g>
+      <g id="Metamorphosis">
+        <rect class="st1" x="432.15" y="628.15" width="10" height="10" transform="translate(1070.3 196) rotate(90)"/>
+      </g>
+      <g id="LTTO">
+        <rect class="st1" x="457.15" y="683.15" width="5" height="10" transform="translate(919.3 1376.3) rotate(180)"/>
+      </g>
+      <g id="Rasputin_Tea_House" data-name="Rasputin Tea House">
+        <rect class="st1" x="392.15" y="733.15" width="10" height="10" transform="translate(1135.3 341) rotate(90)"/>
+      </g>
+      <g id="Affront_Laundry" data-name="Affront Laundry">
+        <rect class="st1" x="422.15" y="733.15" width="10" height="10" transform="translate(1165.3 311) rotate(90)"/>
+      </g>
+      <g id="Voidfarers_Guild" data-name="Voidfarers Guild">
+        <rect class="st1" x="392.15" y="713.15" width="10" height="10" transform="translate(1115.3 321) rotate(90)"/>
+      </g>
+      <g id="Infestridium_Clinics" data-name="Infestridium Clinics">
+        <rect class="st1" x="427.15" y="648.15" width="10" height="10" transform="translate(1085.3 221) rotate(90)"/>
+      </g>
+      <g id="The_Save_point" data-name="The Save point">
+        <rect class="st1" x="412.15" y="718.15" width="10" height="10" transform="translate(1140.3 306) rotate(90)"/>
+      </g>
+      <g id="G:_0ST" data-name="G://0ST">
+        <rect class="st1" x="397.15" y="648.15" width="10" height="10" transform="translate(1055.3 251) rotate(90)"/>
+      </g>
+      <g id="Sentient_Liberation_Front" data-name="Sentient Liberation Front">
+        <rect class="st1" x="412.14" y="728.14" width="10.02" height="10" transform="translate(1150.29 315.99) rotate(90)"/>
+      </g>
+      <g id="Rapture">
+        <rect class="st1" x="397.15" y="658.15" width="10" height="10" transform="translate(1065.3 261) rotate(90)"/>
+      </g>
+      <g id="Pilot_s_Perch" data-name="Pilot&amp;apos;s Perch">
+        <rect class="st1" x="427.15" y="693.15" width="5" height="10"/>
+      </g>
+      <g id="Sect_of_the_Robot_Moon" data-name="Sect of the Robot Moon">
+        <rect class="st1" x="442.08" y="699.15" width="5" height="14"/>
+      </g>
+      <g id="Dame_was_trouble" data-name="Dame was trouble">
+        <rect class="st1" x="414.65" y="735.65" width="5" height="10" transform="translate(1157.8 323.5) rotate(90)"/>
+      </g>
+      <g id="Jail">
+        <rect class="st1" x="402.15" y="628.15" width="10" height="10" transform="translate(1040.3 226) rotate(90)"/>
+      </g>
+      <g id="Sentinels">
+        <rect class="st1" x="397.15" y="638.15" width="10" height="10" transform="translate(1045.3 241) rotate(90)"/>
+      </g>
+      <g id="NPC_POWER" data-name="NPC POWER">
+        <rect class="st1" x="419.65" y="690.65" width="10" height="5" transform="translate(1117.8 268.5) rotate(90)"/>
+      </g>
+      <g id="Corvid_Alliance" data-name="Corvid Alliance">
+        <rect class="st1" x="454.65" y="660.65" width="10" height="5" transform="translate(1122.8 203.5) rotate(90)"/>
+      </g>
+      <g id="Corvid_Alliance-2" data-name="Corvid Alliance">
+        <rect class="st1" x="454.65" y="640.65" width="10" height="5" transform="translate(1102.8 183.5) rotate(90)"/>
+      </g>
+      <g id="Dino_s" data-name="Dino&amp;apos;s">
+        <rect class="st1" x="417.15" y="668.15" width="10" height="10" transform="translate(1095.3 251) rotate(90)"/>
+      </g>
+      <g id="VultureCorp">
+        <rect class="st1" x="409.65" y="695.65" width="10" height="5" transform="translate(1112.8 283.5) rotate(90)"/>
+      </g>
+      <g id="BRIDE">
+        <rect class="st1" x="389.65" y="715.65" width="10" height="5" transform="translate(1112.8 323.5) rotate(90)"/>
+      </g>
+      <g id="Yandere_Cafe" data-name="Yandere Cafe">
+        <rect class="st1" x="392.15" y="723.15" width="6" height="6" transform="translate(1121.3 331) rotate(90)"/>
+      </g>
+    </g>
+  </g>
+  <g id="MegaMall">
+    <g id="NRG_Racing" data-name="NRG Racing">
+      <rect class="st2" x="543.34" y="566.57" width="10" height="10" transform="translate(1119.91 23.23) rotate(90)"/>
+    </g>
+    <g id="Crux_Industries" data-name="Crux Industries">
+      <rect class="st2" x="543.34" y="556.5" width="30" height="10" transform="translate(1119.84 3.16) rotate(90)"/>
+    </g>
+    <g id="Diatones-2" data-name="Diatones">
+      <rect class="st2" x="543.34" y="546.57" width="10" height="10" transform="translate(1099.91 3.23) rotate(90)"/>
+    </g>
+    <g id="Rusty_s" data-name="Rusty&amp;apos;s">
+      <rect class="st2" x="550.68" y="534.21" width="15" height="10" transform="translate(1097.4 -18.97) rotate(90)"/>
+    </g>
+    <g id="Merch">
+      <rect class="st2" x="568.4" y="511.54" width="10" height="15.06"/>
+      <rect class="st2" x="568.4" y="506.63" width="10" height="5"/>
+    </g>
+    <g id="Body_Shop" data-name="Body Shop">
+      <rect class="st2" x="553.2" y="591.55" width="10" height="10" transform="translate(1154.75 38.35) rotate(90)"/>
+    </g>
+    <g id="Helix">
+      <rect class="st2" x="523.34" y="591.57" width="10" height="10"/>
+    </g>
+    <g id="Endline">
+      <rect class="st2" x="543.34" y="556.57" width="10" height="10"/>
+    </g>
+    <g id="Reboot_Syndi" data-name="Reboot Syndi">
+      <rect class="st2" x="538.55" y="511.65" width="10" height="10" transform="translate(1060.2 -26.9) rotate(90)"/>
+    </g>
+    <g id="Nikinga">
+      <rect class="st2" x="578.4" y="531.6" width="10" height="20" transform="translate(1125 -41.8) rotate(90)"/>
+    </g>
+    <g id="Nikinga-2" data-name="Nikinga">
+      <rect class="st2" x="543.34" y="591.57" width="10" height="10" transform="translate(1144.91 48.23) rotate(90)"/>
+    </g>
+    <g id="Nikinga-3" data-name="Nikinga">
+      <rect class="st2" x="528.26" y="511.65" width="10" height="10" transform="translate(1049.91 -16.6) rotate(90)"/>
+    </g>
+    <g id="Nikinga-4" data-name="Nikinga">
+      <rect class="st2" x="575.9" y="524.1" width="10" height="15" transform="translate(1112.5 -49.29) rotate(90)"/>
+    </g>
+    <g id="Nikinga-5" data-name="Nikinga">
+      <rect class="st2" x="533.34" y="591.57" width="10" height="10" transform="translate(1134.91 58.23) rotate(90)"/>
+    </g>
+    <g id="Metaesthetic_Designs" data-name="Metaesthetic Designs">
+      <rect class="st2" x="578.4" y="551.6" width="10" height="20" transform="translate(1145 -21.8) rotate(90)"/>
+    </g>
+    <g id="Vertextiles">
+      <rect class="st2" x="578.4" y="581.57" width="10" height="20" transform="translate(1174.97 8.17) rotate(90)"/>
+    </g>
+    <g id="GrayStar">
+      <rect class="st2" x="523.5" y="531.57" width="10" height="10" transform="translate(1065.07 8.07) rotate(90)"/>
+    </g>
+    <g id="Lightnerds">
+      <rect class="st2" x="563.4" y="591.55" width="10" height="10" transform="translate(1164.94 28.15) rotate(90)"/>
+    </g>
+    <g id="Red.Ai">
+      <rect class="st2" x="523.44" y="551.87" width="10" height="10" transform="translate(1085.31 28.44) rotate(90)"/>
+    </g>
+    <g id="Red.Ai-2" data-name="Red.Ai">
+      <rect class="st2" x="521" y="564.47" width="10" height="5" transform="translate(1092.97 40.97) rotate(90)"/>
+    </g>
+    <g id="Omni-Dyne">
+      <rect class="st2" x="578.4" y="561.6" width="10" height="20" transform="translate(1155 -11.8) rotate(90)"/>
+    </g>
+    <g id="Starside_Armory" data-name="Starside Armory">
+      <rect class="st2" x="575.9" y="574.1" width="10" height="15" transform="translate(1162.5 .7) rotate(90)"/>
+    </g>
+    <g id="Crisiswear">
+      <rect class="st2" x="578.4" y="541.6" width="10" height="20" transform="translate(1135 -31.8) rotate(90)"/>
+    </g>
+  </g>
+  <g id="PORTOS">
+    <rect class="st7" x="520.69" y="904.76" width="30.86" height="8.79" transform="translate(1445.27 373.03) rotate(90)"/>
+    <rect class="st7" x="280.89" y="521.76" width="18.26" height="8.79"/>
+    <rect class="st7" x="503.45" y="256.11" width="30.86" height="8.79"/>
+    <rect class="st7" x="602.29" y="440.76" width="30.86" height="8.79"/>
+    <rect class="st7" x="279.29" y="317.37" width="30.86" height="8.79"/>
+  </g>
+</svg>

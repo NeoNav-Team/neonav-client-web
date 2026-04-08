@@ -175,7 +175,7 @@ const FullView = ({ location, onCollapse }: any) =>  {
         <Typography sx={modalBodyStyle} component="p">
           <LocationCityIcon fontSize="inherit"/>
           &nbsp;⋅&nbsp;
-          <Link href={`/sites/${location.neosite}`}>
+          <Link href={`${location.neosite}`}>
             {!!location.neosite && location.ownername}
           </Link>
         </Typography>
