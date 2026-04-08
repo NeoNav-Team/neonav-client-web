@@ -746,7 +746,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           secondHexProps={{
             icon: <CancelIcon />,
-            // tooltipText: "Discard Changes",
+            tooltipText: "Discard Changes",
             handleAction: stopEditMode,
           }}
           bigHexProps={{
@@ -754,7 +754,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           thirdHexProps={{
             icon: <SaveIcon />,
-            // tooltipText: "Save Changes",
+            tooltipText: "Save Changes",
             handleAction: handleSaveLocationChanges,
           }}
           fourthHexProps={{
@@ -769,7 +769,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           firstHexProps={{
             icon: <ShareLocationIcon/>,
             //disabled: !window.isSecureContext,
-            // tooltipText: "Share This Location",
+            tooltipText: "Share This Location",
             handleAction: () => {
               if (window.isSecureContext) {
                 navigator.clipboard.writeText("@" + selectedLocationId);
@@ -780,12 +780,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           secondHexProps={{
             icon: <RateReviewIcon/>,
-            // tooltipText: "Add A Review",
+            tooltipText: "Add A Review",
             handleAction: () => setReviewDialogOpen(true),
           }}
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
-            // tooltipText: "Edit Location",
+            tooltipText: "Edit Location",
             // disabled: , // TODO: Need to check if the location is editable by the user
             handleAction: () => {
               fetchAllFactions();
@@ -795,7 +795,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           thirdHexProps={{
             icon: <EventIcon/>,
             link: "/events/" + selectedLocationId,
-            // tooltipText: "See Events",
+            tooltipText: "See Events",
           }}
           fourthHexProps={{
             disabled: true,
@@ -808,7 +808,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         <FooterNav
           firstHexProps={{
             icon: <PersonPinCircleIcon/>,
-            // tooltipText: userLocationKnown ? "Share Your Location" : "Location Unavailable To Share",
+            tooltipText: userLocationKnown ? "Share Your Location" : "Location Unavailable To Share",
             dialog: "Broadcast your position? Your coordinates will be shared with your factions and mutual friends.",
             handleAction: () => {
               if (mapRef.current && userLocationKnown) {
@@ -819,7 +819,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           secondHexProps={{
             icon: <AddLocationIcon/>,
-            // tooltipText: "Add A Location",
+            tooltipText: "Add A Location",
             handleAction: () => {
               setSelectedLocationId("");
               setSelectedLocation(EMPTY_LOCATION);
@@ -830,12 +830,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           bigHexProps={{
             icon: <FilterListIcon/>,
-            // tooltipText: "Layers",
+            tooltipText: "Layers",
             handleAction: openLayerModal,
           }}
           thirdHexProps={{
             icon: userLocationKnown ? <MyLocationIcon/> : <LocationSearchingIcon/>,
-            // tooltipText: userLocationKnown ? "Show Your Location" : "Location Unavailable",
+            tooltipText: userLocationKnown ? "Show Your Location" : "Location Unavailable",
             handleAction: () => {
               if (mapRef.current) {
                 let myMap = myMapObjects.get("map") as L.Map;
@@ -851,7 +851,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           fourthHexProps={{
             icon: <LocationDisabledIcon/>,
-            // tooltipText: "Delete Your Shared Locations",
+            tooltipText: "Delete Your Shared Locations",
             dialog: "Delete all location history? Your previously shared positions will be deleted for everyone. This cannot be undone.",
             handleAction: () => {
               if (mapRef.current) {
