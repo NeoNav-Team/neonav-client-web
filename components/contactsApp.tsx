@@ -241,11 +241,13 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
                 dialog: 'User ID',
                 useInput: true,
                 disabled: loading,
+                tooltipText: "Search By ID",
               }}
               secondHexProps={{
                 icon: <QrCodeScannerIcon />,
                 handleAction: handleModelOpen,
                 disabled: loading,
+                tooltipText: "Scan QR Code",
               }}
             />
           </Box>

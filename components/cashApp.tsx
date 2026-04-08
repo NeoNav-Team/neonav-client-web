@@ -394,21 +394,25 @@ export default function CashApp(props: CashAppProps):JSX.Element {
                 dialog: 'User ID',
                 useInput: true,
                 disabled: loading,
+                tooltipText: "Add User By ID",
               }}
               secondHexProps={{
                 icon: <QrCodeScannerIcon />,
                 handleAction: handleModelOpen,
                 disabled: loading,
+                tooltipText: "Scan QR Code",
               }}
               bigHexProps={{
                 icon: <CurrencyExchangeIcon />,
                 handleAction: handleSubmit,
                 loading: loading,
                 disabled: loading || openModel,
+                tooltipText: processTypeValue === "pay" ? "Send c±sн" : "Request c±sн", // TODO: fix this when refactoring payload form object
               }}
               thirdHexProps={{
                 icon: <QueryStatsIcon />,
                 link: `/cash/history/${accountId}`,
+                tooltipText: "Previous Transactions",
               }}
             />
           </Box>

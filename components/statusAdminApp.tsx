@@ -159,7 +159,8 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
               firstHexProps={{
                 icon: <NoMeetingRoomIcon />,
                 handleAction: goRemoveStatus,
-                dialog: "Delete this status?"
+                dialog: "Delete this status?",
+                tooltipText: "Delete Status",
               }}
               secondHexProps={{
                 disabled: true,
@@ -168,6 +169,7 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
                 icon: selectedStatus && selectedStatus.class === 'public' ? <VisibilityIcon /> : <VisibilityOffIcon />,
                 handleAction: goToggleStatus,
                 disabled: alertShow,
+                tooltipText: selectedStatus && selectedStatus.class === 'public' ? "Make Status Private" : "Make Status Public",
               }}
               thirdHexProps={{
                 disabled: true,
@@ -175,6 +177,7 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
               fourthHexProps={{
                 icon: <TocIcon />,
                 link: factionId ? `/factions/${factionId}` : '/garden',
+                tooltipText: factionId ? "Faction" : "Jaden/Garden",
               }}
             />
           </Box>

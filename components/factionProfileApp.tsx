@@ -298,31 +298,37 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                 icon: editMode ? <SaveIcon /> : <BorderColorIcon />,
                 disabled: !isAdmin,
                 handleAction: editButtonAction,
+                tooltipText: editMode ? "Save Changes" : "Edit Faction",
               }}
               secondHexProps={{
                 disabled: !isAdmin,
                 icon: <AllInboxIcon />,
                 link: `/factions/${accountId}/status/inbox`,
+                tooltipText: "Faction Statuses",
               }}
               bigHexProps={
                 isRep ? {
                   icon: <RateReviewIcon />,
                   link: `/factions/${accountId}/setstatus`,
+                  tooltipText: "Add Status As Faction",
                 } : {
                   icon: <RateReviewIcon />,
                   handleAction: writeButtonAction,
                   dialog: 'Share your thoughts with us?',
                   useInput: true,
+                  tooltipText: "Leave Message",
                 }
               }
               thirdHexProps={{
                 disabled: true,
                 icon: <TagIcon />,
                 link: `/factions/${accountId}/tags`,
+                tooltipText: "Faction Tags",
               }}
               fourthHexProps={{
                 icon: <TocIcon />,
                 link: '/factions',
+                tooltipText: "All Factions",
               }}
             />
           </Box>
