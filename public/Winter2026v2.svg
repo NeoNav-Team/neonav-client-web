@@ -55,7 +55,7 @@
 
       <!-- Medical Shapes -->
       .st6 {
-        fill: #FFFFFF88;
+        fill: #FFFFFFAA;
         stroke: #EC1C24;
         vector-effect: non-scaling-stroke;
         stroke-width: 2px;
@@ -102,10 +102,13 @@
       </g>
     </g>
     <g id="Sec">
-      <polygon class="st8" points="142.56 342.62 185.56 455.03 103.56 487.03 106.56 342.62 142.56 342.62"/>
+      <polygon class="st8" points="141.00 342.62 201.30 487.03 106.56 487.03 106.56 342.62"/>
     </g>
     <g id="Med" class="st6">
       <rect id="rect2708" class="st6" x="280.82" y="367.29" width="50.94" height="81.26"/>
+    </g>
+    <g id="Command" data-name="Command">
+      <rect class="st1" x="421.56" y="792.34" width="30" height="55" transform="translate(15 -40.5)"/>
     </g>
     <g id="Laser_Field" data-name="Laser Field">
       <rect class="st1" x="421.56" y="792.34" width="30" height="60" transform="translate(1258.9 385.78) rotate(90)"/>
@@ -115,16 +118,7 @@
     </g>
     <g id="The_Core" data-name="The Core">
       <g id="Legs">
-        <!-- Make these one path -->
-        <path id="path467" class="st1" d="M493.06,896.82v5h-5v-5h5Z"/>
-        <path id="path460" class="st1" d="M493.13,911.79h-5v-10h5v10Z"/>
-        <path id="path461" class="st1" d="M493.13,921.82h-5v-10h5v10Z"/>
-        <path id="path462" class="st1" d="M478.06,911.82h-5v-10h5v10Z"/>
-        <path id="path463" class="st1" d="M478.06,921.82h-5v-10h5v10Z"/>
-        <path id="path464" class="st1" d="M488.1,896.79v5h-10v-5h10Z"/>
-        <path id="path465" class="st1" d="M503.13,916.82v5h-10v-5h10Z"/>
-        <path id="path466" class="st1" d="M473.08,916.82v5h-10v-5h10Z"/>
-        <path id="path474" class="st1" d="M478.1,896.79v5h-5v-5h5Z"/>
+        <path id="path466" class="st1" d="M463.08,916.82h10v-20h20v20h10v5h-15v-20h-10v20h-15v-5Z"/>
       </g>
       <g id="Left_Arm" data-name="Left Arm">
         <rect class="st1" x="457.58" y="870.17" width="7" height="5" transform="translate(1404.19 1163.71) rotate(135)"/>
@@ -266,7 +260,7 @@
     </g>
     <g id="Modules_Level_1" data-name="Modules Level 1">
       <g id="D15_Unit-0">
-        <rect class="st1" x="434.15" y="711.15" width="10" height="14" transform="translate(1157.3 279) rotate(90)"/>
+        <rect class="st1" x="434.15" y="711.15" width="10" height="5" transform="translate(1148.3 279) rotate(90)"/>
       </g>
       <g id="Bastards_Broken_Things" data-name="Bastards &amp;amp; Broken Things">
         <rect class="st1" x="449.65" y="700.65" width="20" height="5" transform="translate(1162.8 243.5) rotate(90)"/>
@@ -378,12 +372,6 @@
       </g>
       <g id="Dino_s" data-name="Dino&amp;apos;s">
         <rect class="st1" x="417.15" y="668.15" width="10" height="10" transform="translate(1095.3 251) rotate(90)"/>
-      </g>
-      <g id="VultureCorp">
-        <rect class="st1" x="409.65" y="695.65" width="10" height="5" transform="translate(1112.8 283.5) rotate(90)"/>
-      </g>
-      <g id="BRIDE">
-        <rect class="st1" x="389.65" y="715.65" width="10" height="5" transform="translate(1112.8 323.5) rotate(90)"/>
       </g>
       <g id="Yandere_Cafe" data-name="Yandere Cafe">
         <rect class="st1" x="392.15" y="723.15" width="6" height="6" transform="translate(1121.3 331) rotate(90)"/>
