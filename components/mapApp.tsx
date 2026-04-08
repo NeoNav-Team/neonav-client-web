@@ -160,6 +160,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
   const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [linkedLocationId, setLinkedLocationId] = useState("");
   const [markerFromLinkShown, setMarkerFromLinkShown] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(EMPTY_LOCATION);
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -608,10 +609,23 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     const locationMarkersLayer = layerData.get("locationMarkersLayer") as L.LayerGroup | undefined;
     if (!mymap || !locationMarkersLayer) return;
 
+    // If we passed in a location ID, load details for it
+    if (!selectedLocationId && props?.params?.id && props?.params?.id.startsWith("L")) {
+      setSelectedLocationId(props?.params?.id);
+      fetchLocationById(props?.params?.id);
+      const location = state?.network?.collections?.locations?.find(loc => loc.id === selectedLocationId);
+      // TODO This doesn't actually work because we don't know the owner yet
+      if (location?.owner.startsWith("C")) {
+        fetchFactionDetails(location.owner);
+      }
+      setLinkedLocationId(props?.params?.id);
+    }
+
     renderLocationsToLeafletLayers({
       layerData,
       locations,
-      userId: state?.network?.selected?.account,
+      linkedLocationId,
+      userId: state?.network?.selected?.account!,
       onMarkerClick: (leafletMarker) => {
         if (stateRef.current != "view") {
           // Fix access violations due to focus
@@ -644,22 +658,16 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         }
       });
     });
-
-    // If we passed in a location ID, open it up
-    if (!selectedLocationId && props?.params?.id && props?.params?.id.startsWith("L")) {
-      setSelectedLocationId(props?.params?.id);
-      fetchLocationById(props?.params?.id);
-      const location = state?.network?.collections?.locations?.find(loc => loc.id === selectedLocationId);
-      if (location?.owner.startsWith("C")) {
-        fetchFactionDetails(location.owner);
-      }
-    }
   }, [state?.network?.collections?.locations]);
 
   useEffect(() => {
     let locations = state?.network?.collections?.locations || [];
     if (locations.length > 0 && selectedLocationId && !!locations.find(loc => loc.id === selectedLocationId)) {
       const foundLocation = locations.find(loc => loc.id === selectedLocationId);
+      // Set the neosite data if we have it
+      if ((state?.network?.entity as any).id === foundLocation.owner) {
+        foundLocation.neosite = (state?.network?.entity as any).neosite;
+      }
       setSelectedLocation(foundLocation);
       setEditLocationFormData({
         name: foundLocation.name || '',

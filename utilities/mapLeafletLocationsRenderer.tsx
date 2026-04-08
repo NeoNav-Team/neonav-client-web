@@ -39,8 +39,8 @@ const LOCATOR = "L401233115";
 export interface LeafletLocationsRendererParams {
   layerData: Map<string, LayerGroup>;
   locations: any[];
-  userId?: string;
-  factions?: any[];
+  userId: string;
+  linkedLocationId: string;
   onMarkerClick: (leafletMarker: L.Marker) => void;
   infoModalState: any;
   selectedLocationId: string;
@@ -109,7 +109,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     layerData,
     locations,
     userId,
-    factions,
+    linkedLocationId,
     onMarkerClick,
     infoModalState,
     selectedLocationId,
@@ -164,7 +164,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     loc.rating = enrichedLoc.rating;
     
     // Determine the layer
-    let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, megablockRect, megamallRect });
+    let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, linkedLocationId, megablockRect, megamallRect });
 
     // Create the marker
     const { icon, color } = getVenueIconAndColor(loc.venuetype ?? "");
