@@ -42,7 +42,7 @@ export function getTargetLayer(
   // 1. User/Faction Owned (Unverified)
   if (!loc.verified && (
     loc.owner === userId || 
-    loc.createdby === userId || 
+    loc.creator === userId || 
     factions.some(f => f.id === loc.owner)
   )) {
     return layers.get("mylocations")!;

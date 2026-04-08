@@ -1,10 +1,11 @@
-import L from "leaflet";
+import L, { divIcon } from "leaflet";
 import ReactDOMServer from 'react-dom/server';
 import type { LayerGroup } from "leaflet";
 import React from "react";
 import { enrichLocation, getTargetLayer } from "@/utilities/mapLocationUtils";
 
 // Map Icons
+import { SvgIcon } from '@mui/material';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import WcIcon from '@mui/icons-material/Wc';
@@ -21,8 +22,8 @@ import HiveIcon from '@mui/icons-material/Hive';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import SimCardIcon from '@mui/icons-material/SimCard';
 import SpeakerIcon from '@mui/icons-material/Speaker';
-import LocalMall from '@mui/icons-material/LocalMall';
 import AttributionIcon from '@mui/icons-material/Attribution';
+import AddIcon from '@mui/icons-material/Add';
 // Allegiance Icons
 // https://www.iconarchive.com/show/material-icons-by-pictogrammers/dna-icon.html // Helix
 import ControlCameraIcon from '@mui/icons-material/ControlCamera'; // Endline
@@ -35,13 +36,15 @@ const MEGAMALL_NW = "L174138988";
 const MEGAMALL_SE = "L205837229";
 const LOCATOR = "L401233115";
 
-
 export interface LeafletLocationsRendererParams {
   layerData: Map<string, LayerGroup>;
   locations: any[];
   userId?: string;
   factions?: any[];
   onMarkerClick: (leafletMarker: L.Marker) => void;
+  infoModalState: any;
+  selectedLocationId: string;
+  updateField: Function;
 }
 
 export interface LeafletLocationPinsRendererParams {
@@ -82,20 +85,22 @@ const neoPink = "#D45893"; // #D45893
 const neoOrange = "#FCAC6F"; // #FCAC6F
 const neoGreen = "#47E15D"; // #47E15D
 
-// TODO: More robust venue type detection and icon/color assignment
-// TODO: Move to location renderer or other util file
+// TODO: More robust venue type detection and icon/color assignment?
 const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
   const vt = (venuetype || '').toLowerCase();
   if (vt.includes('arcade')) return { icon: <GamepadIcon style={{ color: cyberOrange }} />, color: cyberBlueLight };
-  if (vt.includes('food') || vt.includes('stall') || vt.includes('restaurant') || vt.includes('dining')) return { icon: <RamenDiningIcon style={{ color: cyberYellow }} />, color: cyberGreen };
+  if (vt.includes('food')) return { icon: <RamenDiningIcon style={{ color: cyberYellow }} />, color: cyberGreen };
+  if (vt.includes('restaurant') || vt.includes('dining')) return { icon: <RestaurantIcon style={{ color: cyberYellow }} />, color: cyberGreen };
+  if (vt.includes('bar')) return { icon: <LocalBarIcon style={{ color: cyberYellow }} />, color: cyberGreen };
   if (vt.includes('entertainment') || vt.includes('music')) return { icon: <SpeakerIcon style={{ color: cyberGreen }} />, color: cyberYellow };
   if (vt.includes('megablock') || vt.includes('block')) return { icon: <HiveIcon style={{ color: cyberBlueDark }} />, color: cyberYellow };
-  if (vt.includes('megamall') || vt.includes('block')) return { icon: <LocalMall style={{ color: cyberBlueDark }} />, color: cyberYellow };
+  if (vt.includes('megamall') || vt.includes('block')) return { icon: <LocalMallIcon style={{ color: cyberBlueDark }} />, color: cyberYellow };
   if (vt.includes('dev')) return { icon: <AdjustIcon style={{ color: "#FFFFFF" }} />, color: "#FF0000" };
   if (vt.includes('porto')) return { icon: <WcIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
   if (vt.includes('medical')) return { icon: <HealthAndSafetyIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
   if (vt.includes('security')) return { icon: <LocalPoliceIcon style={{ color: "#FFFFFF" }} />, color: cyberOrange };
   if (vt.includes('location_pin')) return { icon: <AttributionIcon style={{ color: "#FFFFFF" }} />, color: cyberGreen };
+  if (vt.includes('new_location')) return { icon: <AddIcon style={{ color: cyberYellow }} />, color: cyberGreen };
   return { icon: <AdjustIcon style={{ color: cyberYellow }} />, color: cyberBlueDark };
 };
 
@@ -106,6 +111,9 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     userId,
     factions,
     onMarkerClick,
+    infoModalState,
+    selectedLocationId,
+    updateField,
   } = params;
 
   // 1. Setup & Clear Layers
@@ -161,10 +169,19 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
     // Create the marker
     const { icon, color } = getVenueIconAndColor(loc.venuetype ?? "");
-    const leafletMarker: L.Marker = L.marker(latlng, { icon: getDivIcon(icon, color), autoPan: true })
+    const leafletMarker: L.Marker = L.marker(latlng, {
+      icon: getDivIcon(icon, color),
+      autoPan: true,
+      draggable: (infoModalState === "edit" && loc.id === selectedLocationId)
+    })
       .addTo(targetLayer)
-      .on("click", () => onMarkerClick(leafletMarker)
-    );
+      .on("click", () => onMarkerClick(leafletMarker))
+      .on('dragend', (e) => {
+        const newPos = e.target.getLatLng();
+        updateField("lat", newPos.lat.toFixed(6)); // Your state for the DB
+        updateField("long", newPos.lng.toFixed(6)); // Your state for the DB
+      })
+    ;
 
     // Handle metadata and tooltips
     leafletMarker.bindTooltip(loc.name, { permanent: true, direction: "right" });
@@ -172,7 +189,6 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
     // Dev features
     if (loc.id === LOCATOR) {
-      leafletMarker.options.draggable = true;
       leafletMarker.dragging?.enable();
       leafletMarker.on('dragend', () => {
         const { lat, lng } = leafletMarker.getLatLng();
@@ -207,15 +223,35 @@ export function renderLocationPinsToLeafletLayers(params: LeafletLocationPinsRen
     const { icon, color } = getVenueIconAndColor("location_pin");
     const leafletMarker: L.Marker = L.marker(latlng, { icon: getDivIcon(icon, color), autoPan: true })
       .addTo(layerData.get("pinsLayer")!)
-      .on("click", () => onMarkerClick(leafletMarker)
-    );
+      .on("click", () => onMarkerClick)
+    ;
 
     const isoString: string = pin.ts;
     const date: Date = new Date(isoString);
+    date.setFullYear(date.getFullYear() + 200); // 200 year jump to 22xx
 
-    // Returns a human-readable string based on the user's locale (e.g., "3/20/2024, 8:00:00 AM")
+    // Returns a human-readable string based on the user's locale (e.g., "3/20/2224, 8:00:00 AM")
     const readableDate: string = date.toLocaleString(); 
 
-    leafletMarker.bindTooltip(pin.name + "<br>" + pin.userid + "<br>" + readableDate, { permanent: true, direction: "right" });
+    leafletMarker.bindTooltip(pin.name + " [" + pin.userid + "]<br>" + readableDate, { permanent: true, direction: "right" });
   });
 };
+
+export function renderNewLocationPin(latLng: L.LatLng, mymap: L.Map, updateField: Function): L.Marker {
+  const { icon, color } = getVenueIconAndColor("new_location");
+  const newMarker = L.marker(latLng, {
+    icon: getDivIcon(icon, color),
+    autoPan: true,
+    draggable: true,
+  }).on('dragend', (e) => {
+    const newPos = e.target.getLatLng();
+    updateField("lat", newPos.lat.toFixed(6)); // Your state for the DB
+    updateField("long", newPos.lng.toFixed(6)); // Your state for the DB
+  }).addTo(mymap);
+
+  newMarker.setZIndexOffset(2000);
+
+  newMarker.bindTooltip("New Location", { permanent: true, direction: "right" });
+
+  return newMarker;
+}

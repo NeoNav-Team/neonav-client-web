@@ -2,30 +2,15 @@
 
 import 'styles/leaflet.css';
 import styles from "@/styles/generic.module.css";
-import itemStyles from '../styles/item.module.css';
 import React, {useEffect, useRef, useState} from "react";
 import L from 'leaflet';
 import 'leaflet-rotate';
 import {
   Box,
   Container,
-  Divider,
-  IconButton,
-  Link,
   Modal,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Typography,
+  SelectChangeEvent,
 } from '@mui/material';
-import CastleIcon from "@mui/icons-material/Castle"; // Faction Icon
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import FooterNav from "@/components/footerNav";
 import ReviewDialog from '@/components/reviewDialog';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
@@ -37,17 +22,16 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
 import EventIcon from '@mui/icons-material/Event';
 import RateReviewIcon from '@mui/icons-material/RateReview';
-import LocationCityIcon from '@mui/icons-material/LocationCity';
-import PersonIcon from '@mui/icons-material/Person';
 import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SaveIcon from '@mui/icons-material/Save';
 
-import ItemStatus from "@/components/itemStatus";
-import SimpleScrollContainer from "@/components/simpleScrollContainer";
+import { MapInfoModal } from '@/components/mapInfoModal';
 import { Context as NnContext } from "@/components/context/nnContext";
 import { NnProviderValues } from "@/components/context/nnTypes";
 import MapLayersModal from "@/components/mapLayersModal";
 import { initStaticLayerGroups, wireZoomLayerVisibility } from "@/utilities/mapLeafletLayerUtils";
-import { renderLocationsToLeafletLayers, renderLocationPinsToLeafletLayers } from "@/utilities/mapLeafletLocationsRenderer";
+import { renderLocationsToLeafletLayers, renderLocationPinsToLeafletLayers, renderNewLocationPin } from "@/utilities/mapLeafletLocationsRenderer";
 
 
 interface PageContainerProps {
@@ -66,6 +50,9 @@ interface RotateControl extends L.Control {
 
 const SVG_MAP_FILE = "/NeoMap2026v3.svg"
 const NEONAV_MAINT = "C461879533";
+const NEOCITY_ADMIN = "C231465509";
+
+const EMPTY_LOCATION = {id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""};
 
 class CustomTileLayer extends L.TileLayer {
   constructor(options?: L.TileLayerOptions) {
@@ -122,6 +109,15 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     boxShadow: 24,
     transition: 'all 0.3s ease-in-out',
   };
+  const modalStyle_50 = {
+    position: 'absolute' as 'absolute',
+    top: '50dvh',
+    height: '50vh',
+    left: '0%',
+    width: '100%',
+    boxShadow: 24,
+    transition: 'all 0.3s ease-in-out',
+  };
   const modalStyle_90 = {
     position: 'absolute' as 'absolute',
     top: '10dvh',
@@ -131,19 +127,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     boxShadow: 24,
     transition: 'all 0.3s ease-in-out',
   };
-  const modalTitleStyle = {
-    fontFamily: 'Jura',
-    fontSize: '18px',
-    letterSpacing: '0.05rem',
-    padding: '10px 16px 0',
-    filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)',
-  }
-  const modalBodyStyle = {
-    fontFamily: 'Jura',
-    fontSize: '14px',
-    padding: '0px 16px 0',
-    filter: 'drop-shadow(rgb(255, 255, 255) 0px 0px 4px)',
-  }
   const flexFooter = {
     position: 'absolute',
     top: 'calc(100dvh - 174px)',
@@ -164,21 +147,22 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     transition: 'all 0.1s ease-in-out',
   };
   const mapFull = {
-    height: "100%",
+    height: '100dvh',
     transition: 'all 0.3s ease-in-out',
   };
   const mapEdit = {
-    height: "50%",
+    height: '50dvh',
     transition: 'all 0.3s ease-in-out',
   };
   const mapRef = useRef(null);
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
   const [selectedLocationId, setSelectedLocationId] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState({id: "", name: "", description: "", venuetype: "", openState: "", nextTimeMsg: "", prettyhours: [], rating: "", ownerisfaction: false, owner: "", ownername: "", ownerlink: "", reviews: [], neocities: ""});
+  const [selectedLocation, setSelectedLocation] = useState(EMPTY_LOCATION);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalSizeStyle, setInfoModalSizeStyle] = useState(modalStyle_0);
   const [infoModalSize, setInfoModalSize] = useState(0);
+  const [infoModalState, setInfoModalState] = useState<'view' | 'edit' | 'create'>('view');
   const [showLayerModal, setShowLayerModal] = useState(false);
   const [layerModalSizeStyle, setLayerModalSizeStyle] = useState(modalStyle_0);
   const [layerStates, setLayerStates] = useState<Record<string, boolean>>({
@@ -190,16 +174,21 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [editLocationFormData, setEditLocationFormData] = React.useState({name: "", lat: 0, long: 0, owner: "", description: "", venuetype: "", hours: [] as any});
 
   const { state,
     setAlert = (severity: string, message: string) => {},
     fetchAllLocations = () => {},
     fetchUnverifiedLocations = () => {},
     fetchLocationById = (id: string) => {},
+    createLocation = (doc: any) => {},
+    createFactionLocation = (faction: any, doc: any) => {},
+    updateLocation = (id: string, doc:any) => {},
     addLocationReview = (id: string, review:any) => {},
     addLocationPin = (lat: string, long: string) => {},
     fetchLocationPins = (id: string) => {},
     deleteLocationPins = () => {},
+    fetchAllFactions = () => {},
   }: NnProviderValues = React.useContext(NnContext);
 
   const options: L.MapOptions = {
@@ -211,6 +200,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     rotate: true,
     bearing: 0,
     maxBounds: L.latLng(35.0798889, -117.8222298).toBounds(1400),
+    keyboard: false,
   };
 
   const openInfoModal = () => {
@@ -225,12 +215,107 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }
 
   const closeInfoModal = () => {
+    if (infoModalState != "view") {
+      return;
+    }
     setInfoModalSize(0);
     setInfoModalSizeStyle(modalStyle_0);
     setFooterStyle(flexFooter);
     setTimeout(() => {
       setShowInfoModal(false);
     }, 100);
+  }
+
+  const startEditMode = () => {
+    setInfoModalState("edit");
+    setInfoModalSizeStyle(modalStyle_50);
+    // Timeout is required for animation to start
+    setTimeout(() => {
+      setMapStyle(mapEdit);
+    }, 0);
+    // Wait for animation to complete before invalidating size
+    setTimeout(() => {
+      (myMapObjects.get("map") as L.Map).invalidateSize();
+    }, 300);
+  }
+
+  const startCreateMode = () => {
+    // Open the info modal
+    setInfoModalSize(90);
+    setInfoModalSizeStyle(modalStyle_0);
+    setFooterStyle(flexFooterFront);
+    setShowInfoModal(true);
+    // Timeout is required for animation to start
+    setTimeout(() => {
+      setInfoModalSizeStyle(modalStyle_50);
+    }, 0);
+
+    // Create new leaflet marker at the center of user view or current user's location if they are on site
+    let currentUserLocation = myMapObjects.get("map").getCenter() as L.LatLng;
+    if (userLocationKnown && L.latLng(35.0798889, -117.8222298).toBounds(1400).contains(lastKnownLocation)) {
+      currentUserLocation = lastKnownLocation;
+    }
+    const newMarker = renderNewLocationPin(currentUserLocation, myMapObjects.get("map"), updateField);
+    myMapObjects.set("newMarker", newMarker);
+    myMapObjects.get("map").flyTo(currentUserLocation);
+    
+    setEditLocationFormData({
+      name: "New Location",
+      lat: currentUserLocation.lat,
+      long: currentUserLocation.lng,
+      owner: state?.user?.profile?.auth?.userid || "",
+      description: "",
+      venuetype: "",
+      hours: [], // Hours can't be set during create
+    });
+    setInfoModalState("create");
+    setInfoModalSizeStyle(modalStyle_50);
+    // Timeout is required for animation to start
+    setTimeout(() => {
+      setMapStyle(mapEdit);
+    }, 0);
+    // Wait for animation to complete before invalidating size
+    setTimeout(() => {
+      (myMapObjects.get("map") as L.Map).invalidateSize();
+    }, 300);
+  }
+
+  const stopEditMode = () => {
+    if (infoModalState === "edit") {
+      setInfoModalSizeStyle(modalStyle_90);
+    } else {
+      // Do info modal close steps
+      setInfoModalSize(0);
+      setInfoModalSizeStyle(modalStyle_0);
+      setFooterStyle(flexFooter);
+      setTimeout(() => {
+        setShowInfoModal(false);
+      }, 100);
+    }
+    setInfoModalState("view");
+    // Timeout is required for animation to start
+    setTimeout(() => {
+      setMapStyle(mapFull);
+    }, 0);
+    // Wait for animation to complete before invalidating size
+    setTimeout(() => {
+      (myMapObjects.get("map") as L.Map).invalidateSize();
+    }, 300);
+    // Marker Cleanup
+    let allMarkers: L.Marker[] = myMapObjects.get("allMarkers") || [];
+    let leafletMarker = allMarkers.find((marker: any) => marker.id === selectedLocationId);
+    if (leafletMarker) {
+      const location = state?.network?.collections?.locations?.find(loc => loc.id === (leafletMarker as any).id);
+      leafletMarker.setLatLng(L.latLng(location.lat, location.long));
+      // Wait for animation to complete before flying to marker
+      setTimeout(() => {
+        myMapObjects.get("map").flyTo(leafletMarker?.getLatLng());
+      }, 400);
+    }
+    if (!!myMapObjects.get("newMarker")) {
+      myMapObjects.get("newMarker").remove();
+      myMapObjects.set("newMarker", undefined);
+    }
   }
 
   const openLayerModal = () => {
@@ -262,10 +347,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     setTimeout(() => setInfoModalSize(10), 200);
     setFooterStyle(flexFooterHidden);
   }
-
-  const handleMouseUpDownIgnore = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
 
   const handleLayerSwitch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const myMap = myMapObjects.get("map") as L.Map | undefined;
@@ -333,6 +414,98 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     }
   });
 
+  function getShallowDiff<T extends object>(obj1: T, obj2: T): Partial<T> {
+    const diff: Partial<T> = {};
+    
+    // Get all unique keys from both objects
+    const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]) as Set<keyof T>;
+  
+    allKeys.forEach(key => {
+      if (obj1[key] !== obj2[key]) {
+        diff[key] = obj2[key];
+      }
+    });
+  
+    return diff;
+  }
+
+  const handleSaveLocationChanges = async () => {
+    console.log("Saving form data:", editLocationFormData);
+    const foundLocation = state?.network?.collections?.locations?.find(loc => loc.id === selectedLocationId);
+    const locationFormDiff = getShallowDiff({
+      name: foundLocation?.name || '',
+      lat: foundLocation?.lat || 0,
+      long: foundLocation?.long || 0,
+      owner: foundLocation?.owner || '',
+      description: foundLocation?.description || '',
+      venuetype: foundLocation?.venuetype || '',
+      hours: foundLocation?.hours || {},   // This will be weird with a shallow diff, but I don't have hours available yet
+    }, editLocationFormData);
+    console.log("Reduced form data:", locationFormDiff);
+    if (infoModalState == "edit") {
+      updateLocation(selectedLocationId, locationFormDiff);
+    } else {
+      if (editLocationFormData.owner.startsWith("C")) {
+        createFactionLocation(editLocationFormData.owner, locationFormDiff);
+      } else {
+        createLocation(locationFormDiff);
+      }
+    }
+    stopEditMode();
+    // Give it a second for the location to be created
+    setTimeout(() => {
+      fetchUnverifiedLocations();
+    }, 1000);
+  };
+
+  // A generic helper that doesn't care about the event object
+  const updateField = (name: string, value: any) => {
+    setEditLocationFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  // Simple handler for TextFields
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    updateField(e.target.name, e.target.value);
+  };
+  
+  // Simple handler for Selects
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    updateField(e.target.name, e.target.value);
+  };
+  
+  // Add a new empty shift for a specific day
+  const addShift = (day: string) => {
+    const newShift = { day, open: '09:00', close: '17:00' };
+    updateField('hours', [...(editLocationFormData.hours || []), newShift]);
+  };
+
+  // Remove a specific shift by its index
+  const removeShift = (index: number) => {
+    const updatedHours = (editLocationFormData.hours || []).filter((_: any, i: number) => i !== index);
+    updateField('hours', updatedHours);
+  };
+
+  // Handler to update hours
+  const handleHourChange = (index: number, field: 'open' | 'close', newValue: any) => {
+    const updatedHours = [...(editLocationFormData.hours || [])] as any[];
+    if (!updatedHours[index]) return;
+  
+    let timeString = newValue ? newValue.format('HH:mm') : null;
+  
+    // Special Case: If they pick midnight for CLOSE, we store 24:00
+    // Also check if they picked a time that matches the start of the day
+    if (field === 'close' && (timeString === '00:00' || (newValue && newValue.hour() === 0 && newValue.minute() === 0))) {
+      timeString = '24:00';
+    }
+  
+    updatedHours[index] = {
+      ...updatedHours[index],
+      [field]: timeString
+    };
+  
+    updateField('hours', updatedHours);
+  };
+
   useEffect(() => {
     if (mapRef.current && !myMapObjects.has("map")) {
       const mymap = L.map(mapRef?.current, options);
@@ -342,6 +515,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       handleRotate();
 
+      // Guess from google maps                     35.083411, -117.824837 ;  35.079076, -117.820043 (it isn't right)
       L.imageOverlay(SVG_MAP_FILE, L.latLngBounds([[35.082950, -117.824404], [35.078739, -117.820037]]), {
         opacity: 1,
       }).addTo(mymap);
@@ -355,6 +529,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       // Set up structural layers (location markers + zoom-toggled megablock/megamall).
       initStaticLayerGroups(mymap, layerData);
+
+      // Listen to zoom level changes to toggle megablock and megamall layers.
+      wireZoomLayerVisibility(mymap, layerData);
 
       // == Set up listeners/hooks ==
       mymap.on('locationfound', (e) => {
@@ -371,18 +548,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       
       mymap.on('locationerror', (e) => {
         setUserLocationKnown(false);
-
         // This is mostly for debugging, I doubt we want to pop this alert every time location hiccoughs
         alert("Location access error.");
       });
 
-      mymap.on('moveend', (e) => {
-        //console.log(mymap.getCenter());
-      });
-
-      // Listen to zoom level changes to toggle megablock and megamall layers.
-      wireZoomLayerVisibility(mymap, layerData);
-
+      // Start location fetching
       if (typeof window !== 'undefined' && window?.isSecureContext) {
         mymap.locate({
           watch: true, // starts continuous watching of location changes
@@ -401,6 +571,21 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapRef]);
+
+  // More violation access fixes
+  useEffect(() => {
+    if (infoModalState != "view") {
+      // Force focus out of the map/markers before the modal renders
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    }
+  }, [infoModalState]);
+
+  const stateRef = useRef(infoModalState);
+  useEffect(() => {
+    stateRef.current = infoModalState;
+  }, [infoModalState]);
 
   const locationsFetchedRef = useRef(false);
   useEffect(() => {
@@ -423,11 +608,22 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       userId: state?.user?.profile?.auth?.userid,
       factions: state?.user?.factions,
       onMarkerClick: (leafletMarker) => {
+        console.log(leafletMarker);
+        if (stateRef.current != "view") {
+          // Fix access violations due to focus
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+          return;
+        }
         setSelectedLocationId((leafletMarker as any).id);
         fetchLocationById((leafletMarker as any).id);
         mymap.flyTo(leafletMarker.getLatLng());
         openInfoModal();
       },
+      infoModalState,
+      selectedLocationId,
+      updateField,
     });
 
     // We are setting all the markers into this myMapObjects then using it immediately below, but we will need to do this search elsewhere
@@ -455,7 +651,17 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   useEffect(() => {
     let locations = state?.network?.collections?.locations || [];
     if (locations.length > 0 && selectedLocationId && !!locations.find(loc => loc.id === selectedLocationId)) {
-      setSelectedLocation(locations.find(loc => loc.id === selectedLocationId));
+      const foundLocation = locations.find(loc => loc.id === selectedLocationId);
+      setSelectedLocation(foundLocation);
+      setEditLocationFormData({
+        name: foundLocation.name || '',
+        lat: foundLocation.lat || 0,          // Hidden from input, but kept in state
+        long: foundLocation.long || 0,        // Hidden from input, but kept in state
+        owner: foundLocation.owner || '',
+        description: foundLocation.description || '',
+        venuetype: foundLocation.venuetype || '',
+        hours: foundLocation.hours || {},
+      })
     }
   }, [selectedLocationId, state?.network?.collections?.locations]);
 
@@ -492,165 +698,36 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       <Modal
         open={showInfoModal}
         onClose={closeInfoModal}
+        hideBackdrop={infoModalState != "view"}
+        disableEnforceFocus={infoModalState != "view"}
+        disableScrollLock={infoModalState != "view"}
         sx={{
           '& .MuiModal-backdrop': {
             backgroundColor: 'rgba(93, 28, 194, 0.2)', // Change the color and opacity
           },
+          pointerEvents: (infoModalState != "view") ? 'none' : 'auto',
         }}
       >
         <Box sx={infoModalSizeStyle}
           className={styles.submenuPane}
           data-augmented-ui="tl-clip tr-clip-y br-2-clip-x both">
-          {(infoModalSize === 10) &&
-            (
-              <Box>
-                <Stack direction="row"
-                  spacing={1}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography sx={modalTitleStyle} onClick={expandModalFrom10}>
-                    {selectedLocation.name}
-                  </Typography>
-                  <IconButton
-                    onClick={expandModalFrom10}
-                    onMouseDown={handleMouseUpDownIgnore}
-                    onMouseUp={handleMouseUpDownIgnore}
-                  >
-                    <ExpandLessIcon/>
-                  </IconButton>
-                </Stack>
-                <Typography sx={modalBodyStyle} component="p">
-                  {selectedLocation.venuetype}
-                </Typography>
-                <Typography sx={modalBodyStyle} component="p">{selectedLocation.openState} ⋅ {selectedLocation.nextTimeMsg}</Typography>
-              </Box>
-            )}
-          {(infoModalSize === 90) &&
-            (
-              <Box>
-                <Stack direction="row"
-                  spacing={1}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography sx={modalTitleStyle} onClick={colapseModalFrom90}>
-                    {selectedLocation.name}
-                  </Typography>
-                  <IconButton
-                    onClick={colapseModalFrom90}
-                    onMouseDown={handleMouseUpDownIgnore}
-                    onMouseUp={handleMouseUpDownIgnore}
-                  >
-                    <ExpandMoreIcon/>
-                  </IconButton>
-                </Stack>
-                <Stack direction="column"
-                  spacing={0.5}
-                  justifyContent="flex-start"
-                  alignItems="flex-start"
-                >
-                  <Typography sx={modalBodyStyle} component="p">
-                    [{selectedLocation.id}]
-                  </Typography>
-                  <Typography sx={modalBodyStyle} component="p">
-                    {selectedLocation.rating}
-                  </Typography>
-                  <Typography sx={modalBodyStyle} component="p">
-                    {selectedLocation.venuetype}
-                  </Typography>
-                  <Typography sx={modalBodyStyle} component="p">{selectedLocation.openState} ⋅ {selectedLocation.nextTimeMsg}</Typography>
-                  <Divider color="secondary" flexItem/>
-                  <Typography sx={modalBodyStyle} component="p">
-                    {(selectedLocation.ownerisfaction ?
-                      <CastleIcon fontSize="inherit"/> : <PersonIcon />)}
-                    &nbsp;⋅&nbsp;
-                    <Link
-                      href={`${selectedLocation.ownerlink}`}>
-                      {selectedLocation.ownername}
-                    </Link>
-                  </Typography>
-                  <Divider color="secondary" flexItem/>
-                  <Typography sx={modalBodyStyle} component="p"><QueryBuilderIcon fontSize="inherit"/>&nbsp;{selectedLocation.openState}</Typography>
-                  <TableContainer component={Paper} style={{padding: '1vh'}}>
-                    <Table aria-label="simple table">
-                      <TableBody>
-                        {selectedLocation.prettyhours.map((row: any) => (
-                          <TableRow
-                            key={row.day}
-                            sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                          >
-                            <TableCell component="th" scope="row" sx={modalBodyStyle}>
-                              {row.day}
-                            </TableCell>
-                            <TableCell align="right" sx={modalBodyStyle}>
-                              {row.hours.map((hourBlock: string, index: number) => (
-                                <span key={index}>
-                                  {hourBlock}
-                                  {index < row.hours.length - 1 && <br/>}
-                                </span>
-                              ))}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <Divider color="secondary" flexItem/>
-                  <Typography sx={modalBodyStyle} component="p">
-                    <LocationCityIcon fontSize="inherit"/>
-                    &nbsp;⋅&nbsp;
-                    <Link href={`/sites/${selectedLocation.neocities}`}>
-                      {!!selectedLocation.neocities && selectedLocation.ownername}
-                    </Link>
-                  </Typography>
-                  {(selectedLocation.description && <Divider color="secondary" flexItem/>)}
-                  <Typography sx={modalBodyStyle} component="p">
-                    {selectedLocation.description}
-                  </Typography>
-                  <Divider color="secondary" flexItem/>
-                  <Typography sx={modalBodyStyle} component="p">
-                    {selectedLocation.rating}
-                  </Typography>
-                </Stack>
-                <SimpleScrollContainer>
-                  <Box sx={{minWidth: "100%", height: "30vh"}}>
-                    <Stack
-                      spacing={0}
-                      style={{
-                        display: "flex",
-                        flexDirection: "column-reverse",
-                      }}
-                    >
-                      <div key="spacer"><Box sx={{height: "110px"}}/></div>
-                      {!selectedLocation.reviews || selectedLocation.reviews.length === 0 && (
-                        <Typography sx={modalBodyStyle} component="p">Be the first to leave a review!</Typography>
-                      )}
-                      {selectedLocation.reviews?.length >= 1 &&
-                        selectedLocation.reviews.filter((reviewItem: any) => !!reviewItem.review).map((reviewItem: any) => {
-                          const {reviewer, ts, reviewerName, rating, review} = reviewItem;
-                          return (
-                            <div key={`${ts}-container`}>
-                              <ItemStatus
-                                id="0000000000"
-                                username={reviewerName}
-                                userid={reviewer}
-                                date={ts}
-                                text={review}
-                                action="coment"
-                                value={rating}
-                                tag=""
-                                collection=""
-                                hidden={false}
-                              />
-                            </div>
-                          );
-                        })}
-                    </Stack>
-                  </Box>
-                </SimpleScrollContainer>
-              </Box>
-            )}
+          <MapInfoModal 
+            key={selectedLocationId}
+            location={selectedLocation}
+            size={infoModalSize}
+            onExpand={expandModalFrom10}
+            onCollapse={colapseModalFrom90}
+            isAdmin={state?.user?.factions?.some(f => f.id === NEONAV_MAINT || f.id === NEOCITY_ADMIN) ?? false} // ew
+            mode={infoModalState} // 'view', 'edit', etc.
+            formData={editLocationFormData}
+            handlers={{
+              setTextFormData: handleTextChange,
+              setSelectFormData: handleSelectChange,
+              handleHourChange: handleHourChange,
+              addShift: addShift,
+              removeShift: removeShift,
+            }}
+          />
         </Box>
       </Modal>
       <MapLayersModal
@@ -659,9 +736,35 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         layerModalSizeStyle={layerModalSizeStyle}
         layerStates={layerStates}
         onToggle={handleLayerSwitch}
-        showDev={state?.user?.factions?.some(f => f.id === NEONAV_MAINT) ?? false} // ew
+        showDev={state?.user?.factions?.some(f => f.id === NEONAV_MAINT) ?? false} // double ew
       />
-      <Box sx={footerStyle} hidden={!showInfoModal}>
+      {/* Footer for editing locations */}
+      <Box sx={footerStyle} hidden={!showInfoModal || infoModalState === "view"}> 
+        <FooterNav
+          firstHexProps={{
+            disabled: true,
+          }}
+          secondHexProps={{
+            icon: <CancelIcon />,
+            // tooltipText: "Discard Changes",
+            handleAction: stopEditMode,
+          }}
+          bigHexProps={{
+            disabled: true,
+          }}
+          thirdHexProps={{
+            icon: <SaveIcon />,
+            // tooltipText: "Save Changes",
+            handleAction: handleSaveLocationChanges,
+          }}
+          fourthHexProps={{
+            disabled: true,
+          }}
+        />
+        <ReviewDialog id={selectedLocationId} open={reviewDialogOpen} handleClose={() => {setReviewDialogOpen(false); fetchLocationById(selectedLocationId);}} addLocationReview={addLocationReview}/>
+      </Box>
+      {/* Footer for viewing locations */}
+      <Box sx={footerStyle} hidden={!showInfoModal || infoModalState != "view"}>
         <FooterNav
           firstHexProps={{
             icon: <ShareLocationIcon/>,
@@ -683,7 +786,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
             // tooltipText: "Edit Location",
-            // TODO: Switch to edit modal and begin editing
+            // disabled: , // TODO: Need to check if the location is editable by the user
+            handleAction: () => {
+              fetchAllFactions();
+              startEditMode();
+            },
           }}
           thirdHexProps={{
             icon: <EventIcon/>,
@@ -696,6 +803,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         />
         <ReviewDialog id={selectedLocationId} open={reviewDialogOpen} handleClose={() => {setReviewDialogOpen(false); fetchLocationById(selectedLocationId);}} addLocationReview={addLocationReview}/>
       </Box>
+      {/* Footer for default map view */}
       <Box sx={footerStyle} hidden={showInfoModal}>
         <FooterNav
           firstHexProps={{
@@ -712,6 +820,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           secondHexProps={{
             icon: <AddLocationIcon/>,
             // tooltipText: "Add A Location",
+            handleAction: () => {
+              setSelectedLocationId("");
+              setSelectedLocation(EMPTY_LOCATION);
+              fetchAllFactions();
+              startCreateMode();
+            },
             // TODO: Create location modal things
           }}
           bigHexProps={{
