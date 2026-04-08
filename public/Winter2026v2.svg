@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1021.68 924.58">
   <defs>
+    <filter id="bgBlur" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="100"/>
+    </filter>
     <style>
       <!-- Road Shapes -->
       .st0 {
@@ -78,8 +81,14 @@
       .st9 {
         fill: #ff00ff;
       }
+
+      .st10 {
+        fill: #120458;
+        filter: url('#bgBlur');
+      }
     </style>
   </defs>
+  <circle id="background" class="st10" cx="500" cy="500" r="400"/>
   <g id="Doesnt_Change" data-name="Doesnt Change">
     <g id="Layer_18" data-name="Layer 18">
       <!-- join up missing piece of road near security -->
