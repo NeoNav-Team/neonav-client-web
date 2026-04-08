@@ -59,9 +59,16 @@ export default function InputChannelTab(props:InputChannelTabProps):JSX.Element 
   const handleScope = (event: React.SyntheticEvent, newValue: InputChannelScope) => {
     setScope(newValue);
     const { showChannelList, defaultChannelListIndex } = getScopeChannelVars(newValue);
-    const  defaultSelected = showChannelList ? defaultChannelListIndex : null;
+    const defaultSelected = showChannelList ? defaultChannelListIndex : null;
     changeHandler && changeHandler(defaultChannelListIndex);
     setSelected(defaultSelected);
+    if (defaultChannelListIndex) {
+      window.history.pushState({
+        as: `/chat/${defaultChannelListIndex}`,
+        url: `/chat/[...id]`,
+        options: { shallow: true }
+      }, '', `/chat/${defaultChannelListIndex}`);
+    }
   };
 
   const setUniqueName = (name: string) => {
