@@ -123,6 +123,10 @@ export const authApiEnpoints = {
     method: "put",
     path: "/api/chat/channels/$channel/$id",
   },
+  channelsLatest: {
+    method: "get",
+    path: "/api/chat/channels/latest",
+  },
   chatHistory: {
     method: "get",
     path: "/api/chat/channels/$id/history",

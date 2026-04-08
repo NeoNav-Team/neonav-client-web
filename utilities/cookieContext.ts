@@ -4,7 +4,6 @@ import { HotbarKey } from "./hotbarOptions";
 
 const DEFAULT_HOTBAR_KEYS: HotbarKey[] = ['map', 'myQRCode', 'qrScanner'];
 
-const MAX_UNREAD_COUNTED = 1000;
 const MAX_CLIPBOARD_ITEMS = 50;
 
 const setSimpleEntity = (contact:nnEntity): NnSimpleEntity => {
@@ -66,37 +65,6 @@ export const getCookieContext = () => {
 
 export const getCookieToken = () => {
   return Cookies.get('accessToken') || '';
-}
-
-export const getCookieUnread = () => {
-  const encodedStringState = Cookies.get('nnUnread') || '';
-  const unreadString = encodedStringState.length >= 3 ? decodeURIComponent(escape(window.atob(encodedStringState))) : '';
-  const unreadArr = unreadString.length >= 6 ? unreadString.split(',') : [];
-  return unreadArr;
-}
-
-export const setCookieUnread = (newUnread:string) => {
-  const unreadArr = getCookieUnread();
-  if (unreadArr.length >= MAX_UNREAD_COUNTED) { //limiting count since spam
-    unreadArr.shift();
-  }
-  unreadArr.push(newUnread);
-  const unreadString = unreadArr.join(',');
-  const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net', expires: 30 });
-}
-
-export const filterCookieUnread = (newUnread:string) => {
-  const unreadArr = getCookieUnread();
-  unreadArr.filter((unread:string) => { return unread !== newUnread});
-  const unreadString = unreadArr.join(',');
-  const encodedStringState = window.btoa(unescape(encodeURIComponent(unreadString)));
-  Cookies.set('nnUnread', encodedStringState, { domain: '.neonav.net', expires: 30 });
-}
-
-export const clearCookieUnread = () => {
-  Cookies.set('nnUnread', '', { domain: '.neonav.net' });
-  return [];
 }
 
 export const setCookieToken = (newToken:string) => {

@@ -214,13 +214,12 @@ export type ActionTypes =
   'setEvents' |
   'removeStatus' |
   'setSelected' |
-  'updateMessageHistory' |
+  'receiveMessage' |
   'updateClipboardEntities' |
   'removeUserFromChannel' | 
-  'fetchUnreadCount' |
   'setUnreadCount' |
-  'clearUnreadCountByType' |
-  'clearAllUnreadCounts' |
+  'receiveMessage' |
+  'clearChannelUnread' |
   'initContext' |
   'setAccessToken';
 
@@ -281,7 +280,7 @@ export type NnProviderDispatch = {
     fetchLocationPins: (_userId:string) => void;
     fetchUserProfile: () => void;
     patchUserToken: () => void;
-    fetchUnreadCount: () => void;
+    fetchChannelsLatest: () => void;
     updateUserProfile: (_document:any, _update:any) => void;
     removeUserFromFaction: (_factionId:string, _userId:string) => void;
     addUserToFaction: (_factionId:string, _userId:string) => void;
@@ -299,7 +298,7 @@ export type NnProviderDispatch = {
     removeRepToFaction: (_factionId:string, _userId:string) => void;
     joinFaction: (_factionId:string) => void;
     joinUserToChannel: (_channelId:string) => void;
-    longPollMessages: (_since:string) => void;
+    longPollMessages: (_since?: string) => void;
     removeUserFromChannel: (_channelId:string,_userId?:string) => void;
     requestPayment: (_userId:string, _amount:string) => void;
     requestFactionPayment: (_factionId:string, _userId:string, _amount:string) => void;
