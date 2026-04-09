@@ -31,6 +31,7 @@ import AllInboxIcon from '@mui/icons-material/AllInbox';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import Link from 'next/link';
 
 interface FactionProfileAppProps {
   params: {
@@ -242,6 +243,16 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                         <Box>
                           <Divider variant="middle" color="primary"><Typography variant="h6">About Us</Typography></Divider>
                           <p>{completeProfile.description}</p>
+                          {(profile as any).neosite && (
+                            <>
+                              <Divider variant="middle" color="primary"><Typography variant="h6">NeoSite</Typography></Divider>
+                              <Box sx={{ padding: '8px', textAlign: 'center' }}>
+                                <Link href={`/sites?site=${encodeURIComponent((profile as any).neosite)}`}>
+                                  <Typography variant="h6" color="primary">{completeProfile.name}</Typography>
+                                </Link>
+                              </Box>
+                            </>
+                          )}
                           <Divider variant="middle" color="(primary"><Typography variant="h6">Recent News</Typography></Divider>
                           {statuses && statuses.length >= 1 ? (
                             <Box sx={{ minWidth: '100%', minHeight: '100%' }}>
