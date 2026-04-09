@@ -61,6 +61,43 @@ export async function idbPutMessages(messages: NnChatMessage[]): Promise<void> {
   });
 }
 
+export async function idbGetChannels(): Promise<string[]> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const index = tx.objectStore(STORE_NAME).index('by_channel_ts');
+    const channels = new Set<string>();
+    const req = index.openKeyCursor();
+    req.onsuccess = () => {
+      const cursor = req.result;
+      if (cursor) {
+        channels.add((cursor.key as [string, string])[0]);
+        cursor.continue();
+      } else {
+        resolve([...channels]);
+      }
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+export async function idbClearChannel(channelId: string): Promise<void> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const index = store.index('by_channel_ts');
+    const range = IDBKeyRange.bound([channelId, ''], [channelId, '\uffff']);
+    const req = index.getAll(range);
+    req.onsuccess = () => {
+      const all = req.result as NnChatMessage[];
+      all.forEach(msg => { if (msg.id) store.delete(msg.id); });
+    };
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 export async function idbCullChannel(channelId: string): Promise<void> {
   const db = await openDb();
   return new Promise((resolve, reject) => {

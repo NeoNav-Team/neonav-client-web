@@ -94,6 +94,7 @@ export type NnChatMessage = {
     confirm?: string,
     decline?: string,
     buttons?: any,
+    notifyapp?: string,
 }
 
 export type NnFaction = {

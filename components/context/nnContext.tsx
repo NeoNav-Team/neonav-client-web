@@ -200,8 +200,11 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
       if (msgChannel === clonedState.network.selected.channel) {
         clonedState.network.collections.messages.unshift(msg);
       }
-      const current: LooseObject = clonedState.network.selected.unread || {};
-      clonedState.network.selected.unread = { ...current, [msgChannel]: (current[msgChannel] || 0) + 1 };
+      const myAccount = clonedState.network.selected.account;
+      if (msg.fromid !== myAccount) {
+        const current: LooseObject = clonedState.network.selected.unread || {};
+        clonedState.network.selected.unread = { ...current, [msgChannel]: (current[msgChannel] || 0) + 1 };
+      }
       break;
     }
     case 'setUnreadCount':

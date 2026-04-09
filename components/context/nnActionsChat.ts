@@ -17,9 +17,12 @@ import {
   idbGetLatestId,
   idbPutMessages,
   idbCullChannel,
+  idbGetChannels,
+  idbClearChannel,
   MSG_CAP,
 } from '@/utilities/idbMessages';
 
+const notifyChannel = restrictedChannels[0];
 const alertChannel = restrictedChannels[1];
 
 export const fetchChannelsLatest = (dispatch: DispatchFunc) => async () => {
@@ -97,8 +100,19 @@ export const clearUnreadCountByType = (dispatch: DispatchFunc) => async (channel
 
 export const fetchUserChannels = (dispatch: DispatchFunc) => async () => {
   const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {
+  const onSuccess = async (response:APIResponse) => {
     const { data } = response;
+    const channels: any[] = Array.isArray(data) ? (data as any[]) : [];
+    const allowedIds = new Set<string>([
+      ...channels.map((ch: any) => ch.id),
+      ...restrictedChannels,
+    ]);
+    const idbChannelIds = await idbGetChannels();
+    await Promise.all(
+      idbChannelIds
+        .filter(id => !allowedIds.has(id))
+        .map(id => idbClearChannel(id))
+    );
     dispatch({
       type: 'setUserChannels',
       payload: data,
@@ -211,6 +225,10 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since: string
         type: 'setAnnouncement',
         payload: message,
       });
+    }
+
+    if (channel === notifyChannel && (message.text || '').includes('channel')) {
+      fetchUserChannels(dispatch)();
     }
   };
   const onError = (err:netcheckAPIResData) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useContext, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { restrictedChannels, globalChannel } from '../utilities/constants';
 import styles from '../styles/generic.module.css';
@@ -25,6 +25,8 @@ interface ChatAppProps {
 
 const GLOBAL_CHAT = globalChannel;
 const NOTIFICATIONS = restrictedChannels[0];
+const ALERTS = restrictedChannels[1];
+const NOTIFY_CHANNELS = [NOTIFICATIONS, ALERTS];
 
 const flexContainer = {
   height: '100%',
@@ -78,9 +80,13 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     joinUserToChannel = (channelId:string) => {},
     removeUserFromChannel = (channelId:string, userId?:string) => {},
   }: NnProviderValues = useContext(NnContext);
-  const selectedChannel:string = useMemo(() => { 
-    const channel = state.network?.selected?.channel || idFromParams || GLOBAL_CHAT;
-    return notify ? NOTIFICATIONS : channel;
+  const selectedChannel:string = useMemo(() => {
+    const channel = state.network?.selected?.channel;
+    if (notify) {
+      return (channel && NOTIFY_CHANNELS.includes(channel)) ? channel : NOTIFICATIONS;
+    }
+    const validChannel = channel && !NOTIFY_CHANNELS.includes(channel) ? channel : null;
+    return validChannel || idFromParams || GLOBAL_CHAT;
   }, [idFromParams, notify, state.network?.selected?.channel]);
   const unread:LooseObject = useMemo(() => {
     return state?.network?.selected?.unread || {};
@@ -92,6 +98,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     const last30 = chatLength > 30 ? orderChatArr.slice(0, 30) : orderChatArr;
     return last30;
   }, [state?.network?.collections?.messages]);
+  const prevChannelRef = useRef<string>('');
   const [ initFetched, setInitFetched ] = useState<boolean>(false);
   const [ initSelected, setInitSelected ] = useState<boolean>(false);
   const [ lastUnread, setLastUnread ] = useState<string>('');
@@ -112,9 +119,8 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     selectedChannel,
   ])
 
-  const channelSelection = (selectedChannel:string) => {
-    fetchChannelHistory(selectedChannel);
-    setSelected('channel', selectedChannel);
+  const channelSelection = (newChannel:string) => {
+    setSelected('channel', newChannel);
   }
 
   const updateMessage = (event: React.ChangeEvent<HTMLInputElement>)  => {
@@ -171,11 +177,23 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [initChat]);
 
   useEffect(() => {
+    if (prevChannelRef.current === selectedChannel) return;
+    const wasInitialized = prevChannelRef.current !== '';
+    prevChannelRef.current = selectedChannel;
+    if (!wasInitialized) return; // initChat handles the first fetch
+    fetchChannelHistory(selectedChannel);
+  }, [selectedChannel, fetchChannelHistory]);
+
+  useEffect(() => {
     if (!initSelected) {
-      idFromParams && setSelected('channel', idFromParams);
+      if (notify) {
+        setSelected('channel', NOTIFICATIONS);
+      } else {
+        idFromParams && setSelected('channel', idFromParams);
+      }
       setInitSelected(true);
     }
-  }, [idFromParams, initSelected, setSelected]);
+  }, [idFromParams, initSelected, notify, setSelected]);
 
   useEffect(() => {
     const scroller = document.getElementById('simpleScoll');
