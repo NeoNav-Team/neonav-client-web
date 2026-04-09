@@ -51,7 +51,7 @@ const flexContainer = {
   display: 'flex',
   flexDirection: 'column',
   flexWrap: 'nowrap',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   alignContent: 'space-around',
   alignItems: 'stretch',
 };
@@ -156,6 +156,7 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
     updateEvent = (_id: string, _payload: any) => {},
     createEvent = (_locationId: string, _payload: any) => {},
     cancelEvent = (_id: string, _payload: any) => {},
+    fetchLocationById = (_id: string) => {},
   }: NnProviderValues = useContext(NnContext);
 
   const userId = state?.user?.profile?.auth?.userid || '';
@@ -200,6 +201,15 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
     },
     [locations],
   );
+
+  useEffect(() => {
+    if (!modalEvent?.location) return;
+    const loc = locations.find((l: any) => l.id === modalEvent.location);
+    if (loc && !loc.ownername) {
+      fetchLocationById(loc.id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalEvent]);
 
   useEffect(() => {
     if (locations.length === 0) fetchAllLocations();
@@ -466,25 +476,27 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
         style={{ height: '100%', maxHeight: 'calc(100% - 74px)', marginTop: '70px' }}
         data-augmented-ui="tr-rect br-clip bl-clip both"
       >
-        <Box sx={{ ...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT }}>
+        <Box sx={{ ...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT, transform: 'translateZ(0)' }}>
 
           {/* ── Toolbar ── */}
           <Box sx={{ flex: '0 0 auto', width: '100%' }}>
             {/* View buttons as subtitleLine header */}
-            <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
-              <ButtonGroup variant="text" size="small" fullWidth>
-                {(Object.keys(VIEW_LABELS) as EventView[]).map((v) => (
-                  <Button
-                    key={v}
-                    variant={view === v ? 'contained' : 'text'}
-                    color="primary"
-                    onClick={() => handleViewChange(v)}
-                    sx={{ textTransform: 'none', fontSize: '0.85rem', fontFamily: 'Jura', py: 0.25 }}
-                  >
-                    {VIEW_LABELS[v]}
-                  </Button>
-                ))}
-              </ButtonGroup>
+            <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both" style={{ overflow: 'hidden' }}>
+              <Box sx={{ width: 'calc(100% - 48px)' }}>
+                <ButtonGroup variant="text" size="small" fullWidth>
+                  {(Object.keys(VIEW_LABELS) as EventView[]).map((v) => (
+                    <Button
+                      key={v}
+                      variant={view === v ? 'contained' : 'text'}
+                      color="primary"
+                      onClick={() => handleViewChange(v)}
+                      sx={{ textTransform: 'none', fontSize: '0.85rem', fontFamily: 'Jura', py: 0.25 }}
+                    >
+                      {VIEW_LABELS[v]}
+                    </Button>
+                  ))}
+                </ButtonGroup>
+              </Box>
             </div>
 
             {/* Date selector */}
@@ -565,7 +577,7 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                     const nowMs = now.getTime();
                     const items: React.ReactNode[] = [];
                     let markerInserted = false;
-                    filteredEvents.forEach((event, i) => {
+                    filteredEvents.forEach((event) => {
                       if (isToday && !markerInserted) {
                         const eventMs = event.open ? new Date(event.open).getTime() : 0;
                         if (eventMs > nowMs) {
@@ -607,6 +619,7 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
               <FooterNav
                 bigHexProps={{
                   icon: <AddIcon />,
+                  tooltipText: 'Create Event',
                   handleAction: () => {
                     setCreateFields({ name: '', description: '', open: '', close: '', locationId: '' });
                     setCreateModalOpen(true);
@@ -624,7 +637,7 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
           <div
             className={styles.darkPane}
             data-augmented-ui="tr-rect br-clip bl-clip both"
-            style={{ padding: '16px', backgroundColor: 'var(--background-color)' }}
+            style={{ padding: '16px', backgroundColor: modalEvent?.cancelled ? 'var(--color-danger, #7b0000)' : 'var(--background-color)' }}
           >
             {modalEvent && editFields && (() => {
               const loc = locations.find((l: any) => l.id === modalEvent.location);
@@ -657,7 +670,7 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                       />
                     ) : (
                       <Typography variant="h6" className={itemStyles.name}>
-                        {modalEvent.name}
+                        {modalEvent.cancelled ? `CANCELLED - ${modalEvent.name}` : modalEvent.name}
                       </Typography>
                     )}
                   </div>
@@ -777,7 +790,8 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                   {/* Owner faction panel */}
                   {loc?.owner && (() => {
                     const ownerFaction = factions.find((f: any) => f.id === loc.owner);
-                    const ownerName = ownerFaction?.name || loc.owner;
+                    const ownerName = loc.ownername || ownerFaction?.name;
+                    const displayName = ownerName ? `${ownerName} (${loc.owner})` : loc.owner;
                     return (
                       <a href={`/factions/${loc.owner}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                         <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay" style={{ cursor: 'pointer' }}>
@@ -785,11 +799,11 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                             <Box
                               component="img"
                               src={imageUrl(loc.owner, true)}
-                              alt={ownerName}
+                              alt={displayName}
                               sx={{ width: 32, height: 32, objectFit: 'cover', flexShrink: 0 }}
                             />
                             <Typography component="div">
-                              <span className={itemStyles.name}>{ownerName}</span>
+                              <span className={itemStyles.name}>{displayName}</span>
                             </Typography>
                           </Stack>
                         </div>
