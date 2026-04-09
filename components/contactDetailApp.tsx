@@ -18,6 +18,7 @@ import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import { useRouter } from 'next/navigation';
 import { imageUrl } from '@/utilities/constants';
 import { CurrencyExchange } from '@mui/icons-material';
 
@@ -102,7 +103,15 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     addRecentScan = (entity:any) => {},
     fetchUserContacts = () => {},
   }: NnProviderValues = useContext(NnContext);
+  const router = useRouter();
   const entityId:string = id || '';
+
+  useEffect(() => {
+    if (entityId && entityId[0].toUpperCase() === 'C') {
+      router.replace(`/factions/${entityId}`);
+    }
+  }, [entityId, router]);
+
   const contacts:NnContact[] | NnSimpleEntity[] = useMemo(() => {
     return state?.network?.collections?.contacts || [];
   }, [state]);
@@ -227,9 +236,9 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                   <SimpleScrollContainer>
                     <Stack>
                       <Typography variant='h6' color="primary">{name(entity?.meta?.firstname, entity?.meta?.lastname)}</Typography>
-                      <Typography variant='h6' color="primary">Occupation <span>{entity?.meta?.occupation || 'N/A'}</span></Typography>
-                      <Typography variant='h6' color="primary">Skills <span>{entity?.meta?.skills || 'N/A'}</span></Typography>
-                      <Typography variant='h6' color="primary">Description</Typography>
+                      <Typography variant='h6' color="primary">Occupation: <span>{entity?.meta?.occupation || 'N/A'}</span></Typography>
+                      <Typography variant='h6' color="primary">Skills: <span>{entity?.meta?.skills || 'N/A'}</span></Typography>
+                      <Typography variant='h6' color="primary">Description: </Typography>
                       <p>{entity?.description || 'N/A'}</p>
                     </Stack>
                   </SimpleScrollContainer>
