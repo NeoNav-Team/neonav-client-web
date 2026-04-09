@@ -30,8 +30,8 @@ export default function MapLayersModal(props: MapLayersModalProps): JSX.Element 
   
   const labels: Record<MapLayersModalLayerId, string> = {
     pinsLayer: "Location Pins",
-    mylocations: "My Locations",
-    unverified: "Unverified Locations",
+    mylocations: "My Locations (Unverified)",
+    unverified: "Other Locations (Unverified)",
     devLayer: "Dev Layer",
   };
 

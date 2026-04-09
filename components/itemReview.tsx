@@ -4,6 +4,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import styles from '../styles/item.module.css';
 import { isoDateToDaily, isoDateToMonth } from '@/utilities/fomat';
+import SimpleDialog from './simpleDialog';
+import { useState, useContext } from 'react';
+import { Context as NnContext } from "@/components/context/nnContext";
+import { NnProviderValues } from "@/components/context/nnTypes";
 
 interface ItemReviewProps {
   id: string;
@@ -13,8 +17,7 @@ interface ItemReviewProps {
   ts: string;
   rating: number;
   review?: string;
-  isAdmin?: boolean; // Toggle this based on user permissions
-  onDelete?: (id:string, reviewid:string) => void; // Callback for the trash icon
+  canDelete?: boolean; // Toggle this based on user permissions
 }
 
 export default function ItemReview({
@@ -25,9 +28,14 @@ export default function ItemReview({
   ts,
   rating,
   review,
-  isAdmin = false,
-  onDelete
+  canDelete = false,
 }: ItemReviewProps): JSX.Element {
+
+  const {
+    deleteLocationReview = (reviewid:string) => {},
+    fetchLocationById = (id:string) => {},
+  }: NnProviderValues = useContext(NnContext);
+  const [open, setOpen] = useState(false);
 
   return (
     <Box style={{ padding: '1vh 0', width: '100%' }}>
@@ -45,18 +53,29 @@ export default function ItemReview({
               </span>
             </Typography>
 
-            {isAdmin && (
+            {canDelete && (
               <IconButton 
                 size="small" 
                 onClick={() => {
-                  // do dialog
-                  onDelete?.(id, reviewid);
+                  setOpen(true);
                 }}
                 sx={{ color: 'rgba(255,255,255,1)', p: 0 }}
               >
                 <DeleteIcon fontSize="small" />
               </IconButton>
             )}
+            <SimpleDialog 
+              open={open}
+              handleClose={() => setOpen(false)}
+              handleAction={() => {
+                deleteLocationReview(reviewid);
+                setTimeout(() => {
+                  fetchLocationById(id); // Pull latest location data after deleting review
+                }, 100);
+                setOpen(false);
+              }}
+              dialog="Are you sure you want to delete this review? This action cannot be undone."
+            />
           </Stack>
 
           {/* Review Text Body */}
