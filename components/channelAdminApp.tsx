@@ -89,6 +89,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
     fetchChannelDetails = (id:string) =>{},
     fetchChannelUsers = (id:string) =>{},
     setSelected = (indexType:string, channelId:string) => {},
+    leaveUserChannel = (channel:string, userId:string) => {},
     removeUserFromChannel = (channel:string, userId?:string) => {},
     inviteUserToChannel = (channel:string, userId:string) => {},
     toggleChannelScope = (id:string) =>{},
@@ -187,7 +188,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
   }, [channelInfo?.id, entity, goFetchChannelUsers, id, userList.length]);
 
   const goLeaveChannel = () =>  {
-    removeUserFromChannel(channelInfo?.id, userId);
+    leaveUserChannel(channelInfo?.id, userId);
     if (channelInfo?.id === state.network?.selected?.channel) {
       setSelected('channel', '');
     }

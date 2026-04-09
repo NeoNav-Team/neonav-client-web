@@ -56,6 +56,7 @@ import {
   fetchChannelUsers,
   longPollMessages,
   sendChannelMessage,
+  leaveUserChannel,
   removeUserFromChannel,
   toggleChannelScope,
 } from './nnActionsChat';
@@ -320,6 +321,7 @@ export const { Context, Provider } = DataContextCreator(
     joinFaction,
     joinUserToChannel,
     inviteUserToChannel,
+    leaveUserChannel,
     longPollMessages,
     patchUserToken,
     removeRepToFaction,

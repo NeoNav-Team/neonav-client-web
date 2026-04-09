@@ -241,6 +241,26 @@ export const longPollMessages = (dispatch: DispatchFunc) => async (since: string
   longPollApi('pollMessages', {token, since}, onSuccess, onError);
 }
 
+export const leaveUserChannel = (dispatch: DispatchFunc) => async (channel: string, userId: string) => {
+  const token = getCookieToken();
+  const onSuccess = async (_response: APIResponse) => {
+    clearLocalStorage('lastFetch_channels');
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'success', message: 'Left channel.', show: true },
+    });
+    await fetchUserChannels(dispatch)();
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Leave channel error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+  };
+  executeApi('channelLeave', { channel, id: userId, token }, onSuccess, onError);
+};
+
 export const removeUserFromChannel = (dispatch: DispatchFunc) => async (channel:string, id:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {

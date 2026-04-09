@@ -300,6 +300,7 @@ export type NnProviderDispatch = {
     removeRepToFaction: (_factionId:string, _userId:string) => void;
     joinFaction: (_factionId:string) => void;
     joinUserToChannel: (_channelId:string) => void;
+    leaveUserChannel: (_channelId:string, _userId:string) => void;
     longPollMessages: (_since?: string) => void;
     removeUserFromChannel: (_channelId:string,_userId?:string) => void;
     requestPayment: (_userId:string, _amount:string) => void;
