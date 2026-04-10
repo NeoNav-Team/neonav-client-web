@@ -456,7 +456,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       description: foundLocation?.description || '',
       venuetype: foundLocation?.venuetype || '',
       hours: foundLocation?.hours || {},
-      tooltip: foundLocation.tooltip || {
+      tooltip: foundLocation?.tooltip || {
         name: foundLocation?.name || '', 
         lat: foundLocation?.lat || 0,
         long: foundLocation?.long || 0,}
