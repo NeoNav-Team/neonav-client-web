@@ -27,6 +27,12 @@ export function initStaticLayerGroups(
   // Default view starts with the combined layer.
   mymap.addLayer(layerData.get('megablockAndMegamallLocations')!);
 
+  // These are labels
+  layerData.set('labelsNorthUp', L.layerGroup());
+  layerData.set('labelsNorthLeft', L.layerGroup());
+
+  mymap.addLayer(layerData.get('labelsNorthUp')!);
+
   // Placeholders used by the Layers modal.
   layerData.set('mylocations', L.layerGroup());
   layerData.set('unverified', L.layerGroup());

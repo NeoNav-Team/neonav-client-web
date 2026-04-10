@@ -187,7 +187,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
   } = params;
 
   // 1. Setup & Clear Layers
-  const requiredLayers = ['locationMarkersLayer', 'megablockLocations', 'megamallLocations', 'megablockAndMegamallLocations', 'devLayer', 'pinsLayer', 'mylocations', 'unverified'];
+  const requiredLayers = ['locationMarkersLayer', 'megablockLocations', 'megamallLocations', 'megablockAndMegamallLocations', 'devLayer', 'pinsLayer', 'mylocations', 'unverified', 'labelsNorthUp', 'labelsNorthLeft'];
   for (const key of requiredLayers) {
     const layer = layerData.get(key);
     if (!layer) {
@@ -232,6 +232,12 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     loc.openState = enrichedLoc.openState;
     loc.nextTimeMsg = enrichedLoc.nextTimeMsg;
     loc.rating = enrichedLoc.rating;
+
+    // Special handling for labels
+    if (loc.venuetype.toLowerCase().startsWith("label") || loc.venuetype.toLowerCase().startsWith("road") ) {
+      drawLabels(loc, latlng, onMarkerClick, infoModalState, layerData);
+      return;
+    }
     
     // Determine the layer
     let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, linkedLocationId, megablockRect, megamallRect });
@@ -323,4 +329,39 @@ export function renderNewLocationPin(latLng: L.LatLng, mymap: L.Map, updateField
   newMarker.bindTooltip('New Location', { permanent: true, direction: 'right' });
 
   return newMarker;
+}
+
+function drawLabels(location: any, latLng: L.LatLng, onMarkerClick: Function, infoModalState: string, layerData: Map<string, LayerGroup>): (void) {
+  const northUp = layerData.get("labelsNorthUp")!;
+  const northLeft = layerData.get("labelsNorthLeft")!;
+
+  if (location.venuetype.toLowerCase() === "label" || location.venuetype.toLowerCase() === "road") {
+    const tooltip_a = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+      .setLatLng(latLng)
+      .setContent(location.name)
+      .on('click', () => onMarkerClick(tooltip_a))
+      .addTo(northUp);
+    (tooltip_a as any).id = location.id;
+
+    let tooltip_b = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+      .setLatLng(latLng)
+      .setContent('<div style="transform: rotate(-90deg); transform-origin: center center;">' + location.name + '</div>')
+      .on('click', () => onMarkerClick(tooltip_b))
+      .addTo(northLeft);
+    (tooltip_b as any).id = location.id;
+  } else {
+    const tooltip_a = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+      .setLatLng(latLng)
+      .setContent('<div style="transform: rotate(90deg); transform-origin: center center;">' + location.name + '</div>')
+      .on('click', () => onMarkerClick(tooltip_a))
+      .addTo(northUp);
+    (tooltip_a as any).id = location.id;
+
+      const tooltip_b = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+      .setLatLng(latLng)
+      .setContent(location.name)
+      .on('click', () => onMarkerClick(tooltip_b))
+      .addTo(northLeft);
+    (tooltip_b as any).id = location.id;
+  }
 }
