@@ -127,11 +127,6 @@
       </g>
       <rect id="Lighting_Rig" class="downtown" x="488.99" y="870.76" width="40" height="9" transform="translate(789.54 -97.59) rotate(46.27)"/>
     </g>
-    <g>
-      <rect class="debug" x="529.31" y="814.54" width="20" height="2.53" transform="translate(447.69 -157.85) rotate(28.09)"/>
-      <rect class="debug" x="524.09" y="824.56" width="20" height="2.53" transform="translate(451.8 -154.21) rotate(28.09)"/>
-      <polygon id="Gaming_Dome_Hex" class="debug" points="543.13 819.35 534.3 814.64 527.85 816.12 530.21 822.31 539.03 827.02 545.49 825.53 543.13 819.35"/>
-    </g>
     <rect id="Kepler_Sky_Control" class="midtown" x="503.43" y="496.51" width="20" height="20" transform="translate(1019.94 -6.91) rotate(90)"/>
     <polygon id="Cycle_Parking" class="midtown" points="466.97 557.04 444.14 557.04 421.32 557.04 421.32 568.65 444.14 568.65 466.97 568.65 466.97 557.04"/>
     <rect class="generator" x="504.14" y="491.22" width="10" height="5"/>
