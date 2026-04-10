@@ -102,6 +102,10 @@ export function generateOpenMessages(prettyhours: any[]): {openState: string, ne
       const hoursString = todayRow.hours[i];
       if (hoursString === "Closed") continue;
 
+      if (hoursString === "Open 24 hours") {
+        return { openState: "Open", nextTimeMsg: "Open 24 hours" };
+      }
+
       // Split into open/close time
       const [openStr, closeStr] = hoursString.split(" - ");
       if (!openStr || !closeStr) continue;
@@ -142,6 +146,12 @@ export function generateOpenMessages(prettyhours: any[]): {openState: string, ne
         for (let i = 0; i < tomorrowRow.hours.length; i++) {
           const hoursString = tomorrowRow.hours[i];
           if (hoursString === "Closed") continue;
+
+          if (hoursString === "Open 24 hours") {
+            nextTimeMsg = `Opens 12:00AM ${tomorrowRow.day}`;
+            break;
+         }
+         
           const [openStr] = hoursString.split(" - ");
           if (openStr) {
             nextTimeMsg = `Opens ${openStr} ${tomorrowRow.day}`;
