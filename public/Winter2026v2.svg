@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1021.68 924.58">
+  <!-- viewBox="0 0 1631 2480" -->
   <defs>
     <filter id="bgBlur" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="100"/>
@@ -16,6 +17,13 @@
       <!-- Downtown Shapes -->
       .downtown {
         fill: #47E15D55;
+        stroke: #47E15D;
+        vector-effect: non-scaling-stroke;
+        stroke-width: 2px;
+      }
+
+      .downtown-nofill {
+        fill: none;
         stroke: #47E15D;
         vector-effect: non-scaling-stroke;
         stroke-width: 2px;
@@ -90,16 +98,14 @@
   </defs>
   <circle id="background" class="background" cx="500" cy="500" r="400"/>
   <g id="Doesnt_Change" data-name="Doesnt Change">
-    <g id="Layer_18" data-name="Layer 18">
+    <g id="Roads" data-name="Roads">
       <!-- join up missing piece of road near security -->
       <path class="road" d="M1021.53,365.91v-20h-294.88V14.15h-30v331.76h-194.79V.15h-35v345.76h-187.74V1.56h-30v344.35h-73.77L28.15,3.15H.15l223,533,21,37v-67l-60.22-140.24h65.18v441.76h.29v10h217.44v73.77h35v-73.77h194.79v28.12h30v-28.12h177.12v-20h-177.12v-431.76h294.88ZM466.85,713.15h-9.7v-55h9.7v55ZM466.85,648.15h-9.7v-10h-50v55.01h-5v39.99h55v-10h9.7v74.53h-187.74v-328h187.74v178.47ZM466.85,449.68h-187.74v-83.76h187.74v83.76ZM501.85,530.55h21.59v48h-21.59v-48ZM696.64,797.68h-194.79v-208.57h21.59v2.44h49.96v-101.13h-49.96v26.23h-21.59v-46.97h104.28v255.93h10.53v-255.93h79.98v328ZM696.64,449.68h-194.79v-83.76h194.79v83.76Z"/>
     </g>
   </g>
   <g id="Misc">
     <g id="Gaming_Dome" data-name="Gaming Dome">
-      <g id="g486">
-        <path id="path475" class="downtown" d="M514.59,793.29c8.56,0,15.5,6.94,15.5,15.5s-6.94,15.5-15.5,15.5c-8.56,0-15.5-6.94-15.5-15.5s6.94-15.5,15.5-15.5Z"/>
-      </g>
+      <circle id="path475" class="downtown" cx="514.59" cy="808.79" r="15.5"/>
     </g>
     <g id="Sec">
       <polygon class="security" points="141.00 342.62 201.30 487.03 106.56 487.03 106.56 342.62"/>
@@ -117,15 +123,9 @@
       <rect class="downtown" x="424.15" y="822.68" width="10" height="40" transform="translate(1271.83 413.53) rotate(90)"/>
     </g>
     <g id="The_Core" data-name="The Core">
-      <g id="Legs">
-        <path id="path466" class="downtown" d="M463.08,916.82h10v-20h20v20h10v5h-15v-20h-10v20h-15v-5Z"/>
-      </g>
-      <g id="Left_Arm" data-name="Left Arm">
-        <rect class="downtown" x="457.58" y="870.17" width="7" height="5" transform="translate(1404.19 1163.71) rotate(135)"/>
-        <rect class="downtown" x="469.9" y="858.86" width="5" height="5" transform="translate(1415.51 1136.4) rotate(135)"/>
-        <rect class="downtown" x="463.86" y="863.43" width="10" height="10" transform="translate(1414.47 1150.97) rotate(135)"/>
-      </g>
-      <rect id="Lighting_Rig" class="downtown" x="488.99" y="870.76" width="40" height="9" transform="translate(789.54 -97.59) rotate(46.27)"/>
+      <path id="Stage" data-name="Stage" class="downtown" d="M463.08,916.82h10v-20h20v20h10v5h-15v-20h-10v20h-15v-5Z"/>
+      <path id="Left_Arm" data-name="Left Arm" class="downtown" d="M472.5 858l3.54 3.54l-3.54 3.54l3.54 3.54l-7.08 7.08l-3.54 -3.54l-4.95 4.95l-3.54 -3.54Z"/>
+      <rect id="Lighting_Rig" data-name="Lighting_Rig" class="downtown" x="488.99" y="870.76" width="40" height="9" transform="translate(789.54 -97.59) rotate(46.27)"/>
     </g>
     <rect id="Kepler_Sky_Control" class="midtown" x="503.43" y="496.51" width="20" height="20" transform="translate(1019.94 -6.91) rotate(90)"/>
     <polygon id="Cycle_Parking" class="midtown" points="466.97 557.04 444.14 557.04 421.32 557.04 421.32 568.65 444.14 568.65 466.97 568.65 466.97 557.04"/>
@@ -226,31 +226,31 @@
   </g>
   <g id="Kaiju">
     <g id="Space_Needle" data-name="Space Needle">
-      <rect class="downtown" x="502.09" y="633.96" width="10" height="5" transform="translate(1143.55 129.37) rotate(90)"/>
+      <rect class="downtown-nofill" x="502.09" y="633.96" width="10" height="5" transform="translate(1143.55 129.37) rotate(90)"/>
     </g>
     <g id="Shooters">
-      <rect class="downtown" x="517.09" y="659.96" width="10" height="5" transform="translate(1184.55 140.37) rotate(90)"/>
+      <rect class="downtown-nofill" x="517.09" y="659.96" width="10" height="5" transform="translate(1184.55 140.37) rotate(90)"/>
     </g>
     <g id="Kuusi_Pala" data-name="Kuusi Pala">
-      <rect class="downtown" x="517.09" y="669.96" width="10" height="5" transform="translate(1194.55 150.37) rotate(90)"/>
+      <rect class="downtown-nofill" x="517.09" y="669.96" width="10" height="5" transform="translate(1194.55 150.37) rotate(90)"/>
     </g>
     <g id="Space_Bear_Academy" data-name="Space Bear Academy">
-      <rect class="downtown" x="509.59" y="627.46" width="10" height="10" transform="translate(1147.05 117.87) rotate(90)"/>
-      <rect class="downtown" x="519.56" y="627.46" width="10" height="10" transform="translate(1157.02 107.9) rotate(90)"/>
+      <rect class="downtown-nofill" x="509.59" y="627.46" width="10" height="10" transform="translate(1147.05 117.87) rotate(90)"/>
+      <rect class="downtown-nofill" x="519.56" y="627.46" width="10" height="10" transform="translate(1157.02 107.9) rotate(90)"/>
     </g>
     <g id="Sakura_Falling_Dai" data-name="Sakura Falling/Dai">
-      <rect class="downtown" x="509.59" y="687.46" width="10" height="10" transform="translate(1207.05 177.87) rotate(90)"/>
+      <rect class="downtown-nofill" x="509.59" y="687.46" width="10" height="10" transform="translate(1207.05 177.87) rotate(90)"/>
     </g>
     <g id="Calamity_Captain_s_Lodge" data-name="Calamity Captain&amp;apos;s Lodge">
-      <rect class="downtown" x="542.59" y="703.47" width="20" height="10" transform="translate(1261.06 155.88) rotate(90)"/>
+      <rect class="downtown-nofill" x="542.59" y="703.47" width="20" height="10" transform="translate(1261.06 155.88) rotate(90)"/>
     </g>
   </g>
   <g id="MB1">
     <g id="pink_Layout" data-name="pink Layout">
       <rect class="downtown" x="452.15" y="733.15" width="10" height="10"/>
       <rect class="downtown" x="457.15" y="628.15" width="5" height="10"/>
-      <rect class="downtown" x="462.15" y="648.15" width="5" height="10"/>
-      <rect class="downtown" x="462.15" y="713.15" width="5" height="10"/>
+      <rect class="downtown-nofill" x="462.15" y="648.15" width="5" height="10"/>
+      <rect class="downtown-nofill" x="462.15" y="713.15" width="5" height="10"/>
       <rect class="downtown" x="457.15" y="723.15" width="5" height="10"/>
     </g>
     <g id="Modules_Level_1" data-name="Modules Level 1">

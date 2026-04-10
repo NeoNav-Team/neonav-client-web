@@ -176,6 +176,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   });
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
+  const [mapBearing, setMapBearing] = useState(0);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [editLocationFormData, setEditLocationFormData] = React.useState({name: '', lat: 0, long: 0, owner: '', description: '', venuetype: '', hours: [] as any, tooltip: {name: '', lat: 0, long: 0}});
 
@@ -273,9 +274,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       venuetype: '',
       hours: [], // Hours can't be set during create
       tooltip: {
-        name: 'New Location',
-        lat: currentUserLocation.lat,
-        long: currentUserLocation.lng,
+        name: '',
+        lat: 0,
+        long: 0,
       }
     });
     setInfoModalState('create');
@@ -405,6 +406,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
         
         (myMapObjects.get('map') as any).setBearing(next);
+        setMapBearing(next);
       });
 
 
@@ -802,10 +804,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       <Box sx={footerStyle} hidden={!showInfoModal || infoModalState === 'view'}> 
         <FooterNav
           firstHexProps={{
-            icon: <DeleteForever />,
-            tooltipText: 'Delete Location',
+            icon: infoModalState === "create" ? <></> : <DeleteForever />,
+            tooltipText: infoModalState === "create" ? '' : 'Delete Location',
             dialog: 'Delete Location? Ths cannot be undone!',
-            disabled: selectedLocation.verified && state?.network?.selected?.account != NEONAV_MAINT,
+            disabled: (selectedLocation.verified && state?.network?.selected?.account != NEONAV_MAINT) || infoModalState === "create" ,
             handleAction: () => {
               deleteLocation(selectedLocationId);
               stopEditMode();
@@ -868,14 +870,14 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           bigHexProps={{
             icon: <EditLocationAltIcon/>,
-            tooltipText: Math.abs((myMapObjects.get('map') as any)?.getBearing()) > 0.1 ? 'Unavailable When Rotated' : 'Edit Location',
+            tooltipText: Math.abs(mapBearing) > 0.1 ? 'Unavailable When Rotated' : 'Edit Location',
             disabled: 
               !(state?.network?.selected?.account === NEONAV_MAINT ||           // User is admin
                 state?.network?.selected?.account === selectedLocation.owner || // User is owner
                 (state?.network?.selected?.account === selectedLocation.creator && // User is creator
                  !selectedLocation.verified)
               ) ||
-              Math.abs((myMapObjects.get('map') as any)?.getBearing()) > 1   // Disable edit when rotated
+              Math.abs(mapBearing) > 0.1   // Disable edit when rotated
             ,
             handleAction: () => {
               fetchAllFactions();
@@ -918,7 +920,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           }}
           secondHexProps={{
             icon: <AddLocationIcon/>,
-            tooltipText: 'Add A Location',
+            tooltipText: Math.abs(mapBearing) > 0.1 ? 'Unavailable When Rotated' : 'Add A Location',
+            disabled: Math.abs(mapBearing) > 0.1,   // Disable edit when rotated
             handleAction: () => {
               setSelectedLocationId('');
               setSelectedLocation(EMPTY_LOCATION);
