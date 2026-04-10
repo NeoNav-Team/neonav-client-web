@@ -46,7 +46,7 @@ export function compressHoursAcrossMidnight(hoursData: any[]): any[] {
 
       // JOIN LOGIC: If this period ends at Midnight, check if next day opens at Midnight 
       // and closes before 4:00 AM.
-      if (close === "24:00") {
+      if (open !== "00:00" && close === "24:00") {
         const joinable = nextDayHours.find(h => h.open === "00:00" && h.close <= "04:00");
         if (joinable) {
           close = joinable.close;
@@ -151,7 +151,7 @@ export function generateOpenMessages(prettyhours: any[]): {openState: string, ne
             nextTimeMsg = `Opens 12:00AM ${tomorrowRow.day}`;
             break;
          }
-         
+
           const [openStr] = hoursString.split(" - ");
           if (openStr) {
             nextTimeMsg = `Opens ${openStr} ${tomorrowRow.day}`;
