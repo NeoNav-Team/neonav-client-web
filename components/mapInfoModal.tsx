@@ -66,9 +66,9 @@ const VENUE_TYPES = [
   'Office',
   'Porto',
   'Reboot Syndicate',
+  'Sentinels',
   'Service',
   'Store',
-  'Syndicate',
 ];
 
 const handleMouseUpDownIgnore = (event: React.MouseEvent<HTMLButtonElement>) => {

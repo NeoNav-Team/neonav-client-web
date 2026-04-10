@@ -22,7 +22,7 @@ import LocalMallIcon from '@mui/icons-material/LocalMall'; // Store
 // https://www.iconarchive.com/show/material-icons-by-pictogrammers/dna-icon.html // Helix loaded below
 import ControlCameraIcon from '@mui/icons-material/ControlCamera'; // Endline
 import ViewInArIcon from '@mui/icons-material/ViewInAr'; // Reboot?
-import EarbudsIcon from '@mui/icons-material/Earbuds'; // Syndicate?
+import EarbudsIcon from '@mui/icons-material/Earbuds'; // Sentinels?
 
 import HiveIcon from '@mui/icons-material/Hive'; // Megamall
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety'; // Medical
@@ -129,7 +129,7 @@ const VENUE_ICON_MAP = new Map<string, any>([
   ['endline', {icon: ControlCameraIcon, iconColor: cyberBlueDark, pinColor: neoGreen}],
   ['helix', {icon: DnaIcon, iconColor: cyberBlueDark, pinColor: cyberYellow}],
   ['reboot', {icon: ViewInArIcon, iconColor: white, pinColor: rebootRed}],
-  ['syndicate', {icon: EarbudsIcon, iconColor: white, pinColor: cyberOrange}],
+  ['sentinels', {icon: EarbudsIcon, iconColor: white, pinColor: cyberOrange}],
 
   ['dev', {icon: AdjustIcon, iconColor: white, pinColor: red}],
   ['info', {icon: InfoOutlinedIcon, iconColor: white, pinColor: red}],
@@ -199,10 +199,10 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
   // 2. Constants & Bounds (Consider moving these to a config file)
   // Find corners of mega structures for bounding boxes
-  const megablockNW = locations.find(loc => loc.id === MEGABLOCK_NW) ?? {lat: '35.079368', long: '-117.822524'};
-  const megablockSE = locations.find(loc => loc.id === MEGABLOCK_SE) ?? {lat: '35.078996', long: '-117.822285'};
-  const megamallNW = locations.find(loc => loc.id === MEGAMALL_NW) ?? {lat: '35.079656', long: '-117.822066'};
-  const megamallSE = locations.find(loc => loc.id === MEGAMALL_SE) ?? {lat: '35.079379', long: '-117.821903'};
+  const megablockNW = locations.find(loc => loc.id === MEGABLOCK_NW) ?? {lat: '35.079415', long: '-117.822534'};
+  const megablockSE = locations.find(loc => loc.id === MEGABLOCK_SE) ?? {lat: '35.079064', long: '-117.822277'};
+  const megamallNW = locations.find(loc => loc.id === MEGAMALL_NW) ?? {lat: '335.079748', long: '-117.822086'};
+  const megamallSE = locations.find(loc => loc.id === MEGAMALL_SE) ?? {lat: '35.079477', long: '-117.821845'};
 
   const megablockRect = L.latLngBounds(
     L.latLng(megablockNW.lat, megablockNW.long),

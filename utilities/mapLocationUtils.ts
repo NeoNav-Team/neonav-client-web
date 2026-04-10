@@ -2,9 +2,6 @@ import L from "leaflet";
 import { compressHoursAcrossMidnight, generateOpenMessages } from "./mapTimeUtils";
 import { NEONAV_MAINT } from '@/utilities/constants';
 
-const MEGABLOCK_META = "L229118014"; // TODO maybe move these to constants file if it makes sense
-const MEGAMALL_META = "L128533982";
-
 /** 
  * Enriches raw location data with display-ready strings and metadata.
  */
@@ -55,7 +52,7 @@ export function getTargetLayer(
 
   // 4. System/Dev Layers
   if (loc.owner === NEONAV_MAINT || loc.venuetype === "Dev" || loc.venuetype === "dev") return layers.get("devLayer")!;
-  if (loc.id === MEGABLOCK_META || loc.id === MEGAMALL_META) return layers.get("megablockAndMegamallLocations")!;
+  if (loc.venuetype.toLowerCase() === "megablock" || loc.venuetype.toLowerCase() === "megamall") return layers.get("megablockAndMegamallLocations")!;
 
   // 5. Spatial Layers (Mega Structures)
   if (megablockRect.contains(latlng)) return layers.get("megablockLocations")!;
