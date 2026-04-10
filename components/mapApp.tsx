@@ -273,9 +273,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       venuetype: '',
       hours: [], // Hours can't be set during create
       tooltip: {
-        name: 'New Location',
-        lat: currentUserLocation.lat,
-        long: currentUserLocation.lng,
+        name: '',
+        lat: 0,
+        long: 0,
       }
     });
     setInfoModalState('create');
@@ -802,10 +802,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       <Box sx={footerStyle} hidden={!showInfoModal || infoModalState === 'view'}> 
         <FooterNav
           firstHexProps={{
-            icon: <DeleteForever />,
-            tooltipText: 'Delete Location',
+            icon: infoModalState === "create" ? <></> : <DeleteForever />,
+            tooltipText: infoModalState === "create" ? '' : 'Delete Location',
             dialog: 'Delete Location? Ths cannot be undone!',
-            disabled: selectedLocation.verified && state?.network?.selected?.account != NEONAV_MAINT,
+            disabled: (selectedLocation.verified && state?.network?.selected?.account != NEONAV_MAINT) || infoModalState === "create" ,
             handleAction: () => {
               deleteLocation(selectedLocationId);
               stopEditMode();
