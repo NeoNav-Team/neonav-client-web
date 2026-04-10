@@ -187,7 +187,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
   } = params;
 
   // 1. Setup & Clear Layers
-  const requiredLayers = ['locationMarkersLayer', 'megablockLocations', 'megamallLocations', 'megablockAndMegamallLocations', 'devLayer', 'pinsLayer', 'mylocations', 'unverified', 'roadLabelsNorthUp', 'roadLabelsNorthLeft'];
+  const requiredLayers = ['locationMarkersLayer', 'megablockLocations', 'megamallLocations', 'megablockAndMegamallLocations', 'devLayer', 'pinsLayer', 'mylocations', 'unverified', 'labelsNorthUp', 'labelsNorthLeft'];
   for (const key of requiredLayers) {
     const layer = layerData.get(key);
     if (!layer) {
@@ -233,9 +233,9 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     loc.nextTimeMsg = enrichedLoc.nextTimeMsg;
     loc.rating = enrichedLoc.rating;
 
-    // Special handling for road labels
-    if (loc.venuetype.toLowerCase() === 'road' || loc.venuetype.toLowerCase() === 'road 90') {
-      drawRoadLabels(loc, latlng, layerData);
+    // Special handling for labels
+    if (loc.venuetype.toLowerCase().startsWith("label") || loc.venuetype.toLowerCase().startsWith("road") ) {
+      drawLabels(loc, latlng, onMarkerClick, infoModalState, layerData);
       return;
     }
     
@@ -331,29 +331,37 @@ export function renderNewLocationPin(latLng: L.LatLng, mymap: L.Map, updateField
   return newMarker;
 }
 
-function drawRoadLabels(location: any, latLng: L.LatLng, layerData: Map<string, LayerGroup>): (void) {
-  const northUp = layerData.get("roadLabelsNorthUp")!;
-  const northLeft = layerData.get("roadLabelsNorthLeft")!;
+function drawLabels(location: any, latLng: L.LatLng, onMarkerClick: Function, infoModalState: string, layerData: Map<string, LayerGroup>): (void) {
+  const northUp = layerData.get("labelsNorthUp")!;
+  const northLeft = layerData.get("labelsNorthLeft")!;
 
-  if (location.venuetype.toLowerCase() === "road") {
-    L.tooltip({permanent: true, direction: 'center'})
+  if (location.venuetype.toLowerCase() === "label" || location.venuetype.toLowerCase() === "road") {
+    const tooltip_a = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent(location.name)
+      .on('click', () => onMarkerClick(tooltip_a))
       .addTo(northUp);
+    (tooltip_a as any).id = location.id;
 
-    L.tooltip({permanent: true, direction: 'center'})
+    let tooltip_b = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent('<div style="transform: rotate(-90deg); transform-origin: center center;">' + location.name + '</div>')
-      .addTo(northLeft);  
+      .on('click', () => onMarkerClick(tooltip_b))
+      .addTo(northLeft);
+    (tooltip_b as any).id = location.id;
   } else {
-    L.tooltip({permanent: true, direction: 'center'})
+    const tooltip_a = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent('<div style="transform: rotate(90deg); transform-origin: center center;">' + location.name + '</div>')
+      .on('click', () => onMarkerClick(tooltip_a))
       .addTo(northUp);
+    (tooltip_a as any).id = location.id;
 
-    L.tooltip({permanent: true, direction: 'center'})
+      const tooltip_b = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent(location.name)
-      .addTo(northLeft);  
+      .on('click', () => onMarkerClick(tooltip_b))
+      .addTo(northLeft);
+    (tooltip_b as any).id = location.id;
   }
 }

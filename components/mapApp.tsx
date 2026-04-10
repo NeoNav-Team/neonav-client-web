@@ -407,11 +407,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
 
         if (next == 0) {
-          mymap.removeLayer(layerData.get('roadLabelsNorthLeft'));
-          mymap.addLayer(layerData.get('roadLabelsNorthUp'));
+          mymap.removeLayer(layerData.get('labelsNorthLeft'));
+          mymap.addLayer(layerData.get('labelsNorthUp'));
         } else {
-          mymap.removeLayer(layerData.get('roadLabelsNorthUp'));
-          mymap.addLayer(layerData.get('roadLabelsNorthLeft'));
+          mymap.removeLayer(layerData.get('labelsNorthUp'));
+          mymap.addLayer(layerData.get('labelsNorthLeft'));
         }
         
         mymap.setBearing(next);
