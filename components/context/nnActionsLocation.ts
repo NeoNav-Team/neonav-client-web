@@ -11,7 +11,7 @@ export const fetchUnverifiedLocations = (dispatch: DispatchFunc) => async () => 
 };
 
 export const fetchAllLocations = (dispatch: DispatchFunc) => async () => {
-  fetchLocations(false, dispatch);
+  fetchLocations(true, dispatch);
 };
 
 const fetchLocations = (unverified: boolean, dispatch: DispatchFunc) => {

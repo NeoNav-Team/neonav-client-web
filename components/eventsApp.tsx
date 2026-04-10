@@ -24,9 +24,11 @@ import {
   Select,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -185,6 +187,9 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
   const [modalEvent, setModalEvent] = useState<NnEvent | null>(null);
   const [editFields, setEditFields] = useState<{ name: string; description: string; open: string; close: string } | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [showUnverified, setShowUnverified] = useState(false);
+  const [locationsFetchDone, setLocationsFetchDone] = useState(() => locations.length > 0);
+  const locationsChangeCount = useRef(0);
   const [createFields, setCreateFields] = useState<{ name: string; description: string; open: string; close: string; locationId: string }>({ name: '', description: '', open: '', close: '', locationId: '' });
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasAutoAdvanced = useRef(false);
@@ -215,6 +220,11 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
     if (locations.length === 0) fetchAllLocations();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    locationsChangeCount.current += 1;
+    if (locationsChangeCount.current > 1) setLocationsFetchDone(true);
+  }, [locations]);
 
   // Once locations load, resolve the real name for an initial location
   useEffect(() => {
@@ -336,6 +346,11 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
     const sorted = contextEvents
       .filter((e) => {
         if (!e.open) return false;
+        if (view === 'events' && e.location) {
+          const loc = locations.find((l: any) => l.id === e.location);
+          if (!loc) return false;
+          if (!showUnverified && !loc.verified) return false;
+        }
         if (e.cancelled) {
           // cancelled: only show if future AND user has RSVP'd (or is owner)
           const isFuture = new Date(e.open) > now;
@@ -358,11 +373,20 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
       const t = new Date(e.open!);
       return t >= start && t < end;
     });
-  }, [contextEvents, selectedDate, view, selectedLocation, userId, accountId]);
+  }, [contextEvents, selectedDate, view, selectedLocation, userId, accountId, showUnverified, locations]);
+
+  const filteredLocations = useMemo(() =>
+    locations
+      .filter((l: any) => (l.venuetype || '').toLowerCase() !== 'dev')
+      .filter((l: any) => showUnverified || l.verified === true)
+      .sort((a: any, b: any) => (a.name || '').localeCompare(b.name || '')),
+  [locations, showUnverified],
+  );
 
   const showRsvpButton = view !== 'manage';
-  const isFetching = fetchedViews.has(viewKey) && contextEvents.length === 0 && view !== 'locations';
+  const isFetching = !fetchedViews.has(viewKey) && view !== 'locations';
   const showDatePicker = view !== 'manage' && !(view === 'locations' && !selectedLocation);
+  const showVerifiedToggle = view === 'events' || view === 'locations';
 
   // ─── Event item ─────────────────────────────────────────────────────────────
   const renderEventItem = (event: NnEvent) => {
@@ -499,39 +523,55 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
               </Box>
             </div>
 
-            {/* Date selector */}
-            {showDatePicker && (
+            {/* Date selector + verified toggle */}
+            {(showDatePicker || showVerifiedToggle) && (
               <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
                 {view === 'locations' && selectedLocation && (
                   <IconButton size="small" onClick={() => { setSelectedLocation(null); setRsvpOverrides({}); }} title="Back">
                     <ArrowBackIcon fontSize="small" />
                   </IconButton>
                 )}
-                <IconButton size="small" onClick={handleDatePrev}>
-                  <ChevronLeftIcon fontSize="small" />
-                </IconButton>
-                <Box sx={{ minWidth: 120, textAlign: 'center' }}>
-                  <Typography
-                    variant="caption"
-                    className={itemStyles.dateText}
-                    sx={{ fontSize: '1.1rem', display: 'block' }}
-                  >
-                    {formatDate(selectedDate)}
-                  </Typography>
-                  {view === 'locations' && selectedLocation && (
-                    <Typography
-                      variant="caption"
-                      className={itemStyles.dateText}
-                      sx={{ fontSize: '0.7rem', display: 'block', opacity: 0.7 }}
-                      noWrap
-                    >
-                      {selectedLocation.name}
-                    </Typography>
-                  )}
-                </Box>
-                <IconButton size="small" onClick={handleDateNext}>
-                  <ChevronRightIcon fontSize="small" />
-                </IconButton>
+                {showDatePicker && (
+                  <>
+                    <IconButton size="small" onClick={handleDatePrev}>
+                      <ChevronLeftIcon fontSize="small" />
+                    </IconButton>
+                    <Box sx={{ minWidth: 120, textAlign: 'center' }}>
+                      <Typography
+                        variant="caption"
+                        className={itemStyles.dateText}
+                        sx={{ fontSize: '1.1rem', display: 'block' }}
+                      >
+                        {formatDate(selectedDate)}
+                      </Typography>
+                      {view === 'locations' && selectedLocation && (
+                        <Typography
+                          variant="caption"
+                          className={itemStyles.dateText}
+                          sx={{ fontSize: '0.7rem', display: 'block', opacity: 0.7 }}
+                          noWrap
+                        >
+                          {selectedLocation.name}
+                        </Typography>
+                      )}
+                    </Box>
+                    <IconButton size="small" onClick={handleDateNext}>
+                      <ChevronRightIcon fontSize="small" />
+                    </IconButton>
+                  </>
+                )}
+                {showVerifiedToggle && (
+                  <Tooltip title={showUnverified ? 'Show verified only' : 'Show all locations'}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowUnverified(v => !v)}>
+                      <IconButton size="small" color={showUnverified ? 'default' : 'primary'}>
+                        <VerifiedIcon fontSize="small" />
+                      </IconButton>
+                      <Typography variant="caption" className={itemStyles.dateText} color={showUnverified ? 'text.disabled' : 'primary'}>
+                        VERIFIED
+                      </Typography>
+                    </span>
+                  </Tooltip>
+                )}
               </Stack>
             )}
           </Box>
@@ -541,15 +581,20 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
             {view === 'locations' && !selectedLocation ? (
               <Box ref={scrollRef} sx={{ ...scrollSx, flexDirection: 'column' }}>
                 <Stack spacing={0} sx={{ width: '100%' }}>
-                  {locations.length === 0 ? (
+                  {!locationsFetchDone && locations.length === 0 ? (
                     <Stack direction="column" justifyContent="center" alignItems="center" sx={{ minHeight: '40vh' }}>
                       <CircularProgress color="secondary" />
                     </Stack>
+                  ) : filteredLocations.length === 0 ? (
+                    <Box style={{ padding: '1vh 0', width: '100%' }}>
+                      <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
+                        <Typography component="div" sx={{ textAlign: 'center', opacity: 0.6 }}>
+                          <span className={itemStyles.dateText}>No locations found.</span>
+                        </Typography>
+                      </div>
+                    </Box>
                   ) : (
-                    locations
-                      .filter((l: any) => l.venuetype !== 'dev')
-                      .sort((a: any, b: any) => (a.name || '').localeCompare(b.name || ''))
-                      .map(renderLocationItem)
+                    filteredLocations.map(renderLocationItem)
                   )}
                 </Stack>
               </Box>
