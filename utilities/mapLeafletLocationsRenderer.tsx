@@ -336,32 +336,32 @@ function drawLabels(location: any, latLng: L.LatLng, onMarkerClick: Function, in
   const northLeft = layerData.get("labelsNorthLeft")!;
 
   if (location.venuetype.toLowerCase() === "label" || location.venuetype.toLowerCase() === "road") {
-    const tooltip_a = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+    const tooltip_a: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent(location.name)
       .on('click', () => onMarkerClick(tooltip_a))
       .addTo(northUp);
-    (tooltip_a as any).id = location.id;
+    tooltip_a.id = location.id;
 
-    let tooltip_b = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+    let tooltip_b: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent('<div style="transform: rotate(-90deg); transform-origin: center center;">' + location.name + '</div>')
       .on('click', () => onMarkerClick(tooltip_b))
       .addTo(northLeft);
-    (tooltip_b as any).id = location.id;
+    tooltip_b.id = location.id;
   } else {
-    const tooltip_a = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+    const tooltip_a: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent('<div style="transform: rotate(90deg); transform-origin: center center;">' + location.name + '</div>')
       .on('click', () => onMarkerClick(tooltip_a))
       .addTo(northUp);
-    (tooltip_a as any).id = location.id;
+    tooltip_a.id = location.id;
 
-      const tooltip_b = L.tooltip({permanent: true, direction: 'center', interactive: true, })
+      const tooltip_b: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
       .setContent(location.name)
       .on('click', () => onMarkerClick(tooltip_b))
       .addTo(northLeft);
-    (tooltip_b as any).id = location.id;
+    tooltip_b.id = location.id;
   }
 }
