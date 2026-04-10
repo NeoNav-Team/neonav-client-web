@@ -69,19 +69,19 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
     <>
       <Tooltip 
         className={styles.footerItem}
-        title={props.tooltipText || ""} 
+        title={props.tooltipText || ''} 
         enterTouchDelay={500} // Triggers long-press slightly faster on mobile
-        leaveTouchDelay={1500} // Keeps it visible briefly after letting go
+        leaveTouchDelay={3000} // Keeps it visible briefly after letting go
         slotProps={{ // Styling is here becuase they don't always inherit the local CSS automatically
           tooltip: {
             sx: {
               fontFamily: "'Jura', sans-serif",
-              fontSize: "1rem",
-              backgroundColor: "rgba(20, 0, 40, 0.9)", // Dark purple base
-              color: "#00f3ff", // Cyber cyan text
-              border: "1px solid #ff00ff", // Neon pink border
-              boxShadow: "0 0 10px #ff00ff, inset 0 0 5px #00f3ff",
-              padding: "8px 12px",
+              fontSize: '1rem',
+              backgroundColor: 'rgba(20, 0, 40, 0.9)', // Dark purple base
+              color: '#00f3ff', // Cyber cyan text
+              border: '1px solid #ff00ff', // Neon pink border
+              boxShadow: '0 0 10px #ff00ff, inset 0 0 5px #00f3ff',
+              padding: '8px 12px',
 
               // The Glitch Logic
               animation: 'heavyGlitch 3s step-end 1',
@@ -121,8 +121,8 @@ export default function ButtonHexFab(props:ButtonHexFabProps):JSX.Element {
           },
         }}
       >
-        <Fab color="secondary"
-          aria-label="scan"
+        <Fab color='secondary'
+          aria-label='scan'
           style={{ opacity: icon && !disabled ? 1 : 0.3 }}
           sx={getsize(size)}
           disabled={disabled || icon ? false : true}

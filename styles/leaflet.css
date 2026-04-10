@@ -589,10 +589,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
 /* Base styles for the element that has a tooltip */
 .leaflet-tooltip {
 	position: absolute;
-	padding: 6px;
+	padding: 7px;
 	font-family: "Jura", Jura, Roboto, sans-serif;
   font-style: normal;
-	font-size: 16px;
+	font-size: 14px;
 	background-color: #12045800;
 	border: 1px solid #12045800;
 	border-radius: 3px;
