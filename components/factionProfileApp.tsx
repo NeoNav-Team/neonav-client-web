@@ -87,10 +87,11 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
-  const { 
+  const {
     state,
     fetchFactionDetails = (accountId:string) => {},
     fetchFactionStatuses = (accountId:string) => {},
+    fetchAllLocations = () => {},
     setUserStatus = (accountId:string, body:string) => {},
     updateFactionProfile = (factionId:string, document:any, update:any) => {},
   }: NnProviderValues = useContext(NnContext);
@@ -101,6 +102,12 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
     const statuses = state?.network?.collections?.statuses || [];
     return statuses.filter(status => status.class === 'public');
   }, [state?.network?.collections?.statuses]);
+  const locations: any[] = useMemo(() => {
+    return state?.network?.collections?.locations || [];
+  }, [state?.network?.collections?.locations]);
+  const factionLocations = useMemo(() => {
+    return locations.filter((l: any) => l.owner === factionId && !l.deleted && l.private !== true);
+  }, [locations, factionId]);
   const userId = state?.user?.profile?.auth?.userid;
   const accountId = factionId || '';
   const admin = profile && profile?.admin?.length && profile?.admin[0];
@@ -118,7 +125,8 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
   const goFetchFactionProfile = useCallback(() => {
     fetchFactionDetails(accountId);
     fetchFactionStatuses(accountId);
-  }, [fetchFactionDetails, accountId, fetchFactionStatuses]);
+    fetchAllLocations();
+  }, [fetchFactionDetails, accountId, fetchFactionStatuses, fetchAllLocations]);
 
   const updateDefaultForm = (profile:nnEntity) => {
     let updatedDefaultForm:Form = JSON.parse(JSON.stringify(defaultProfile));
@@ -243,13 +251,30 @@ export default function FactionProfileApp(props: FactionProfileAppProps):JSX.Ele
                         <Box>
                           <Divider variant="middle" color="primary"><Typography variant="h6">About Us</Typography></Divider>
                           <p>{completeProfile.description}</p>
-                          {(profile as any).neosite && (
+                          {((profile as any).neosite || factionLocations.length > 0) && (
                             <>
-                              <Divider variant="middle" color="primary"><Typography variant="h6">NeoSite</Typography></Divider>
-                              <Box sx={{ padding: '8px', textAlign: 'center' }}>
-                                <Link href={`/sites?site=${encodeURIComponent((profile as any).neosite)}`}>
-                                  <Typography variant="h6" color="primary">{completeProfile.name}</Typography>
-                                </Link>
+                              <Divider variant="middle" color="primary"><Typography variant="h6">Links</Typography></Divider>
+                              <Box sx={{ padding: '8px', textAlign: 'left' }}>
+                                {(profile as any).neosite && (
+                                  <Box sx={{ mb: 1 }}>
+                                    <Typography variant="body2" color="text.secondary" component="span">NeoSite: </Typography>
+                                    <Link href={`/sites?site=${encodeURIComponent((profile as any).neosite)}`}>
+                                      <Typography variant="body1" color="primary" component="span">{completeProfile.name}</Typography>
+                                    </Link>
+                                  </Box>
+                                )}
+                                {factionLocations.length > 0 && (
+                                  <Box>
+                                    <Typography variant="body2" color="text.secondary">Map Locations:</Typography>
+                                    {factionLocations.map((loc: any) => (
+                                      <Box key={loc.id} sx={{ ml: 1, mt: 0.5 }}>
+                                        <Link href={`/map/${loc.id}`}>
+                                          <Typography variant="body1" color="primary">{loc.name || loc.id}</Typography>
+                                        </Link>
+                                      </Box>
+                                    ))}
+                                  </Box>
+                                )}
                               </Box>
                             </>
                           )}
