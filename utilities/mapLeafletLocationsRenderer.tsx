@@ -199,10 +199,10 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
   // 2. Constants & Bounds (Consider moving these to a config file)
   // Find corners of mega structures for bounding boxes
-  const megablockNW = locations.find(loc => loc.id === MEGABLOCK_NW) ?? {lat: '35.079368', long: '-117.822524'};
-  const megablockSE = locations.find(loc => loc.id === MEGABLOCK_SE) ?? {lat: '35.078996', long: '-117.822285'};
-  const megamallNW = locations.find(loc => loc.id === MEGAMALL_NW) ?? {lat: '35.079656', long: '-117.822066'};
-  const megamallSE = locations.find(loc => loc.id === MEGAMALL_SE) ?? {lat: '35.079379', long: '-117.821903'};
+  const megablockNW = locations.find(loc => loc.id === MEGABLOCK_NW) ?? {lat: '35.079415', long: '-117.822534'};
+  const megablockSE = locations.find(loc => loc.id === MEGABLOCK_SE) ?? {lat: '35.079064', long: '-117.822277'};
+  const megamallNW = locations.find(loc => loc.id === MEGAMALL_NW) ?? {lat: '335.079748', long: '-117.822086'};
+  const megamallSE = locations.find(loc => loc.id === MEGAMALL_SE) ?? {lat: '35.079477', long: '-117.821845'};
 
   const megablockRect = L.latLngBounds(
     L.latLng(megablockNW.lat, megablockNW.long),
