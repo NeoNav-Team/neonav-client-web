@@ -380,7 +380,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     const headingA = 0;
     const headingB = -90;
 
-    const rotateControl = (myMapObjects.get('map') as any).rotateControl as RotateControl;
+    const mymap = (myMapObjects.get('map') as any);
+    const rotateControl = mymap.rotateControl as RotateControl;
 
     if (rotateControl && rotateControl._arrow) {
       const oldArrow = rotateControl._arrow;
@@ -402,10 +403,18 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       L.DomEvent.on(newArrow, 'click', (e) => {
         L.DomEvent.stop(e);
 
-        const current = (myMapObjects.get('map') as any).getBearing();
+        const current = mymap.getBearing();
         const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
+
+        if (next == 0) {
+          mymap.removeLayer(layerData.get('roadLabelsNorthLeft'));
+          mymap.addLayer(layerData.get('roadLabelsNorthUp'));
+        } else {
+          mymap.removeLayer(layerData.get('roadLabelsNorthUp'));
+          mymap.addLayer(layerData.get('roadLabelsNorthLeft'));
+        }
         
-        (myMapObjects.get('map') as any).setBearing(next);
+        mymap.setBearing(next);
         setMapBearing(next);
       });
 

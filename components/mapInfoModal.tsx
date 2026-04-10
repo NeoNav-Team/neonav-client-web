@@ -71,6 +71,16 @@ const VENUE_TYPES = [
   'Store',
 ];
 
+const DEV_VENUES = [
+  'Dev',
+  'Medical',
+  'Megablock',
+  'Megamall',
+  'Road',
+  'Road 90',
+  'Security',
+];
+
 const handleMouseUpDownIgnore = (event: React.MouseEvent<HTMLButtonElement>) => {
   event.preventDefault();
 };
@@ -284,7 +294,7 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
 
   // Admin only venue types
   if (isAdmin && !VENUE_TYPES.includes('Megamall')) {
-    VENUE_TYPES.push('Dev', 'Medical', 'Megablock', 'Megamall', 'Security');
+    VENUE_TYPES.push(...DEV_VENUES);
   }
 
   return (

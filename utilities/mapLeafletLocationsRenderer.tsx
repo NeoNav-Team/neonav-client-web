@@ -187,7 +187,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
   } = params;
 
   // 1. Setup & Clear Layers
-  const requiredLayers = ['locationMarkersLayer', 'megablockLocations', 'megamallLocations', 'megablockAndMegamallLocations', 'devLayer', 'pinsLayer', 'mylocations', 'unverified'];
+  const requiredLayers = ['locationMarkersLayer', 'megablockLocations', 'megamallLocations', 'megablockAndMegamallLocations', 'devLayer', 'pinsLayer', 'mylocations', 'unverified', 'roadLabelsNorthUp', 'roadLabelsNorthLeft'];
   for (const key of requiredLayers) {
     const layer = layerData.get(key);
     if (!layer) {
@@ -232,6 +232,12 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     loc.openState = enrichedLoc.openState;
     loc.nextTimeMsg = enrichedLoc.nextTimeMsg;
     loc.rating = enrichedLoc.rating;
+
+    // Special handling for road labels
+    if (loc.venuetype.toLowerCase() === 'road' || loc.venuetype.toLowerCase() === 'road 90') {
+      drawRoadLabels(loc, latlng, layerData);
+      return;
+    }
     
     // Determine the layer
     let targetLayer = getTargetLayer(loc, latlng, layerData, { userId, linkedLocationId, megablockRect, megamallRect });
@@ -323,4 +329,31 @@ export function renderNewLocationPin(latLng: L.LatLng, mymap: L.Map, updateField
   newMarker.bindTooltip('New Location', { permanent: true, direction: 'right' });
 
   return newMarker;
+}
+
+function drawRoadLabels(location: any, latLng: L.LatLng, layerData: Map<string, LayerGroup>): (void) {
+  const northUp = layerData.get("roadLabelsNorthUp")!;
+  const northLeft = layerData.get("roadLabelsNorthLeft")!;
+
+  if (location.venuetype.toLowerCase() === "road") {
+    L.tooltip({permanent: true, direction: 'center'})
+      .setLatLng(latLng)
+      .setContent(location.name)
+      .addTo(northUp);
+
+    L.tooltip({permanent: true, direction: 'center'})
+      .setLatLng(latLng)
+      .setContent('<div style="transform: rotate(-90deg); transform-origin: center center;">' + location.name + '</div>')
+      .addTo(northLeft);  
+  } else {
+    L.tooltip({permanent: true, direction: 'center'})
+      .setLatLng(latLng)
+      .setContent('<div style="transform: rotate(90deg); transform-origin: center center;">' + location.name + '</div>')
+      .addTo(northUp);
+
+    L.tooltip({permanent: true, direction: 'center'})
+      .setLatLng(latLng)
+      .setContent(location.name)
+      .addTo(northLeft);  
+  }
 }
