@@ -167,7 +167,7 @@ export const verifyLocation = (dispatch: DispatchFunc) => async (id:string) => {
     });
     return err;
   };
-  executeApi('updateLocation', { id, token }, onSuccess, onError);
+  executeApi('verifyLocation', { id, token }, onSuccess, onError);
 };
 
 export const addLocationReview = (dispatch: DispatchFunc) => async (id:string, review:any) => {
