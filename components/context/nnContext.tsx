@@ -226,24 +226,37 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   return newState;
 };
 
+const decodeJwtPayload = (token: string): any => {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return {};
+    // JWT uses base64url — convert to standard base64 before atob
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(window.atob(base64));
+  } catch {
+    return {};
+  }
+};
+
 export const initContext = (dispatch: DispatchFunc) => async () => {
   let onLoadUserContext = {};
   const cookieContextData = getCookieContext();
+  // Always decode JWT for authoritative user identity (handles base64url encoding)
+  const jwtPayload = decodeJwtPayload(getCookieToken());
+  const jwtId = jwtPayload.id ?? '';
+
   if (Object.keys(cookieContextData).length === 0) {
     // creates nnContext cookie if one does not exist
-    const cookieJWTData = getCookieToken();
-    const cookieDataArr = cookieJWTData.split('.');
-    const cookieDataObj =  JSON.parse(window.atob(cookieDataArr[1]));
     //creates empty default context with just the userID
     const jwtContext =  {
       network: {
         selected:{
-          account: cookieDataObj.id,
+          account: jwtId,
         },
         collections: {
           transactions: [
             {
-              id: cookieDataObj.id,
+              id: jwtId,
               collection: [],
             }
           ],
@@ -257,7 +270,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
       user: {
         profile: {
           auth: {
-            userid: cookieDataObj.id,
+            userid: jwtId,
           }
         }
       }
@@ -266,6 +279,22 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     setCookieContext(onLoadUserContext);
   } else {
     onLoadUserContext = cookieContextData;
+    // Repair stale/empty identity fields using the JWT as source of truth
+    if (jwtId && !(onLoadUserContext as any)?.network?.selected?.account) {
+      (onLoadUserContext as any).network = {
+        ...(onLoadUserContext as any).network,
+        selected: { ...(onLoadUserContext as any).network?.selected, account: jwtId },
+      };
+    }
+    if (jwtId && !(onLoadUserContext as any)?.user?.profile?.auth?.userid) {
+      (onLoadUserContext as any).user = {
+        ...(onLoadUserContext as any).user,
+        profile: {
+          ...(onLoadUserContext as any).user?.profile,
+          auth: { ...(onLoadUserContext as any).user?.profile?.auth, userid: jwtId },
+        },
+      };
+    }
   }
   //dispatches context to state
   dispatch({
