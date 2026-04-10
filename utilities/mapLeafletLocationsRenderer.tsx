@@ -22,7 +22,7 @@ import LocalMallIcon from '@mui/icons-material/LocalMall'; // Store
 // https://www.iconarchive.com/show/material-icons-by-pictogrammers/dna-icon.html // Helix loaded below
 import ControlCameraIcon from '@mui/icons-material/ControlCamera'; // Endline
 import ViewInArIcon from '@mui/icons-material/ViewInAr'; // Reboot?
-import EarbudsIcon from '@mui/icons-material/Earbuds'; // Syndicate?
+import EarbudsIcon from '@mui/icons-material/Earbuds'; // Sentinels?
 
 import HiveIcon from '@mui/icons-material/Hive'; // Megamall
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety'; // Medical
@@ -129,7 +129,7 @@ const VENUE_ICON_MAP = new Map<string, any>([
   ['endline', {icon: ControlCameraIcon, iconColor: cyberBlueDark, pinColor: neoGreen}],
   ['helix', {icon: DnaIcon, iconColor: cyberBlueDark, pinColor: cyberYellow}],
   ['reboot', {icon: ViewInArIcon, iconColor: white, pinColor: rebootRed}],
-  ['syndicate', {icon: EarbudsIcon, iconColor: white, pinColor: cyberOrange}],
+  ['sentinels', {icon: EarbudsIcon, iconColor: white, pinColor: cyberOrange}],
 
   ['dev', {icon: AdjustIcon, iconColor: white, pinColor: red}],
   ['info', {icon: InfoOutlinedIcon, iconColor: white, pinColor: red}],
