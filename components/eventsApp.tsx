@@ -726,8 +726,9 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                       {canEdit ? (
                         <DateTimePicker
                           label="Open"
+                          ampm={false}
                           value={editFields.open ? dayjs(editFields.open) : null}
-                          onChange={(val: Dayjs | null) => setEditFields({ ...editFields, open: val ? val.toISOString() : '' })}
+                          onChange={(val: Dayjs | null) => setEditFields({ ...editFields, open: val?.isValid() ? val.toISOString() : '' })}
                           renderInput={(params) => (
                             <TextField
                               {...params}
@@ -748,8 +749,9 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                       {canEdit ? (
                         <DateTimePicker
                           label="Close"
+                          ampm={false}
                           value={editFields.close ? dayjs(editFields.close) : null}
-                          onChange={(val: Dayjs | null) => setEditFields({ ...editFields, close: val ? val.toISOString() : '' })}
+                          onChange={(val: Dayjs | null) => setEditFields({ ...editFields, close: val?.isValid() ? val.toISOString() : '' })}
                           renderInput={(params) => (
                             <TextField
                               {...params}
@@ -936,8 +938,9 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                     <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
                       <DateTimePicker
                         label="Open"
+                        ampm={false}
                         value={createFields.open ? dayjs(createFields.open) : null}
-                        onChange={(val: Dayjs | null) => setCreateFields({ ...createFields, open: val ? val.toISOString() : '' })}
+                        onChange={(val: Dayjs | null) => setCreateFields({ ...createFields, open: val?.isValid() ? val.toISOString() : '' })}
                         renderInput={(params) => (
                           <TextField
                             {...params}
@@ -952,8 +955,9 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                     <div className={itemStyles.subtitleLine} data-augmented-ui="tr-clip both">
                       <DateTimePicker
                         label="Close"
+                        ampm={false}
                         value={createFields.close ? dayjs(createFields.close) : null}
-                        onChange={(val: Dayjs | null) => setCreateFields({ ...createFields, close: val ? val.toISOString() : '' })}
+                        onChange={(val: Dayjs | null) => setCreateFields({ ...createFields, close: val?.isValid() ? val.toISOString() : '' })}
                         renderInput={(params) => (
                           <TextField
                             {...params}
