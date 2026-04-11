@@ -52,6 +52,7 @@ interface RotateControl extends L.Control {
 }
 
 const SVG_MAP_FILE = '/Winter2026v2.svg'
+const LRG_SVG_MAP_FILE = '/Winter2026_large_v1.svg'
 
 const EMPTY_LOCATION = {id: '', name: '', description: '', venuetype: '', openState: '', nextTimeMsg: '', prettyhours: [], rating: '', ownerisfaction: false, owner: '', ownername: '', ownerlink: '', creator: '', reviews: [], neosite: '', verified: false, tooltip: {name: '', lat: 0, long: 0}};
 
@@ -94,8 +95,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
   const modalStyle_10 = {
     position: 'absolute' as 'absolute',
-    top: '90dvh',
+    top: 'min(90dvh, calc(100dvh - 96px))',
     height: '10vh',
+    'min-height': '96px',
     left: '0%',
     width: '100%',
     boxShadow: 24,
@@ -560,11 +562,11 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       handleRotate();
 
-      L.imageOverlay(SVG_MAP_FILE, L.latLngBounds([[35.081148, -117.823872], [35.078589, -117.820387]]), {
+      L.imageOverlay(LRG_SVG_MAP_FILE, L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]]), {
         opacity: 1,
       }).addTo(mymap);
 
-      //L.rectangle(L.latLngBounds([[35.081148, -117.823872], [35.078589, -117.820387]])).addTo(mymap);
+      //L.rectangle(L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]])).addTo(mymap);
 
       L.control.scale({
         position: 'topright',
