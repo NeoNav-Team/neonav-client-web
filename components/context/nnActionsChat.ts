@@ -79,7 +79,9 @@ export const fetchChannelsLatest = (dispatch: DispatchFunc) => async () => {
       return;
     }
 
-    const userMsgs = newMsgs.filter(m => m.fromid !== '0000000000');
+    // ?since= is inclusive, so the boundary message we already have may be returned — exclude it
+    const trulyNewMsgs = latestIdbId ? newMsgs.filter(m => m.id !== latestIdbId) : newMsgs;
+    const userMsgs = trulyNewMsgs.filter(m => m.fromid !== '0000000000');
     unreadCounts[channelId] = userMsgs.length >= MSG_CAP ? MSG_CAP : userMsgs.length;
   }));
 
@@ -160,17 +162,37 @@ export const fetchChannelUsers = (dispatch: DispatchFunc) => async (id:string) =
 };
 
 export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id: string) => {
+  const token = getCookieToken();
   const cached = await idbGetMessages(id);
   if (cached.length > 0) {
+    // Show cached messages immediately, then catch up on anything new
     dispatch({
       type: 'setMessageHistory',
       payload: cached,
     });
+    const latestTs = await idbGetLatestTs(id);
+    if (latestTs) {
+      try {
+        const url = `${apiUrl.protocol}://${apiUrl.hostname}/api/chat/channels/${id}/history?since=${encodeURIComponent(latestTs)}`;
+        const res = await axios.get(url, { headers: { 'x-access-token': token } });
+        const newMsgs: NnChatMessage[] = Array.isArray(res?.data) ? res.data : [];
+        if (newMsgs.length) {
+          await idbPutMessages(newMsgs);
+          await idbCullChannel(id);
+          const updated = await idbGetMessages(id);
+          dispatch({
+            type: 'setMessageHistory',
+            payload: updated,
+          });
+        }
+      } catch {
+        // cached data already displayed; longpoll will catch new messages
+      }
+    }
     return;
   }
 
-  // IDB empty — fall back to API
-  const token = getCookieToken();
+  // IDB empty — fall back to full API fetch
   const onSuccess = async (response: APIResponse) => {
     const data = response.data as unknown as NnChatMessage[];
     const msgs = Array.isArray(data) ? data : [];
