@@ -183,7 +183,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [mapStyle, setMapStyle] = useState(mapFull);
   const [mapBearing, setMapBearing] = useState(0);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const [editLocationFormData, setEditLocationFormData] = React.useState({name: '', lat: 0, long: 0, owner: '', description: '', venuetype: '', hours: [] as any, tooltip: {name: '', lat: 0, long: 0}});
+  const [editLocationFormData, setEditLocationFormData] = React.useState({name: '', lat: 0, long: 0, owner: '', description: '', venuetype: '', hours: [] as any, tooltip: {name: '', lat: 0, long: 0, rotation: 0,}});
 
   const { state,
     setAlert = (severity: string, message: string) => {},
@@ -282,6 +282,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         name: '',
         lat: 0,
         long: 0,
+        rotation: 0,
       }
     });
     setInfoModalState('create');
@@ -475,7 +476,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       tooltip: foundLocation?.tooltip || {
         name: foundLocation?.name || '', 
         lat: foundLocation?.lat || 0,
-        long: foundLocation?.long || 0,}
+        long: foundLocation?.long || 0,
+        rotation: foundLocation?.rotation || 0,}
     }, editLocationFormData);
     console.log('Reduced form data:', locationFormDiff);
     if (infoModalState == 'edit') {
@@ -725,6 +727,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           name: foundLocation?.name || '', 
           lat: foundLocation?.lat || 0,
           long: foundLocation?.long || 0,
+          rotation: foundLocation?.rotation || 0,
         }
       })
     }
@@ -801,7 +804,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     }}>
       <div ref={mapRef} id='map' style={mapStyle}/>
       <Autocomplete
-        style={{position: 'absolute', top: '12px', left: '90px', zIndex: '1100', backgroundColor: '#120458', border: '1px solid #ff00ff', borderRadius: '5px', width:'calc(100% - 180px'}}
+        style={{position: 'absolute', top: '12px', left: '70px', zIndex: '1100', backgroundColor: '#120458', border: '1px solid #ff00ff', borderRadius: '5px', width:'calc(100% - 180px'}}
         options={searchBarOptions}
         groupBy={(option: any) => option.venuetype}
         getOptionLabel={(option: any) => option.name}

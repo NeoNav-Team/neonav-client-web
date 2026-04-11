@@ -1,4 +1,4 @@
-import L, { divIcon, icon } from 'leaflet';
+import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 import type { LayerGroup } from 'leaflet';
 import React from 'react';
@@ -8,12 +8,12 @@ import { enrichLocation, getTargetLayer } from '@/utilities/mapLocationUtils';
 import { createSvgIcon } from '@mui/material/utils';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';  // Arcade
 import TempleBuddhistIcon from '@mui/icons-material/TempleBuddhist';  //Chaple
-import WorkIcon from '@mui/icons-material/Work'; // Employment
+import BadgeIcon from '@mui/icons-material/Badge'; // Employment
 import TheaterComedyIcon from '@mui/icons-material/TheaterComedy'; // Entertainment
 import RamenDiningIcon from '@mui/icons-material/RamenDining'; // Food
 import NightlifeIcon from '@mui/icons-material/Nightlife'; // Lounge
 import SpeakerIcon from '@mui/icons-material/Speaker'; // Music
-// Office
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter'; // Office
 import WcIcon from '@mui/icons-material/Wc'; // Porto
 import SimCardIcon from '@mui/icons-material/SimCard'; // Service
 import LocalMallIcon from '@mui/icons-material/LocalMall'; // Store
@@ -113,15 +113,16 @@ const white = '#FFFFFF'; // #FFFFFF
 const red = '#FF0000'; // #FF0000
 
 // TODO this should be synced with the list in mapInfoModal in some way
-const VENUE_ICON_MAP = new Map<string, any>([
+export const VENUE_ICON_MAP = new Map<string, any>([
   ['arcade', {icon: SportsEsportsIcon, iconColor: neoOrange, pinColor: cyberBlueDark}],
   ['chapel', {icon: TempleBuddhistIcon, iconColor: cyberOrange, pinColor: cyberBlueDark}],
-  ['employment', {icon: WorkIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
+  ['employment', {icon: BadgeIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
   ['entertainment', {icon: TheaterComedyIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
   ['food', {icon: RamenDiningIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
+  ['info', {icon: InfoOutlinedIcon, iconColor: white, pinColor: red}],
   ['lounge', {icon: NightlifeIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
   ['music', {icon: SpeakerIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
-  ['office', {icon: HelpOutlineOutlinedIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
+  ['office', {icon: BusinessCenterIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
   ['porto', {icon: WcIcon, iconColor: white, pinColor: cyberOrange}],
   ['service', {icon: SimCardIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
   ['store', {icon: LocalMallIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
@@ -131,15 +132,15 @@ const VENUE_ICON_MAP = new Map<string, any>([
   ['reboot', {icon: ViewInArIcon, iconColor: white, pinColor: rebootRed}],
   ['sentinels', {icon: EarbudsIcon, iconColor: white, pinColor: cyberOrange}],
 
-  ['dev', {icon: AdjustIcon, iconColor: white, pinColor: red}],
-  ['info', {icon: InfoOutlinedIcon, iconColor: white, pinColor: red}],
-  ['megablock', {icon: HiveIcon, iconColor: cyberBlueDark, pinColor: cyberYellow}],
-  ['megamall', {icon: LocalMallIcon, iconColor: cyberBlueDark, pinColor: cyberYellow}],
-  ['medical', {icon: HealthAndSafetyIcon, iconColor: white, pinColor: cyberOrange}],
-  ['security', {icon: LocalPoliceIcon, iconColor: white, pinColor: cyberOrange}],
+  ['dev', {icon: AdjustIcon, iconColor: white, pinColor: red, adminOnly: true}],
+  ['megablock', {icon: HiveIcon, iconColor: cyberBlueDark, pinColor: cyberYellow, adminOnly: true}],
+  ['megamall', {icon: LocalMallIcon, iconColor: cyberBlueDark, pinColor: cyberYellow, adminOnly: true}],
+  ['medical', {icon: HealthAndSafetyIcon, iconColor: white, pinColor: cyberOrange, adminOnly: true}],
+  ['security', {icon: LocalPoliceIcon, iconColor: white, pinColor: cyberOrange, adminOnly: true}],
+  ['road', {adminOnly: true}],
 
-  ['location_pin', {icon: AttributionIcon, iconColor: white, pinColor: cyberGreen}],
-  ['new_location', {icon: AddIcon, iconColor: cyberYellow, pinColor: cyberGreen}],
+  ['location_pin', {icon: AttributionIcon, iconColor: white, pinColor: cyberGreen, hidden: true}],
+  ['new_location', {icon: AddIcon, iconColor: cyberYellow, pinColor: cyberGreen, hidden: true}],
 ]);
 
 const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
@@ -235,7 +236,7 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
 
     // Special handling for labels
     if (loc.venuetype.toLowerCase().startsWith("label") || loc.venuetype.toLowerCase().startsWith("road") ) {
-      drawLabels(loc, latlng, onMarkerClick, infoModalState, layerData);
+      drawLabels(loc, latlng, onMarkerClick, layerData);
       return;
     }
     
@@ -331,35 +332,32 @@ export function renderNewLocationPin(latLng: L.LatLng, mymap: L.Map, updateField
   return newMarker;
 }
 
-function drawLabels(location: any, latLng: L.LatLng, onMarkerClick: Function, infoModalState: string, layerData: Map<string, LayerGroup>): (void) {
+/*
+* TODO respect verifed vs unverified and owned
+*  results in 9 layers - 6 for labels alone
+*   verified markers, verified roads, verified roads north left
+*   owned unverified markers, owned unverified roads, owned unverified roads north left
+*   unverified markers, unverified roads, unverified roads north left
+*/
+function drawLabels(location: any, latLng: L.LatLng, onMarkerClick: Function, layerData: Map<string, LayerGroup>): (void) {
   const northUp = layerData.get("labelsNorthUp")!;
   const northLeft = layerData.get("labelsNorthLeft")!;
 
-  if (location.venuetype.toLowerCase() === "label" || location.venuetype.toLowerCase() === "road") {
+  const rotationNU = location.tooltip.rotation || 0;
+  const rotationNL = rotationNU - 90;
+
+  // Draw roads on the map with future proofing for "labels" venue
+  if (location.venuetype.toLowerCase().startsWith("road") || location.venuetype.toLowerCase() === "label") {
     const tooltip_a: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
-      .setContent(location.name)
+      .setContent(`<div style="transform: rotate(${rotationNU}deg); transform-origin: center center;">${location.name}</div>`)
       .on('click', () => onMarkerClick(tooltip_a))
       .addTo(northUp);
     tooltip_a.id = location.id;
 
     let tooltip_b: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
       .setLatLng(latLng)
-      .setContent('<div style="transform: rotate(-90deg); transform-origin: center center;">' + location.name + '</div>')
-      .on('click', () => onMarkerClick(tooltip_b))
-      .addTo(northLeft);
-    tooltip_b.id = location.id;
-  } else {
-    const tooltip_a: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
-      .setLatLng(latLng)
-      .setContent('<div style="transform: rotate(90deg); transform-origin: center center;">' + location.name + '</div>')
-      .on('click', () => onMarkerClick(tooltip_a))
-      .addTo(northUp);
-    tooltip_a.id = location.id;
-
-      const tooltip_b: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
-      .setLatLng(latLng)
-      .setContent(location.name)
+      .setContent(`<div style="transform: rotate(${rotationNL}deg); transform-origin: center center;">${location.name}</div>`)
       .on('click', () => onMarkerClick(tooltip_b))
       .addTo(northLeft);
     tooltip_b.id = location.id;
