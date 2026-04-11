@@ -137,7 +137,7 @@ const FullView = ({ location, onCollapse }: any) =>  {
   const { state, }: NnProviderValues = React.useContext(NnContext);
   
   return (
-    <Box>
+    <Box sx={{ minWidth: '100%', height:'calc(90vh - 150px)' }} >
       <Stack direction='row' spacing={1} justifyContent='space-between' alignItems='center'>
         <Typography sx={modalTitleStyle} onClick={onCollapse}>
           {location.name}
@@ -146,112 +146,108 @@ const FullView = ({ location, onCollapse }: any) =>  {
           <ExpandMoreIcon/>
         </IconButton>
       </Stack>
-      <Stack direction='column'
-        spacing={0.5}
-        justifyContent='flex-start'
-        alignItems='flex-start'
-      >
-        <Typography sx={modalBodyStyle} component='p'>
-          [{location.id}]
-        </Typography>
-        <Typography sx={modalBodyStyle} component='p'>
-          {location.rating}
-        </Typography>
-        <Typography sx={modalBodyStyle} component='p'>
-          {location.venuetype}
-        </Typography>
-        <Typography sx={modalBodyStyle} component='p'>{location.openState} ⋅ {location.nextTimeMsg}</Typography>
-        <Divider color='secondary' flexItem/>
-        <Typography sx={modalBodyStyle} component='p'>
-          {(location.ownerisfaction ?
-            <CastleIcon fontSize='inherit'/> : <PersonIcon />)}
-          &nbsp;⋅&nbsp;
-          <Link
-            href={`${location.ownerlink}`}>
-            {location.ownername}
-          </Link>
-        </Typography>
-        <Divider color='secondary' flexItem/>
-        <Typography sx={modalBodyStyle} component='p'><QueryBuilderIcon fontSize='inherit'/>&nbsp;{location.openState}</Typography>
-        <TableContainer component={Paper} style={{padding: '1vh'}}>
-          <Table aria-label='simple table'>
-            <TableBody>
-              {location.prettyhours.map((row: any) => (
-                <TableRow
-                  key={row.day}
-                  sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                >
-                  <TableCell component='th' scope='row' sx={modalBodyStyle}>
-                    {row.day}
-                  </TableCell>
-                  <TableCell align='right' sx={modalBodyStyle}>
-                    {row.hours.map((hourBlock: string, index: number) => (
-                      <span key={index}>
-                        {hourBlock}
-                        {index < row.hours.length - 1 && <br/>}
-                      </span>
-                    ))}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Divider color='secondary' flexItem/>
-        <Typography sx={modalBodyStyle} component='p'>
-          <LocationCityIcon fontSize='inherit'/>
-          &nbsp;⋅&nbsp;
-          <Link href={`/sites?site=${location.neosite}`}>
-            {!!location.neosite && location.ownername}
-          </Link>
-        </Typography>
-        {(location.description && <Divider color='secondary' flexItem/>)}
-        <Typography sx={modalBodyStyle} component='p'>
-          {location.description}
-        </Typography>
-        <Divider color='secondary' flexItem/>
-        <Typography sx={modalBodyStyle} component='p'>
-          {location.rating}
-        </Typography>
-      </Stack>
-      <SimpleScrollContainer>
-        <Box sx={{minWidth: '100%', height: '30vh'}}>
-          {/* TODO - Might be a bug here after exiting edit mode by saving - flakey */}
-          <Stack
-            spacing={0}
-            style={{
-              display: 'flex',
-              flexDirection: 'column-reverse',
-            }}
-          >
-            <div key='spacer'><Box sx={{height: '110px'}}/></div>
-            {!location.reviews || location.reviews.length === 0 && (
-              <Typography sx={modalBodyStyle} component='p'>Be the first to leave a review!</Typography>
-            )}
-            {location.reviews?.length >= 1 &&
-              location.reviews.filter((reviewItem: any) => !!reviewItem.review).map((reviewItem: any) => {
-                const {_id, reviewer, ts, reviewerName, rating, review} = reviewItem;
-                return (
-                  <div key={`${ts}-container`}>
-                    <ItemReview
-                      id={location.id}
-                      reviewid={_id}
-                      reviewerName={reviewerName}
-                      reviewer={reviewer}
-                      ts={ts}
-                      review={review}
-                      rating={rating}
-                      canDelete={
-                        state?.network?.selected.account === reviewItem.reviewer ||
-                        state?.network?.selected.account === location.owner ||
-                        state?.network?.selected.account === NEONAV_MAINT
-                      }
-                    />
-                  </div>
-                );
-              })}
-          </Stack>
-        </Box>
+      <SimpleScrollContainer sx={{padding: 0, overflowY: 'auto', display: 'block', }}>
+        <Stack direction='column'
+          spacing={0.5}
+          justifyContent='flex-start'
+          alignItems='flex-start'
+        >
+          <Typography sx={modalBodyStyle} component='p'>
+            [{location.id}]
+          </Typography>
+          <Typography sx={modalBodyStyle} component='p'>
+            {location.rating}
+          </Typography>
+          <Typography sx={modalBodyStyle} component='p'>
+            {location.venuetype}
+          </Typography>
+          <Typography sx={modalBodyStyle} component='p'>{location.openState} ⋅ {location.nextTimeMsg}</Typography>
+          <Divider color='secondary' flexItem/>
+          <Typography sx={modalBodyStyle} component='p'>
+            {(location.ownerisfaction ?
+              <CastleIcon fontSize='inherit'/> : <PersonIcon />)}
+            &nbsp;⋅&nbsp;
+            <Link
+              href={`${location.ownerlink}`}>
+              {location.ownername}
+            </Link>
+          </Typography>
+          <Divider color='secondary' flexItem/>
+          <Typography sx={modalBodyStyle} component='p'><QueryBuilderIcon fontSize='inherit'/>&nbsp;{location.openState}</Typography>
+          <TableContainer component={Paper} style={{padding: '1vh'}}>
+            <Table aria-label='simple table'>
+              <TableBody>
+                {location.prettyhours.map((row: any) => (
+                  <TableRow
+                    key={row.day}
+                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                  >
+                    <TableCell component='th' scope='row' sx={modalBodyStyle}>
+                      {row.day}
+                    </TableCell>
+                    <TableCell align='right' sx={modalBodyStyle}>
+                      {row.hours.map((hourBlock: string, index: number) => (
+                        <span key={index}>
+                          {hourBlock}
+                          {index < row.hours.length - 1 && <br/>}
+                        </span>
+                      ))}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Divider color='secondary' flexItem/>
+          <Typography sx={modalBodyStyle} component='p'>
+            <LocationCityIcon fontSize='inherit'/>
+            &nbsp;⋅&nbsp;
+            <Link href={`/sites?site=${location.neosite}`}>
+              {!!location.neosite && location.ownername}
+            </Link>
+          </Typography>
+          {(location.description && <Divider color='secondary' flexItem/>)}
+          <Typography sx={modalBodyStyle} component='p'>
+            {location.description}
+          </Typography>
+          <Divider color='secondary' flexItem/>
+          <Typography sx={modalBodyStyle} component='p'>
+            {location.rating}
+          </Typography>
+        </Stack>
+        <Stack
+          spacing={0}
+          style={{
+            display: 'flex',
+            flexDirection: 'column-reverse',
+          }}
+        >
+          {!location.reviews || location.reviews.length === 0 && (
+            <Typography sx={modalBodyStyle} component='p'>Be the first to leave a review!</Typography>
+          )}
+          {location.reviews?.length >= 1 &&
+            location.reviews.filter((reviewItem: any) => !!reviewItem.review).map((reviewItem: any) => {
+              const {_id, reviewer, ts, reviewerName, rating, review} = reviewItem;
+              return (
+                <div key={`${ts}-container`}>
+                  <ItemReview
+                    id={location.id}
+                    reviewid={_id}
+                    reviewerName={reviewerName}
+                    reviewer={reviewer}
+                    ts={ts}
+                    review={review}
+                    rating={rating}
+                    canDelete={
+                      state?.network?.selected.account === reviewItem.reviewer ||
+                      state?.network?.selected.account === location.owner ||
+                      state?.network?.selected.account === NEONAV_MAINT
+                    }
+                  />
+                </div>
+              );
+            })}
+        </Stack>
       </SimpleScrollContainer>
     </Box>
   );
