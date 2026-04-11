@@ -187,13 +187,16 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   useEffect(() => {
     if (!initSelected) {
       if (notify) {
-        setSelected('channel', NOTIFICATIONS);
+        const currentChannel = state.network?.selected?.channel;
+        if (!currentChannel || !NOTIFY_CHANNELS.includes(currentChannel)) {
+          setSelected('channel', NOTIFICATIONS);
+        }
       } else {
         idFromParams && setSelected('channel', idFromParams);
       }
       setInitSelected(true);
     }
-  }, [idFromParams, initSelected, notify, setSelected]);
+  }, [idFromParams, initSelected, notify, setSelected, state.network?.selected?.channel]);
 
   useEffect(() => {
     const scroller = document.getElementById('simpleScoll');
