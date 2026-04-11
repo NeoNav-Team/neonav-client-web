@@ -213,10 +213,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [clearUnreadCountByType, lastUnread, selectedChannel, setLastUnread]);
 
   useEffect(() => {
-    if (notify && unread[selectedChannel] > 0) {
+    if (unread[selectedChannel] > 0) {
       clearUnreadCountByType(selectedChannel);
     }
-  }, [notify, unread, selectedChannel, clearUnreadCountByType]);
+  }, [unread, selectedChannel, clearUnreadCountByType]);
 
   return (
     <Container disableGutters style={{height: '100%'}}>
