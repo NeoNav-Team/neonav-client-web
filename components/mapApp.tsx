@@ -723,6 +723,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       })
     }
 
+    // This is where we flyTo and open a location that was linked in
     if (props?.params?.id && props?.params?.id.startsWith('L') && !markerFromLinkShown) {
       const mymap = myMapObjects.get('map') as L.Map | undefined;
       if (mymap) {
@@ -732,7 +733,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           leafletMarker.addTo(mymap);
         }
         if (leafletMarker) {
-          mymap.panTo(leafletMarker.getLatLng());
+          mymap.flyTo(leafletMarker.getLatLng(), 21);
           openInfoModal();
           setMarkerFromLinkShown(true);
         }
@@ -786,7 +787,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           if (reason === 'selectOption' && location && location.lat && location.long) {
             const map = myMapObjects.get('map') as L.Map;
             if (map) {
-              map.panTo([location.lat, location.long]); 
+              map.flyTo([location.lat, location.long], 21); 
             }
           }
         }}
