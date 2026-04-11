@@ -110,6 +110,9 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     if (entityId && entityId[0].toUpperCase() === 'C') {
       router.replace(`/factions/${entityId}`);
     }
+    if (entityId && entityId[0].toUpperCase() === 'L') {
+      router.replace(`/map/${entityId}`);
+    }
   }, [entityId, router]);
 
   const contacts:NnContact[] | NnSimpleEntity[] = useMemo(() => {
