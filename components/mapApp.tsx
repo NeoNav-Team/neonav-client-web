@@ -756,9 +756,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         locations
           .filter((loc) => (
             (
-              loc.verified                  // Show all verified locations
-              || layerStates.unverified     // Show unverified locations if that layer is on
-              || (layerStates.mylocations && (loc.owner === userId || loc.creator === userId)) // Show owned locations if that layer is on
+              // Show all verified locations
+              loc.verified
+              // Show unverified locations if that layer is on
+              || (layerStates.unverified && !(loc.owner === userId || loc.creator === userId))
+              // Show owned locations if that layer is on
+              || (layerStates.mylocations && (loc.owner === userId || loc.creator === userId))
             )
             && loc.venuetype.toLowerCase() !== "dev")) // Hide all the dev markers from search
           .sort((a, b) => -b.name.localeCompare(a.name))
