@@ -6,10 +6,12 @@ import React, {useEffect, useRef, useState} from 'react';
 import L from 'leaflet';
 import 'leaflet-rotate';
 import {
+  Autocomplete,
   Box,
   Container,
   Modal,
   SelectChangeEvent,
+  TextField
 } from '@mui/material';
 import FooterNav from '@/components/footerNav';
 import ReviewDialog from '@/components/reviewDialog';
@@ -768,6 +770,27 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       overflow: 'hidden'
     }}>
       <div ref={mapRef} id='map' style={mapStyle}/>
+      <Autocomplete
+        style={{position: 'absolute', top: '12px', left: '90px', zIndex: '1100', backgroundColor: '#120458', border: '1px solid #ff00ff', borderRadius: '5px', width:'calc(100% - 180px'}}
+        options={
+          state.network?.collections?.locations?.
+            filter((loc) => loc.verified && loc.venuetype.toLowerCase() !== "dev")
+            .sort((a, b) => -b.name.localeCompare(a.name))
+            .sort((a, b) => -b.venuetype.localeCompare(a.venuetype)) 
+          || []
+        }
+        groupBy={(option) => option.venuetype}
+        getOptionLabel={(option) => option.name}
+        renderInput={(params) => <TextField {...params} label='Search' />}
+        onChange={(event, location, reason) => {
+          if (reason === 'selectOption' && location && location.lat && location.long) {
+            const map = myMapObjects.get('map') as L.Map;
+            if (map) {
+              map.panTo([location.lat, location.long]); 
+            }
+          }
+        }}
+      />
       <Modal
         open={showInfoModal}
         onClose={closeInfoModal}
