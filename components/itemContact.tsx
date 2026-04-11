@@ -75,7 +75,6 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
                   alignItems="center"
                 >
                   <Stack direction="row" spacing={1} alignItems="center" style={{minWidth: 0, flex: 1}}>
-                    <Avatar src={thumbnail} sx={{width: 24, height: 24, fontSize: 12, backgroundColor:'var(--color-3)', flexShrink: 0}}>{username[0]}</Avatar>
                     <Typography variant='h6' sx={{whiteSpace:'nowrap', overflow:'hidden', textOverflow: 'ellipsis'}}>
                       <span className={styles.name}>{username}</span>
                       <span className={styles.id}> | {id}</span>
