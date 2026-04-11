@@ -2,7 +2,7 @@
 
 import 'styles/leaflet.css';
 import styles from '@/styles/generic.module.css';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {use, useEffect, useRef, useState} from 'react';
 import L from 'leaflet';
 import 'leaflet-rotate';
 import {
@@ -173,11 +173,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const [showLayerModal, setShowLayerModal] = useState(false);
   const [layerModalSizeStyle, setLayerModalSizeStyle] = useState(modalStyle_0);
   const [layerStates, setLayerStates] = useState<Record<string, boolean>>({
-    eventLayer: false,
+    pinsLayer: false,
     devLayer: false,
-    myLocationsLayer: false,
-    unverifiedLayer: false,
+    mylocations: false,
+    unverified: false,
   });
+  const [searchBarOptions, setSearchBarOptions] = useState([] as any);
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
   const [mapBearing, setMapBearing] = useState(0);
@@ -555,6 +556,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     updateField('hours', updatedHours);
   };
 
+  // Map initialization
   useEffect(() => {
     if (mapRef.current && !myMapObjects.has('map')) {
       const mymap = L.map(mapRef?.current, options);
@@ -638,6 +640,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     fetchAllLocations();
   }, [fetchAllLocations]);
 
+  // Lots of things to do when the locations update
   useEffect(() => {
     const locations = state?.network?.collections?.locations;
     if (!locations?.length) return;
@@ -658,6 +661,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       setLinkedLocationId(props?.params?.id);
     }
 
+    // Draw all our markers and labels
     renderLocationsToLeafletLayers({
       layerData,
       locations,
@@ -684,11 +688,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       selectedLocationId,
       updateField,
     });
+
+    // Hide names when we zoom way out
     handleZoomNameToggle(mymap, layerData, selectedLocationId);
 
-    // We are setting all the markers into this myMapObjects then using it immediately below, but we will need to do this search elsewhere
+    // Store all our markers
     myMapObjects.set('allMarkers', []);
-
     layerData.forEach((layer, layerName) => {
       layer.eachLayer((layerPart) => {
         if (layerPart instanceof L.Marker) {
@@ -698,6 +703,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     });
   }, [state?.network?.collections?.locations]);
 
+  // Things to do when a location is selected, should also update when locations data updates
   useEffect(() => {
     let locations = state?.network?.collections?.locations || [];
     if (locations.length > 0 && selectedLocationId && !!locations.find(loc => loc.id === selectedLocationId)) {
@@ -741,6 +747,26 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     }
   }, [selectedLocationId, state?.network?.collections?.locations]);
 
+  // Populate searchBarOptions when layers are toggled or locations update
+  useEffect(() => {
+    const locations = state?.network?.collections?.locations;
+    const userId = state?.network?.selected?.account;
+    if (locations) {
+      setSearchBarOptions(
+        locations
+          .filter((loc) => (
+            (
+              loc.verified                  // Show all verified locations
+              || layerStates.unverified     // Show unverified locations if that layer is on
+              || (layerStates.mylocations && (loc.owner === userId || loc.creator === userId)) // Show owned locations if that layer is on
+            )
+            && loc.venuetype.toLowerCase() !== "dev")) // Hide all the dev markers from search
+          .sort((a, b) => -b.name.localeCompare(a.name))
+          .sort((a, b) => -b.venuetype.localeCompare(a.venuetype)) || []
+      );
+    }
+  }, [layerStates, state?.network?.collections?.locations]);
+
   useEffect(() => {
     const pins = state?.network?.collections?.locationPins;
     if (!pins?.length) return;
@@ -773,15 +799,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       <div ref={mapRef} id='map' style={mapStyle}/>
       <Autocomplete
         style={{position: 'absolute', top: '12px', left: '90px', zIndex: '1100', backgroundColor: '#120458', border: '1px solid #ff00ff', borderRadius: '5px', width:'calc(100% - 180px'}}
-        options={
-          state.network?.collections?.locations?.
-            filter((loc) => loc.verified && loc.venuetype.toLowerCase() !== "dev")
-            .sort((a, b) => -b.name.localeCompare(a.name))
-            .sort((a, b) => -b.venuetype.localeCompare(a.venuetype)) 
-          || []
-        }
-        groupBy={(option) => option.venuetype}
-        getOptionLabel={(option) => option.name}
+        options={searchBarOptions}
+        groupBy={(option: any) => option.venuetype}
+        getOptionLabel={(option: any) => option.name}
         renderInput={(params) => <TextField {...params} label='Search' />}
         onChange={(event, location, reason) => {
           if (reason === 'selectOption' && location && location.lat && location.long) {

@@ -270,22 +270,25 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
 
     // Default: Assign to Current User if creating
     if (currentUserId) {
-      options.set(currentUserId, `${state?.user?.profile?.meta?.username || 'You'} (You)`);
+      options.set(currentUserId, `(You)`);
     }
 
     // 2. Existing Owner (if different)
     if (!isCreateMode && location?.owner && location.owner !== currentUserId) {
-      options.set(location.owner, `${location.ownername || location.owner} (Current)`);
+      options.set(location.owner, `${location.ownername || ''} (Current)`);
     }
 
     // 3. Factions from Context
     (state?.network?.collections?.factions ?? []).forEach((f: any) => {
-      if (f.id != currentUserId) {
-        options.set(f.id, `[${f.id}] ${f.name} [Faction]`);
+      if (f.id != currentUserId && f.id != location?.owner) {
+        options.set(f.id, `${f.name}`);
       }
     });
 
-    return Array.from(options.entries());
+    // Build sorted array
+    const sortedArray = [...options.entries()].sort((a, b) => -b[1].replace("The ", "").localeCompare(a[1].replace("The ", "")));
+
+    return sortedArray;
   }, [state?.network?.collections?.factions]);
 
   // Admin only venue types
@@ -349,7 +352,7 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
               }}
             >
               {ownerOptions.map(([id, name]) => (
-                <MenuItem key={id} value={id}>{name}</MenuItem>
+                <MenuItem key={id} value={id}>{'[' + id + '] ' + name}</MenuItem>
               ))}
             </Select>
           </FormControl>
