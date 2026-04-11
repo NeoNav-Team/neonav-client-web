@@ -226,8 +226,8 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                       alignItems="center"
                       sx={{ minHeight: '100%'}}
                     >
-                      <Typography variant='h5'>{entityId}</Typography>
-                      <Typography variant='h4'>{entity?.name}</Typography>
+                      <Typography variant='h5' sx={{ textShadow: '0 0 4px #000, 0 0 4px #000, 0 0 4px #000' }}>{entityId}</Typography>
+                      <Typography variant='h4' sx={{ textShadow: '0 0 4px #000, 0 0 4px #000, 0 0 4px #000' }}>{entity?.name}</Typography>
                     </Stack>
                   </div>
                 </div>
