@@ -36,6 +36,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { use100vh } from 'react-div-100vh';
 import { imageUrl } from '../utilities/constants';
+import { getSettingsCookie, setSettingsCookie } from '../utilities/cookieContext';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -188,7 +189,7 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
   const [modalEvent, setModalEvent] = useState<NnEvent | null>(null);
   const [editFields, setEditFields] = useState<{ name: string; description: string; open: string; close: string } | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [showUnverified, setShowUnverified] = useState(false);
+  const [showUnverified, setShowUnverified] = useState(() => getSettingsCookie().eventsUnverified ?? false);
   const [locationsFetchDone, setLocationsFetchDone] = useState(() => locations.length > 0);
   const locationsChangeCount = useRef(0);
   const [createFields, setCreateFields] = useState<{ name: string; description: string; open: string; close: string; locationId: string }>({ name: '', description: '', open: '', close: '', locationId: '' });
@@ -217,6 +218,21 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalEvent]);
+
+  // Keep the open modal in sync when contextEvents refreshes (e.g. after an update notification)
+  const modalEventDbid = modalEvent?.dbid ?? null;
+  useEffect(() => {
+    if (!modalEventDbid) return;
+    const fresh = contextEvents.find(e => e.dbid === modalEventDbid);
+    if (fresh) setModalEvent(fresh);
+  }, [contextEvents, modalEventDbid]);
+
+  // Re-fetch events when the modal opens so it always shows current data
+  useEffect(() => {
+    if (!modalEventDbid) return;
+    doFetchForView(view, selectedLocation?.id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalEventDbid]);
 
   useEffect(() => {
     if (locations.length === 0) fetchAllLocations();
@@ -386,6 +402,9 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
       const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
       return sorted.filter((e) => new Date(e.open!) >= cutoff);
     }
+    if (view === 'locations' && selectedLocation) {
+      return sorted.filter((e) => e.close && new Date(e.close) > now);
+    }
     const { start, end } = getDayBounds(selectedDate);
     return sorted.filter((e) => {
       const t = new Date(e.open!);
@@ -401,9 +420,13 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
   [locations, showUnverified],
   );
 
+  const reloadView = () => {
+    setFetchedViews((prev) => { const next = new Set(prev); next.delete(viewKey); return next; });
+  };
+
   const showRsvpButton = view !== 'manage';
   const isFetching = !fetchedViews.has(viewKey) && view !== 'locations';
-  const showDatePicker = view !== 'manage' && !(view === 'locations' && !selectedLocation);
+  const showDatePicker = view !== 'manage' && view !== 'locations';
   const showVerifiedToggle = view === 'events' || view === 'locations';
 
   // ─── Event item ─────────────────────────────────────────────────────────────
@@ -562,16 +585,6 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
                       >
                         {formatDate(selectedDate)}
                       </Typography>
-                      {view === 'locations' && selectedLocation && (
-                        <Typography
-                          variant="caption"
-                          className={itemStyles.dateText}
-                          sx={{ fontSize: '0.7rem', display: 'block', opacity: 0.7 }}
-                          noWrap
-                        >
-                          {selectedLocation.name}
-                        </Typography>
-                      )}
                     </Box>
                     <IconButton size="small" onClick={handleDateNext}>
                       <ChevronRightIcon fontSize="small" />
@@ -580,7 +593,7 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
                 )}
                 {showVerifiedToggle && (
                   <Tooltip title={showUnverified ? 'Show verified only' : 'Show all locations'}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowUnverified(v => !v)}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowUnverified(v => { const next = !v; setSettingsCookie({ eventsUnverified: next }); return next; })}>
                       <IconButton size="small" color={showUnverified ? 'default' : 'primary'}>
                         <VerifiedIcon fontSize="small" />
                       </IconButton>
@@ -705,9 +718,6 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
             {modalEvent && editFields && (() => {
               const loc = locations.find((l: any) => l.id === modalEvent.location);
               const canEdit = !modalEvent.cancelled && (modalEvent.owner === accountId || (accountId !== userId && loc?.owner === accountId));
-              const reloadView = () => {
-                setFetchedViews((prev) => { const next = new Set(prev); next.delete(viewKey); return next; });
-              };
               const handleSave = () => {
                 updateEvent(modalEvent.dbid!, editFields);
                 setModalEvent(null);
@@ -900,6 +910,7 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
                   close: createFields.close,
                 });
                 setCreateModalOpen(false);
+                reloadView();
               };
               return (
                 <Stack spacing={1.5}>
