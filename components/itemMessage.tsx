@@ -23,10 +23,11 @@ interface itemMessageProps {
     text?: string;
     buttons?: LooseObject;
     dialogCallback?: Function;
+    url?: string;
   }
   
 export default function ItemMessage(props:itemMessageProps):JSX.Element {
-  const { buttons = {}, date = '', dialogCallback = null, id = '', username = '', text = '' } = props;
+  const { buttons = {}, date = '', dialogCallback = null, id = '', username = '', text = '', url } = props;
   const hasButtons = 
     JSON.stringify(buttons).length >= 3 
     && !JSON.stringify(buttons).includes('amount');
@@ -63,15 +64,27 @@ export default function ItemMessage(props:itemMessageProps):JSX.Element {
           </div>
         </Box>
       </Stack>
-      <div className={isSystemMsg(id, username) ? styles.systemLine : styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
-        <Box>
-          <Typography>
-            <Link href={`/${id.includes('C') ? 'factions' : 'contacts'}/${id}`}>
-              <span className={styles.name}>{username}</span>
-            </Link>
-             》 {getEnrichedText()}</Typography>
-        </Box>
-      </div>
+      {url && !hasButtons && !hasRequest ? (
+        <Link href={url}>
+          <div className={isSystemMsg(id, username) ? styles.systemLine : styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
+            <Box>
+              <Typography>
+                <span className={styles.name}>{username}</span>
+                 》 {getEnrichedText()}</Typography>
+            </Box>
+          </div>
+        </Link>
+      ) : (
+        <div className={isSystemMsg(id, username) ? styles.systemLine : styles.transactionLine} data-augmented-ui="tr-clip br-round bl-round inlay">
+          <Box>
+            <Typography>
+              <Link href={`/${id.includes('C') ? 'factions' : 'contacts'}/${id}`}>
+                <span className={styles.name}>{username}</span>
+              </Link>
+               》 {getEnrichedText()}</Typography>
+          </Box>
+        </div>
+      )}
       {hasRequest && (
         <Stack
           direction="row"

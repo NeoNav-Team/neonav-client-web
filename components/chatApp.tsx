@@ -261,6 +261,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                         username={item.from}
                         id={item.fromid}
                         dialogCallback={goDialogAction}
+                        url={item.url}
                         buttons={{
                           confirm: item.confirm,
                           decline: item.decline,
