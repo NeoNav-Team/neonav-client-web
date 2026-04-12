@@ -412,9 +412,11 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
     });
   }, [contextEvents, selectedDate, view, selectedLocation, userId, accountId, showUnverified, locations]);
 
+  const HIDDEN_VENUE_TYPES = new Set(['porto', 'road', 'road 90', 'megamall', 'dev', 'megablock', 'security', 'medical']);
+
   const filteredLocations = useMemo(() =>
     locations
-      .filter((l: any) => (l.venuetype || '').toLowerCase() !== 'dev')
+      .filter((l: any) => !HIDDEN_VENUE_TYPES.has((l.venuetype || '').toLowerCase()))
       .filter((l: any) => showUnverified || l.verified === true)
       .sort((a: any, b: any) => (a.name || '').localeCompare(b.name || '')),
   [locations, showUnverified],
@@ -438,6 +440,10 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
     const openTime = event.open ? formatTime(event.open) : '?';
     const closeTime = event.close ? formatTime(event.close) : '?';
     const attendeeCount = event.attendees?.length ?? 0;
+    const eventDay = event.open ? (() => { const { start, end } = getDayBounds(new Date()); return new Date(event.open) >= start && new Date(event.open) < end; })() : true;
+    const datePrefix = (view === 'locations' && !eventDay && event.open)
+      ? new Date(event.open).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ' · '
+      : '';
 
     return (
       <Box
@@ -449,7 +455,7 @@ export default function EventsApp({ initialLocationId, initialEventId }: EventsA
         <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="flex-start">
           <Box sx={{ maxWidth: '72%' }}>
             <div className={itemStyles.subtitleLine} data-augmented-ui="tl-clip both" style={event.cancelled ? { backgroundColor: 'var(--color-danger, #7b0000)' } : undefined}>
-              <div className={itemStyles.name}>{openTime}</div>
+              <div className={itemStyles.name}>{datePrefix}{openTime}</div>
             </div>
           </Box>
         </Stack>
