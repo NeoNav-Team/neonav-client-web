@@ -58,14 +58,6 @@ self.addEventListener('fetch', event => {
   }
 });
 
-// ── Page open/closed tracking ─────────────────────────────────────────────────
-let pageOpen = false;
-
-self.addEventListener('message', event => {
-  if (event.data === 'page-closed') { pageOpen = false; return; }
-  if (event.data === 'page-open')   { pageOpen = true;  return; }
-});
-
 // ── Web Push ──────────────────────────────────────────────────────────────────
 function formatSender(from, fromId) {
   if (fromId && from && from !== fromId) return `${from} (${fromId})`;
@@ -76,8 +68,6 @@ self.addEventListener('push', event => {
   if (!event.data) return;
   let payload;
   try { payload = event.data.json(); } catch { return; }
-
-  if (pageOpen) return; // in-app indicators are sufficient while app is open
 
   let title, body, url, tag;
 
@@ -116,13 +106,20 @@ self.addEventListener('push', event => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(title, {
-      body,
-      icon,
-      badge   : '/maskable_icon_badgex192.png',
-      tag,
-      renotify: true,
-      data    : { url }
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // If a window is focused the user is actively in the app — skip the notification.
+      // Chrome does not require showNotification() when a client is focused, so this
+      // avoids the "This site has been updated in the background" fallback message.
+      const focused = windowClients.some(wc => wc.focused);
+      if (focused) return;
+      return self.registration.showNotification(title, {
+        body,
+        icon,
+        badge   : '/maskable_icon_badgex192.png',
+        tag,
+        renotify: true,
+        data    : { url }
+      });
     })
   );
 });
