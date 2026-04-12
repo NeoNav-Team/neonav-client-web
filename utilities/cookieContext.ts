@@ -2,7 +2,6 @@ import { NnStore, nnEntity, NnSimpleEntity } from "@/components/context/nnTypes"
 import Cookies from "js-cookie";
 import { HotbarKey } from "./hotbarOptions";
 
-const DEFAULT_HOTBAR_KEYS: HotbarKey[] = ['map', 'myQRCode', 'qrScanner'];
 
 const MAX_CLIPBOARD_ITEMS = 50;
 
@@ -81,18 +80,21 @@ export const getCookieClipboard = (): nnEntity[] => {
   return clipboardEntitiesArr;
 }
 
-export const getHotbarCookie = (): HotbarKey[] => {
-  const value = Cookies.get('nnHotbar');
-  if (!value) return [...DEFAULT_HOTBAR_KEYS];
-  try {
-    return JSON.parse(value) as HotbarKey[];
-  } catch {
-    return [...DEFAULT_HOTBAR_KEYS];
-  }
+
+interface NnSettings {
+  eventsUnverified?: boolean;
+  hotbar?: HotbarKey[];
+}
+
+export const getSettingsCookie = (): NnSettings => {
+  const value = Cookies.get('nnSettings');
+  if (!value) return {};
+  try { return JSON.parse(value) as NnSettings; } catch { return {}; }
 };
 
-export const setHotbarCookie = (keys: HotbarKey[]) => {
-  Cookies.set('nnHotbar', JSON.stringify(keys), { domain: '.neonav.net', expires: 365 });
+export const setSettingsCookie = (patch: Partial<NnSettings>) => {
+  const current = getSettingsCookie();
+  Cookies.set('nnSettings', JSON.stringify({ ...current, ...patch }), { domain: '.neonav.net', expires: 365 });
 };
 
 export const setCookieClipboard = (clipboardEntity:nnEntity) => {
