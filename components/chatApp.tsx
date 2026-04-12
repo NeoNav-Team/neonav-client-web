@@ -166,7 +166,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
         }
         break;
       case 'amount':
-        router.push(`/cash/${option}#${entityId}`);
+        router.push(`/cash/${option}#${entityId}`, { scroll: false });
       default:
         break;
     }
