@@ -61,6 +61,7 @@ const VENUE_TYPES = [
   'Entertainment',
   'Food (Vendor)',
   'Helix Industries',
+  'Info',
   'Lounge',
   'Music',
   'Office',
@@ -77,7 +78,6 @@ const DEV_VENUES = [
   'Megablock',
   'Megamall',
   'Road',
-  'Road 90',
   'Security',
 ];
 
@@ -465,6 +465,25 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
                     type='number'
                     fullWidth 
                     value={formData.tooltip.long} 
+                    onChange={setTextFormData} 
+                  />
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <TextField 
+                    label='Rotation' 
+                    name='tooltip.rotation' 
+                    type='number'
+                    fullWidth 
+                    value={formData.tooltip.rotation} 
+                    onChange={setTextFormData} 
+                  />
+                  <TextField
+                    disabled={true} 
+                    label='' 
+                    name='placeholder' 
+                    type='number'
+                    fullWidth 
+                    value=''
                     onChange={setTextFormData} 
                   />
                 </Box>
