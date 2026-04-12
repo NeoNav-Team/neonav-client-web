@@ -139,9 +139,10 @@ const formatTime = (iso: string): string => {
 
 interface EventsAppProps {
   initialLocationId?: string;
+  initialEventId?: string;
 }
 
-export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.Element {
+export default function EventsApp({ initialLocationId, initialEventId }: EventsAppProps): JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const TOOLBAR_HEIGHT = 76;
@@ -194,6 +195,7 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasAutoAdvanced = useRef(false);
   const pageOpenTime = useRef<Date>(new Date());
+  const initialEventHandled = useRef(false);
 
   const viewKey = view === 'locations' && selectedLocation
     ? `locations_${selectedLocation.id}`
@@ -234,6 +236,22 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
       setSelectedLocation({ id: initialLocationId, name: loc.name || initialLocationId });
     }
   }, [initialLocationId, locations]);
+
+  // Once events load, open the modal for a deep-linked event
+  useEffect(() => {
+    if (!initialEventId || initialEventHandled.current || contextEvents.length === 0) return;
+    const event = contextEvents.find(e => e.dbid === initialEventId);
+    if (!event) return;
+    initialEventHandled.current = true;
+    if (event.open) {
+      const d = new Date(event.open);
+      if (d.getHours() < 4) d.setDate(d.getDate() - 1);
+      d.setHours(12, 0, 0, 0);
+      setSelectedDate(d);
+    }
+    setModalEvent(event);
+    setEditFields({ name: event.name || '', description: event.description || '', open: event.open || '', close: event.close || '' });
+  }, [initialEventId, contextEvents]);
 
   const doFetchForView = useCallback(
     (v: EventView, locId?: string) => {
@@ -794,9 +812,9 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                     <Typography component="div">
                       <span className={itemStyles.action}>Location</span>
                       {' 》 '}
-                      <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>
-                        {getLocationName(modalEvent.location || '')}
-                      </span>
+                      <a href={`/map/${modalEvent.location}`} style={{ color: 'inherit', paddingLeft: 4 }}>
+                        <span className={itemStyles.comment}>{getLocationName(modalEvent.location || '')}</span>
+                      </a>
                     </Typography>
                     <Typography component="div">
                       <span className={itemStyles.action}>Host</span>
@@ -813,26 +831,6 @@ export default function EventsApp({ initialLocationId }: EventsAppProps): JSX.El
                       </span>
                     </Typography>
                   </div>
-
-                  {/* Location panel */}
-                  {loc && (
-                    <div className={itemStyles.statusLine} data-augmented-ui="tr-clip inlay">
-                      <Typography component="div">
-                        <span className={itemStyles.action}>Venue</span>
-                        {' 》 '}
-                        <a href={`/map/${modalEvent.location}`} style={{ color: 'inherit' }}>
-                          <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>{loc.name || modalEvent.location}</span>
-                        </a>
-                      </Typography>
-                      {loc.venuetype && (
-                        <Typography component="div">
-                          <span className={itemStyles.action}>Type</span>
-                          {' 》 '}
-                          <span className={itemStyles.comment} style={{ paddingLeft: 4 }}>{loc.venuetype}</span>
-                        </Typography>
-                      )}
-                    </div>
-                  )}
 
                   {/* Owner faction panel */}
                   {loc?.owner && (() => {
