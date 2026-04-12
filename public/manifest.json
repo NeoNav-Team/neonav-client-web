@@ -2,13 +2,12 @@
   "name": "NeoNav",
   "short_name": "NeoNav",
   "start_url": "/",
-  "scope": "https://neonav.net",
+  "scope": "https://dev.neonav.net",
   "scope_extensions": [
     { "type": "origin", "origin": "https://auth.neonav.net"},
     { "type": "origin", "origin": "https://dev.neonav.net"},
     { "type": "origin", "origin": "https://sites.neonav.net"}
   ],
-  "display_override": ["fullscreen", "minimal-ui"],
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#002566",
