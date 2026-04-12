@@ -16,7 +16,7 @@ import {
   Typography
 } from '@mui/material';
 import { HOTBAR_OPTIONS, HotbarKey } from '../utilities/hotbarOptions';
-import { getHotbarCookie, setHotbarCookie } from '../utilities/cookieContext';
+import { getSettingsCookie, setSettingsCookie } from '../utilities/cookieContext';
 import MyQRCode from './myQRCode';
 import QrCodeReader from './qrCodeReader';
 import styles from '../styles/generic.module.css';
@@ -63,14 +63,15 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setHotbarKeys(getHotbarCookie());
+    const saved = getSettingsCookie().hotbar;
+    if (saved) setHotbarKeys(saved);
   }, []);
 
   const handleHotbarSlotChange = (slotIndex: number, key: HotbarKey) => {
     const updated = [...hotbarKeys];
     updated[slotIndex] = key;
     setHotbarKeys(updated);
-    setHotbarCookie(updated);
+    setSettingsCookie({ hotbar: updated });
   };
 
   const handleHotbarAction = (action: string) => {
