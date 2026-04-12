@@ -394,6 +394,48 @@ export const createNewChannel = (dispatch: DispatchFunc) => async (name:string) 
   executeApi('channelCreate', {name, token}, onSuccess, onError);
 };
 
+export const banUserFromChannel = (dispatch: DispatchFunc) => async (channel: string, id: string) => {
+  const token = getCookieToken();
+  const onSuccess = (response: APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'success', message: `User banned from channel.`, show: true },
+    });
+    return data;
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Ban error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+    return err;
+  };
+  executeApi('channelBan', { channel, id, token }, onSuccess, onError);
+};
+
+export const deleteChannelMessage = (dispatch: DispatchFunc) => async (channel: string, message: string) => {
+  const token = getCookieToken();
+  const onSuccess = (response: APIResponse) => {
+    const { data } = response;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'success', message: `Message deleted.`, show: true },
+    });
+    return data;
+  };
+  const onError = (err: netcheckAPIResData) => {
+    const { message = 'Delete message error.' } = err;
+    dispatch({
+      type: 'setAlert',
+      payload: { severity: 'error', message, show: true },
+    });
+    return err;
+  };
+  executeApi('messageDelete', { channel, message, token }, onSuccess, onError);
+};
+
 export const toggleChannelScope = (dispatch: DispatchFunc) => async (channel:string) => {
   const token = getCookieToken();
   const onSuccess = (response:APIResponse) => {

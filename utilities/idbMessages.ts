@@ -98,6 +98,16 @@ export async function idbClearChannel(channelId: string): Promise<void> {
   });
 }
 
+export async function idbGetMessage(id: string): Promise<NnChatMessage | null> {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).get(id);
+    req.onsuccess = () => resolve((req.result as NnChatMessage) ?? null);
+    req.onerror = () => reject(req.error);
+  });
+}
+
 export async function idbCullChannel(channelId: string): Promise<void> {
   const db = await openDb();
   return new Promise((resolve, reject) => {

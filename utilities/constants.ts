@@ -124,6 +124,18 @@ export const authApiEnpoints = {
     method: "put",
     path: "/api/chat/channels/$channel/$id",
   },
+  channelBan: {
+    method: "delete",
+    path: "/api/chat/channels/$channel/$id/ban",
+  },
+  channelBanList: {
+    method: "get",
+    path: "/api/chat/channels/$channel/banlist",
+  },
+  messageDelete: {
+    method: "delete",
+    path: "/api/chat/messages/$channel/$message",
+  },
   channelsLatest: {
     method: "get",
     path: "/api/chat/channels/latest",

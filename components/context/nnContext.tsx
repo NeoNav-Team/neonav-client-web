@@ -45,8 +45,10 @@ import {
 } from './nnActionsCash';
 import {
   adminUserToChannel,
+  banUserFromChannel,
   createNewChannel,
   clearUnreadCountByType,
+  deleteChannelMessage,
   fetchChannelsLatest,
   joinUserToChannel,
   inviteUserToChannel,
@@ -313,8 +315,10 @@ export const { Context, Provider } = DataContextCreator(
     addRepToFaction,
     addUserToFaction,
     adminUserToChannel,
+    banUserFromChannel,
     befriend,
     clearUnreadCountByType,
+    deleteChannelMessage,
     closeAlert,
     closeAnnouncement,
     createFactionLocation,
