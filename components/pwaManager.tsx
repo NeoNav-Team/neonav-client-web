@@ -57,6 +57,10 @@ export default function PwaManager() {
 
         if (Notification.permission === 'granted') {
           subscribeToPush(reg);
+        } else if (Notification.permission === 'default') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') subscribeToPush(reg);
+          });
         }
       })
       .catch(err => console.warn('SW registration failed:', err));
