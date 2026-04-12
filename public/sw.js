@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE     = 'neonav-v1';
+const CACHE     = 'neonav-v2';
 const STATIC_RE = /^\/_next\/static\//;
 
 // ── Install: cache minimal app shell ─────────────────────────────────────────
@@ -85,13 +85,13 @@ self.addEventListener('push', event => {
     // tan/chat payload format — sent by ChatController on message post / mention
     const sender = formatSender(payload.from, payload.fromId);
     if (payload.isAnnounce) {
-      title = `Announcement — ${payload.channelName || 'NeoNav'}`;
+      title = `${payload.channelName || 'NeoNav'}`;
       tag   = `neonav-announce-${payload.channelId}`;
     } else if (payload.mention) {
-      title = `Mentioned in #${payload.channelName || 'chat'}`;
+      title = `Mentioned in ${payload.channelName || 'tan/chat'}`;
       tag   = `neonav-mention-${payload.channelId}`;
     } else {
-      title = payload.channelName || 'NeoNav Chat';
+      title = payload.channelName || 'tan/chat';
       tag   = `neonav-chan-${payload.channelId}`;
     }
     body = `${sender}: ${payload.text || '…'}`;
@@ -104,11 +104,22 @@ self.addEventListener('push', event => {
     tag   = payload.tag   || 'neonav';
   }
 
+  let icon;
+  if (payload.channelId) {
+    icon = payload.isAnnounce
+      ? '/maskable_icon_x192_announce.png'
+      : '/maskable_icon_x192_chat.png';
+  } else if (payload.notifyapp === 'cash') {
+    icon = '/maskable_icon_x192_cash.png';
+  } else {
+    icon = '/maskable_icon_x192_notify.png';
+  }
+
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
-      icon    : '/neonav-192.png',
-      badge   : '/neonav-192.png',
+      icon,
+      badge   : '/maskable_icon_badgex192.png',
       tag,
       renotify: true,
       data    : { url }
