@@ -141,7 +141,7 @@ export const VENUE_ICON_MAP = new Map<string, any>([
   ['road', {adminOnly: true}],
 
   ['location_pin', {icon: AttributionIcon, iconColor: white, pinColor: neoOrange, hidden: true}],
-  ['new_location', {icon: AddCircleIcon, iconColor: red, pinColor: white, hidden: true}],
+  ['new_location', {icon: AddCircleIcon, iconColor: cyberGreen, pinColor: white, hidden: true}],
 ]);
 
 const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
