@@ -1,6 +1,6 @@
 import axios from 'axios';
 import executeApi from '@/utilities/executeApi';
-import longPollApi from '@/utilities/longPollApi';
+import longPollApi, { abortLongPoll } from '@/utilities/longPollApi';
 import {
   APIResponse,
   DispatchFunc,
@@ -70,14 +70,15 @@ export const fetchChannelsLatest = (dispatch: DispatchFunc) => async () => {
       return;
     }
 
-    await idbPutMessages(newMsgs);
-    await idbCullChannel(channelId);
-
-    // No prior IDB data means fresh device — treat as no unread baseline
+    // No prior IDB data means this channel has never been visited — don't pre-populate
+    // IDB so fetchChannelHistory does a clean full fetch on first visit
     if (!latestIdbTs) {
       unreadCounts[channelId] = 0;
       return;
     }
+
+    await idbPutMessages(newMsgs);
+    await idbCullChannel(channelId);
 
     // ?since= is inclusive, so the boundary message we already have may be returned — exclude it
     const trulyNewMsgs = latestIdbId ? newMsgs.filter(m => m.id !== latestIdbId) : newMsgs;
@@ -272,6 +273,7 @@ export const leaveUserChannel = (dispatch: DispatchFunc) => async (channel: stri
       payload: { severity: 'success', message: 'Left channel.', show: true },
     });
     await fetchUserChannels(dispatch)();
+    abortLongPoll();
   };
   const onError = (err: netcheckAPIResData) => {
     const { message = 'Leave channel error.' } = err;
@@ -336,7 +338,8 @@ export const joinUserToChannel = (dispatch: DispatchFunc) => async (channel:stri
     dispatch({
       type: 'setAlert',
       payload: {severity: 'success', message: "Joined channel.", show: true},
-    })
+    });
+    abortLongPoll();
     return data;
   };
   const onError = (err:netcheckAPIResData) => {
@@ -380,7 +383,8 @@ export const createNewChannel = (dispatch: DispatchFunc) => async (name:string) 
     dispatch({
       type: 'setAlert',
       payload: {severity: 'success', message: `Created "${name}"`, show: true},
-    })
+    });
+    abortLongPoll();
     return data;
   };
   const onError = (err:netcheckAPIResData) => {

@@ -1,12 +1,22 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { apiUrl, authApiEnpoints } from '../utilities/constants';
 
 const WAIT_TIME = 300000;
 
+let activeAbortController: AbortController | null = null;
+
+export const abortLongPoll = () => {
+  if (activeAbortController) {
+    activeAbortController.abort();
+    activeAbortController = null;
+  }
+};
+
 const newAbortSignal = (timeoutMs:number) => {
   const abortController = new AbortController();
+  activeAbortController = abortController;
   setTimeout(() => abortController.abort(), timeoutMs || 0);
-  
+
   return abortController.signal;
 }
 
@@ -36,24 +46,29 @@ const longPollApi = async (endpoint:string, data:any, callback: any, errBack: an
     inTemplate && delete data[key];
   });
   const url = `${apiUrl.protocol}://${apiUrl.hostname}${templatedPath}`;
+  const currentSince = data.since;
+  let networkError = false;
   const longPollResponse:any = await axios({
     method,
     url,
     data,
     headers,
     timeout: WAIT_TIME,
-    signal: newAbortSignal(WAIT_TIME) 
+    signal: newAbortSignal(WAIT_TIME)
   }).then(
     (response:AxiosResponse) => {
       return response;
     }
-  ).catch(function (error:AxiosError) {
-    (error:AxiosResponse) => {
-      return error;
-    }
+  ).catch(function () {
+    networkError = true;
+    return undefined;
   });
-  if (
-    typeof longPollResponse !== 'undefined' && 
+  if (networkError || typeof longPollResponse === 'undefined') {
+    // Network error or abort — restart from last known sequence after brief delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    await longPollApi(endpoint, {since: currentSince, token}, callback, errBack);
+  } else if (
+    typeof longPollResponse !== 'undefined' &&
         typeof longPollResponse?.status !== 'undefined' &&(
       longPollResponse?.status === 403 ||
         longPollResponse?.status === 401
