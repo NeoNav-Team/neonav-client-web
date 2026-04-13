@@ -95,9 +95,9 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const { username, firstname, lastname, skills, occupation, bio } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
 
-  const goFetchProfile = useCallback(() => {
+  const goFetchProfile = useCallback(async () => {
     if (!profileFetched) {
-      fetchUserProfile();
+      await fetchUserProfile();
       setProfileFetched(true);
     }
   }, [profileFetched, fetchUserProfile]);
