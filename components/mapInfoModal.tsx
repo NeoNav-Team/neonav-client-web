@@ -59,13 +59,11 @@ const VENUE_TYPES = [
   'Employment',
   'Endline Solutions',
   'Entertainment',
-  'Food (Vendor)',
   'Helix Industries',
   'Info',
   'Lounge',
   'Music',
   'Office',
-  'Porto',
   'Reboot Syndicate',
   'Sentinels',
   'Service',
@@ -74,9 +72,11 @@ const VENUE_TYPES = [
 
 const DEV_VENUES = [
   'Dev',
+  'Food (Vendor)',
   'Medical',
   'Megablock',
   'Megamall',
+  'Porto',
   'Road',
   'Security',
 ];
@@ -292,9 +292,12 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
   }, [state?.network?.collections?.factions]);
 
   // Admin only venue types
-  if (isAdmin && !VENUE_TYPES.includes('Megamall')) {
-    VENUE_TYPES.push(...DEV_VENUES);
-  }
+  const availableVenueTypes = React.useMemo(() => {
+    if (isAdmin) {
+      return [...VENUE_TYPES, ...DEV_VENUES];
+    }
+    return VENUE_TYPES;
+  }, [isAdmin]);
 
   return (
     <SimpleScrollContainer>
@@ -332,7 +335,7 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
                 }
               }}
             >
-              {VENUE_TYPES.map((type) => (
+              {availableVenueTypes.map((type) => (
                 <MenuItem key={type} value={type}>{type}</MenuItem>
               ))}
             </Select>

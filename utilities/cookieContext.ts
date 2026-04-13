@@ -84,6 +84,7 @@ export const getCookieClipboard = (): nnEntity[] => {
 interface NnSettings {
   eventsUnverified?: boolean;
   hotbar?: HotbarKey[];
+  mapLayers?: Record<string, boolean>;
 }
 
 export const getSettingsCookie = (): NnSettings => {

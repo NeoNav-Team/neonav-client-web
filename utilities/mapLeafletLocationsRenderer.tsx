@@ -105,6 +105,7 @@ const cyberOrange = '#D55E00'; // #D55E00
 const cyberBlueDark = '#0072B2'; // #0072B2
 const cyberBlueLight = '#56B4E9'; // #56B4E9
 const cyberYellow = '#F0E442'; // #F0E442
+const cyberPurple = '#8C4DDB'; // #8C4DDB
 const neoPink = '#D45893'; // #D45893
 const neoOrange = '#FCAC6F'; // #FCAC6F
 const neoGreen = '#47E15D'; // #47E15D
@@ -114,17 +115,15 @@ const red = '#FF0000'; // #FF0000
 
 // TODO this should be synced with the list in mapInfoModal in some way
 export const VENUE_ICON_MAP = new Map<string, any>([
-  ['arcade', {icon: SportsEsportsIcon, iconColor: neoOrange, pinColor: cyberBlueDark}],
-  ['chapel', {icon: TempleBuddhistIcon, iconColor: cyberOrange, pinColor: cyberBlueDark}],
-  ['employment', {icon: BadgeIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
-  ['entertainment', {icon: TheaterComedyIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
-  ['food', {icon: RamenDiningIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
-  ['info', {icon: InfoOutlinedIcon, iconColor: white, pinColor: red}],
-  ['lounge', {icon: NightlifeIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
-  ['music', {icon: SpeakerIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
+  ['arcade', {icon: SportsEsportsIcon, iconColor: cyberYellow, pinColor: cyberPurple}],
+  ['chapel', {icon: TempleBuddhistIcon, iconColor: cyberYellow, pinColor: cyberOrange}],
+  ['employment', {icon: BadgeIcon, iconColor: cyberYellow, pinColor: cyberBlueLight}],
+  ['entertainment', {icon: TheaterComedyIcon, iconColor: cyberYellow, pinColor: cyberPurple}],
+  ['info', {icon: InfoOutlinedIcon, iconColor: white, pinColor: cyberOrange}],
+  ['lounge', {icon: NightlifeIcon, iconColor: cyberYellow, pinColor: cyberGreen}],
+  ['music', {icon: SpeakerIcon, iconColor: cyberYellow, pinColor: cyberGreen}],
   ['office', {icon: BusinessCenterIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
-  ['porto', {icon: WcIcon, iconColor: white, pinColor: cyberOrange}],
-  ['service', {icon: SimCardIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
+  ['service', {icon: SimCardIcon, iconColor: cyberYellow, pinColor: cyberBlueLight}],
   ['store', {icon: LocalMallIcon, iconColor: cyberYellow, pinColor: cyberBlueDark}],
   
   ['endline', {icon: ControlCameraIcon, iconColor: cyberBlueDark, pinColor: neoGreen}],
@@ -133,14 +132,16 @@ export const VENUE_ICON_MAP = new Map<string, any>([
   ['sentinels', {icon: EarbudsIcon, iconColor: white, pinColor: cyberOrange}],
 
   ['dev', {icon: AdjustIcon, iconColor: white, pinColor: red, adminOnly: true}],
-  ['megablock', {icon: HiveIcon, iconColor: cyberBlueDark, pinColor: cyberYellow, adminOnly: true}],
-  ['megamall', {icon: LocalMallIcon, iconColor: cyberBlueDark, pinColor: cyberYellow, adminOnly: true}],
-  ['medical', {icon: HealthAndSafetyIcon, iconColor: white, pinColor: cyberOrange, adminOnly: true}],
-  ['security', {icon: LocalPoliceIcon, iconColor: white, pinColor: cyberOrange, adminOnly: true}],
+  ['food', {icon: RamenDiningIcon, iconColor: white, pinColor: cyberGreen, adminOnly: true}],
+  ['megablock', {icon: HiveIcon, iconColor: white, pinColor: cyberBlueLight, adminOnly: true}],
+  ['megamall', {icon: LocalMallIcon, iconColor: white, pinColor: cyberBlueDark, adminOnly: true}],
+  ['medical', {icon: HealthAndSafetyIcon, iconColor: white, pinColor: red, adminOnly: true}],
+  ['porto', {icon: WcIcon, iconColor: white, pinColor: cyberOrange, adminOnly: true}],
+  ['security', {icon: LocalPoliceIcon, iconColor: white, pinColor: red, adminOnly: true}],
   ['road', {adminOnly: true}],
 
-  ['location_pin', {icon: AttributionIcon, iconColor: white, pinColor: cyberGreen, hidden: true}],
-  ['new_location', {icon: AddIcon, iconColor: cyberYellow, pinColor: cyberGreen, hidden: true}],
+  ['location_pin', {icon: AttributionIcon, iconColor: white, pinColor: neoOrange, hidden: true}],
+  ['new_location', {icon: AddIcon, iconColor: red, pinColor: white, hidden: true}],
 ]);
 
 const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
@@ -319,6 +320,7 @@ export function renderNewLocationPin(latLng: L.LatLng, mymap: L.Map, updateField
     icon: getDivIcon(icon, color),
     autoPan: true,
     draggable: true,
+    zIndexOffset: 1000,
   }).on('dragend', (e) => {
     const newPos = e.target.getLatLng();
     updateField('lat', newPos.lat.toFixed(6)); // Your state for the DB
