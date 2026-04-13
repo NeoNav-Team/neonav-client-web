@@ -11,10 +11,11 @@ interface InputMessageProps {
   disabled?: boolean;
   changeHandler: Function;
   submitHandler: Function;
+  focusHandler?: Function;
 }
 
 export default function InputMessage(props:InputMessageProps):JSX.Element {
-  const { disabled, value, changeHandler, submitHandler } = props;
+  const { disabled, value, changeHandler, submitHandler, focusHandler } = props;
 
   return (
     <div
@@ -41,6 +42,7 @@ export default function InputMessage(props:InputMessageProps):JSX.Element {
           >
             <TextField
               onChange={event => changeHandler(event)}
+              onFocus={() => focusHandler?.()}
               value={value}
               disabled={disabled}
               sx={{minWidth: '85%'}}

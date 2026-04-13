@@ -14,6 +14,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../utilities/theme';
 import { Provider  as NnPoivder } from '../components/context/nnContext';
 import HeaderContainer from '@/components/headerContainer';
+import PwaManager from '@/components/pwaManager';
 import Div100vh from 'react-div-100vh';
 
 
@@ -24,14 +25,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
-      <head />
+      <head>
+        <meta name="theme-color" content="#002566" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="NeoNav" />
+        <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials"/>
+      </head>
       <body>
         <ThemeProvider theme={theme} >
           <NnPoivder>
+            <PwaManager />
             <Div100vh>
               <HeaderContainer />
               {children}

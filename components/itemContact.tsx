@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 
-import { 
+import {
   Avatar,
   Badge,
   Box,
@@ -13,6 +13,7 @@ import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import ThreePIcon from '@mui/icons-material/ThreeP';
 import BadgeIcon from '@mui/icons-material/Badge';
 import Groups3Icon from '@mui/icons-material/Groups3';
+import ForumIcon from '@mui/icons-material/Forum';
 import styles from '../styles/item.module.css';
 
 interface itemContactProps {
@@ -23,7 +24,7 @@ interface itemContactProps {
     thumbnail?: string;
     unread?: number;
   }
-  
+
 export default function ItemContact(props:itemContactProps):JSX.Element {
   const {
     id = '',
@@ -31,9 +32,9 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
     collection = 'contacts',
     unread = null,
     subtitle,
-    thumbnail 
+    thumbnail
   } = props;
-  
+
   const personIcon = (collectionType:string) => {
     let icon = <ThreePIcon />;
     switch (collectionType) {
@@ -43,27 +44,65 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
       case  'factions':
         icon = <Groups3Icon />;
         break;
-      case  'channels/admin':
-        icon = <RoomPreferencesIcon />;
-        break;
       default:
         break;
     }
     return icon;
   }
-  
+
+  const isChannel = collection === 'channels/admin';
+
   return (
     <Box style={{padding: '4px 0', width: '100%'}}>
       {subtitle ? (
-        <div 
+        <div
           className={styles.subtitleLine}
           data-augmented-ui="tr-clip both"
         >
           <Typography variant='h5'>{subtitle}</Typography>
         </div>
+      ) : isChannel ? (
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Link href={`/chat/${id}`} style={{flex: 1, minWidth: 0}}>
+            <div
+              className={styles.transactionLine}
+              data-augmented-ui="tr-clip br-round bl-round inlay"
+            >
+              <Box>
+                <Stack direction="row"
+                  spacing={1}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Stack direction="row" spacing={1} alignItems="center" style={{minWidth: 0, flex: 1}}>
+                    <Typography variant='h6' sx={{whiteSpace:'nowrap', overflow:'hidden', textOverflow: 'ellipsis'}}>
+                      <span className={styles.name}>{username}</span>
+                      <span className={styles.id}> | {id}</span>
+                    </Typography>
+                  </Stack>
+                  <Box sx={{flexShrink: 0, pr: 1}}>
+                    <Badge
+                      badgeContent={unread || 0}
+                      color="secondary"
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                      }}
+                    >
+                      <ForumIcon sx={{fontSize: 28, opacity: unread ? 1 : 0.3}} />
+                    </Badge>
+                  </Box>
+                </Stack>
+              </Box>
+            </div>
+          </Link>
+          <Link href={`/channels/admin/${id}`}>
+            <RoomPreferencesIcon />
+          </Link>
+        </Stack>
       ) : (
         <Link href={`/${collection}/${id}`}>
-          <div 
+          <div
             className={styles.transactionLine}
             data-augmented-ui="tr-clip br-round bl-round inlay"
           >
@@ -95,7 +134,7 @@ export default function ItemContact(props:itemContactProps):JSX.Element {
                       <ChatIcon />
                     </Link>
                   )}
-                </Badge> 
+                </Badge>
                 </Stack>
               </Stack>
             </Box>

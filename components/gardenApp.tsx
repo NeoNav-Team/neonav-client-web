@@ -212,26 +212,31 @@ export default function GardenApp(props: GardenAppProps): JSX.Element {
                 icon: filter ? <FilterListIcon /> : <FilterListOffIcon />,
                 handleAction: toggleFilter,
                 disabled: !isAdmin,
+                tooltipText: filter ? "See Only Public Statuses" : "See All Statuses",
               }}
               secondHexProps={{
                 icon: <AllInboxIcon />,
                 link: "/status/inbox",
+                tooltipText: "Inbox",
               }}
               bigHexProps={{
                 icon: <RateReviewIcon />,
                 handleAction: handleBigAction,
                 dialog: "What would you like to share?",
                 useInput: true,
+                tooltipText: "Post Status",
               }}
               thirdHexProps={{
                 icon: <BadgeIcon />,
                 link: `/contacts/${entity.id}`,
+                tooltipText: "Profile",
               }}
               fourthHexProps={{
                 icon: <PsychologyAltIcon />,
                 handleAction: handleLittleAction,
                 dialog: "Write a secret log entry for this user?",
                 useInput: true,
+                tooltipText: "Post Private Status",
               }}
             />
           </Box>

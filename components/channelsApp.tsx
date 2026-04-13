@@ -182,6 +182,7 @@ export default function ChannelsApp(props: ChannelsAppProps):JSX.Element {
                 handleAction: goCreateNewChannel,
                 dialog: 'New channel name',
                 useInput: true,
+                tooltipText: "Create Channel",
               }}
             />
           </Box>

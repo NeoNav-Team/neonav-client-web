@@ -28,6 +28,6 @@ export const config = {
        * - _next/static (static files)
        * - favicon.ico (favicon file)
        */
-      '/((?!api|_next/static|favicon.ico|neonav.svg).*)',
+      '/((?!api|_next/static|favicon.ico|neonav.svg|manifest.json|sw.js|maskable_icon).*)',
     ],
   }

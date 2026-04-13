@@ -16,7 +16,7 @@ import {
   Typography
 } from '@mui/material';
 import { HOTBAR_OPTIONS, HotbarKey } from '../utilities/hotbarOptions';
-import { getHotbarCookie, setHotbarCookie } from '../utilities/cookieContext';
+import { getSettingsCookie, setSettingsCookie } from '../utilities/cookieContext';
 import MyQRCode from './myQRCode';
 import QrCodeReader from './qrCodeReader';
 import styles from '../styles/generic.module.css';
@@ -43,7 +43,7 @@ import PolicyIcon from '@mui/icons-material/Policy';
 import Map from './svgr/map';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
-import Notifications from './svgr/notifications';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Help from './svgr/help';
 import UserSettings from './svgr/usersettings';
 import Hotbar from './hotbar';
@@ -63,14 +63,15 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setHotbarKeys(getHotbarCookie());
+    const saved = getSettingsCookie().hotbar;
+    if (saved) setHotbarKeys(saved);
   }, []);
 
   const handleHotbarSlotChange = (slotIndex: number, key: HotbarKey) => {
     const updated = [...hotbarKeys];
     updated[slotIndex] = key;
     setHotbarKeys(updated);
-    setHotbarCookie(updated);
+    setSettingsCookie({ hotbar: updated });
   };
 
   const handleHotbarAction = (action: string) => {
@@ -91,7 +92,7 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
   const handleIDScan = (result:string) => {
     if (result.length >= 5) {
       handleModelClose();
-      router.push(`/contacts/${result}#scan`);
+      router.push(`/contacts/${result}#scan`, { scroll: false });
     }
   }
 
@@ -224,8 +225,8 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
               alignItems="center"
               minHeight={fixedHeight}
             >
-              <Link href="/notifications">
-                <IconFrame icon={<Notifications fontSize="inherit" />} title="Notifications" />
+              <Link href="/events">
+                <IconFrame icon={<CalendarMonthIcon sx={{ filter: 'drop-shadow(rgb(67, 179, 230) 0px 0px 4px)' }} fontSize="inherit" />} title="Events" />
               </Link>
             </Box>
           </Grid>

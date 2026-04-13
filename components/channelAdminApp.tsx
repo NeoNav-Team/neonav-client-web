@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnChannel, NnContact, nnEntity, NnFaction, NnProviderValues, NnSimpleEntity } from './context/nnTypes';
@@ -76,6 +77,7 @@ const flexFooter = {
 export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element {
   const { params } = props;
   const { id } = params;
+  const router = useRouter();
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
@@ -89,6 +91,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
     fetchChannelDetails = (id:string) =>{},
     fetchChannelUsers = (id:string) =>{},
     setSelected = (indexType:string, channelId:string) => {},
+    leaveUserChannel = (channel:string, userId:string) => {},
     removeUserFromChannel = (channel:string, userId?:string) => {},
     inviteUserToChannel = (channel:string, userId:string) => {},
     toggleChannelScope = (id:string) =>{},
@@ -187,10 +190,8 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
   }, [channelInfo?.id, entity, goFetchChannelUsers, id, userList.length]);
 
   const goLeaveChannel = () =>  {
-    removeUserFromChannel(channelInfo?.id, userId);
-    if (channelInfo?.id === state.network?.selected?.channel) {
-      setSelected('channel', '');
-    }
+    leaveUserChannel(channelInfo?.id, userId);
+    router.push('/channels', { scroll: false });
   }
   const goSetChannelScope = () => {
     toggleChannelScope(channelInfo?.id);
@@ -304,16 +305,19 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
                 disabled: !isAdmin,
                 dialog: dialogForAction(requestValue),
                 handleAction: handleBigAction,
+                tooltipText: requests.find(req => req.value === requestValue)?.label + " User",
               }}
               thirdHexProps={{
                 icon: <NoMeetingRoomIcon />,
                 handleAction: goLeaveChannel,
-                dialog: "Leave this channel?"
+                dialog: "Leave this channel?",
+                tooltipText: "Leave Channel",
               }}
               fourthHexProps={{
                 icon: scope == 'group' ? <LockOpenIcon /> : <LockIcon />,
                 disabled: !isAdmin,
                 handleAction: goSetChannelScope,
+                tooltipText: scope == 'group' ? "Make Channel Public" : "Make Channel Private",
               }}
             />
           </Box>

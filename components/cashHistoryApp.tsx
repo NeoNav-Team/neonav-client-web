@@ -180,6 +180,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
               thirdHexProps={{
                 icon: <CurrencyExchangeIcon />,
                 link: "/cash",
+                tooltipText: "c±sн Wallet"
               }}
             />
           </Box>

@@ -1,0 +1,39 @@
+{
+  "name": "NeoNav",
+  "short_name": "NeoNav",
+  "start_url": "/",
+  "scope": "https://dev.neonav.net",
+  "scope_extensions": [
+    { "type": "origin", "origin": "https://auth.neonav.net"},
+    { "type": "origin", "origin": "https://dev.neonav.net"},
+    { "type": "origin", "origin": "https://sites.neonav.net"}
+  ],
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#002566",
+  "theme_color": "#002566",
+  "icons": [
+    {
+      "src": "/maskable_icon_x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/maskable_icon_x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Events",
+      "url": "/events"
+    },
+    {
+      "name": "Map",
+      "url": "/map"
+    }
+  ]
+
+}

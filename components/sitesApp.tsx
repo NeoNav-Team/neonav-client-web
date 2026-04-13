@@ -3,6 +3,7 @@ import Iframe from 'react-iframe';
 import { Fab } from '@mui/material';
 import Link from 'next/link';
 import ListIcon from '@mui/icons-material/List';
+import { useSearchParams } from 'next/navigation';
 
 interface PageContainerProps {
   index?: string;
@@ -13,9 +14,14 @@ const NEOSITES_INDEX = 'https://sites.neonav.net'
 
 export default function SitesApp(props:PageContainerProps):JSX.Element {
   const { index, indexBtn } = props;
+  const searchParams = useSearchParams();
+  const siteParam = searchParams ? searchParams.get('site') : null;
+  const iframeUrl = siteParam
+    ? new URL(siteParam, NEOSITES_INDEX + '/').href
+    : (index || NEOSITES_INDEX);
 
   return (<>
-    <Iframe url={index || NEOSITES_INDEX}
+    <Iframe url={iframeUrl}
       width="100%"
       height="100%"
       display="block"

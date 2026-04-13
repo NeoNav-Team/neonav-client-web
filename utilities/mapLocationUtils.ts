@@ -1,0 +1,63 @@
+import L from "leaflet";
+import { compressHoursAcrossMidnight, generateOpenMessages } from "./mapTimeUtils";
+import { NEONAV_MAINT } from '@/utilities/constants';
+
+/** 
+ * Enriches raw location data with display-ready strings and metadata.
+ */
+export function enrichLocation(loc: any) {
+  const ratingSum = (loc.reviews || []).reduce((sum: number, r: any) => sum + r.rating, 0);
+  const rating = loc.reviews?.length > 0 
+    ? `Rating: ${(ratingSum / loc.reviews.length).toFixed(1)}` 
+    : "No reviews";
+
+  const prettyhours = compressHoursAcrossMidnight(loc.hours ?? []);
+  const { openState, nextTimeMsg } = generateOpenMessages(prettyhours);
+
+  return {
+    ...loc,
+    rating,
+    prettyhours,
+    openState: openState || "Closed",
+    nextTimeMsg: nextTimeMsg || "",
+    ownerisfaction: loc.owner?.startsWith("C"),
+    ownerlink: loc.owner?.startsWith("C") ? `/factions/${loc.owner}` : `/contacts/${loc.owner}`
+  };
+}
+
+/**
+ * Logic to determine which LayerGroup a location belongs to.
+ */
+export function getTargetLayer(
+  loc: any, 
+  latlng: L.LatLng, 
+  layers: Map<string, L.LayerGroup>, 
+  context: { userId?: string, linkedLocationId:string, megablockRect: L.LatLngBounds, megamallRect: L.LatLngBounds }
+): L.LayerGroup {
+  const { userId, linkedLocationId, megablockRect, megamallRect } = context;
+
+  // 1. Location in page path
+  if (loc.id === linkedLocationId) return layers.get("locationMarkersLayer")!;
+
+  // 2. User/Faction Owned (Unverified)
+  if (!loc.verified && (
+    loc.owner === userId || 
+    loc.creator === userId
+  )) {
+    return layers.get("mylocations")!;
+  }
+
+  // 3. Unverified General
+  if (!loc.verified) return layers.get("unverified")!;
+
+  // 4. System/Dev Layers
+  if (loc.owner === NEONAV_MAINT || loc.venuetype === "Dev" || loc.venuetype === "dev") return layers.get("devLayer")!;
+  if (loc.venuetype.toLowerCase() === "megablock" || loc.venuetype.toLowerCase() === "megamall") return layers.get("megablockAndMegamallLocations")!;
+
+  // 5. Spatial Layers (Mega Structures)
+  if (megablockRect.contains(latlng)) return layers.get("megablockLocations")!;
+  if (megamallRect.contains(latlng)) return layers.get("megamallLocations")!;
+
+  // 6. Default
+  return layers.get("locationMarkersLayer")!;
+}

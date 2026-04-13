@@ -1,9 +1,10 @@
 'use client';
 import merge from 'deepmerge';
 import DataContextCreator from "./dataContextCreator";
-import { 
+import {
   Action,
   DispatchFunc,
+  LooseObject,
   NnChatMessage,
   NnProviderValues,
   NnStore,
@@ -13,6 +14,7 @@ import {
   closeAnnouncement,
   fetchClipboardEntities,
   fetchNetworkStatus,
+  setAlert,
   setSelected,
 } from './nnActionsNetwork';
 import {
@@ -43,17 +45,20 @@ import {
 } from './nnActionsCash';
 import {
   adminUserToChannel,
+  banUserFromChannel,
   createNewChannel,
   clearUnreadCountByType,
+  deleteChannelMessage,
+  fetchChannelsLatest,
   joinUserToChannel,
   inviteUserToChannel,
   fetchUserChannels,
   fetchChannelHistory,
   fetchChannelDetails,
   fetchChannelUsers,
-  fetchUnreadCount,
   longPollMessages,
   sendChannelMessage,
+  leaveUserChannel,
   removeUserFromChannel,
   toggleChannelScope,
 } from './nnActionsChat';
@@ -70,6 +75,32 @@ import {
   setFactionUserStatus,
   fetchFactionStatuses,
 } from './nnActionsFaction';
+import {
+  addLocationPin,
+  addLocationReview,
+  createFactionLocation,
+  createLocation,
+  deleteLocation,
+  deleteLocationPins,
+  deleteLocationReview,
+  fetchAllLocations,
+  fetchLocationById,
+  fetchLocationPins,
+  fetchUnverifiedLocations,
+  updateFactionLocation,
+  updateLocation,
+  verifyLocation,
+} from './nnActionsLocation';
+import {
+  fetchAllEvents,
+  fetchUserEventsAttending,
+  fetchUserEventsMine,
+  fetchLocationEvents,
+  rsvpEvent,
+  updateEvent,
+  createEvent,
+  cancelEvent,
+} from './nnActionsEvent';
 import { nnSchema } from "./nnSchema";
 import {
   getCookieContext,
@@ -77,7 +108,6 @@ import {
   setCookieContext,
   setCookieToken,
 } from "@/utilities/cookieContext";
-import { restrictedChannels } from "@/utilities/constants";
 
 const defaultNnContext:NnStore = merge({}, nnSchema);
 
@@ -97,9 +127,17 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setAnnouncement':
       clonedState.network.announcement = payload;
       break;
-    case 'initContext':
+    case 'initContext': {
+      const preservedChannel = clonedState.network?.selected?.channel;
       clonedState = {...clonedState, ...payload};
+      if (preservedChannel) {
+        clonedState.network = {
+          ...clonedState.network,
+          selected: { ...clonedState.network.selected, channel: preservedChannel },
+        };
+      }
       break;
+    }
     case 'setUserChannels':
       clonedState.user.channels = payload;
       break;
@@ -124,6 +162,23 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setClipboardEntities':
       clonedState.network.collections.clipboardEntities = payload;
       break;
+    case 'setLocations':
+      clonedState.network.collections.locations = payload;
+      break;
+    case 'setEvents':
+      clonedState.network.collections.events = payload;
+      break;
+    case 'updateLocation':
+      const location = clonedState.network.collections.locations.find((l:any) => l.id === (payload as any)?.id);
+      if (location) {
+        clonedState.network.collections.locations = clonedState.network.collections.locations.map((l:any) => l.id === (payload as any)?.id ? payload as any : l);
+      } else {
+        clonedState.network.collections.locations.push(payload);
+      }
+      break;
+    case 'setLocationPins':
+      clonedState.network.collections.locationPins = payload;
+      break;
     case 'updateClipboardEntities':
       let clipboardEntities = clonedState.network.collections.clipboardEntities;
       if (!clipboardEntities.includes(payload)) {
@@ -144,51 +199,84 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setMessageHistory':
       clonedState.network.collections.messages = payload;
       break;
-    case 'updateMessageHistory':
-      const clonedPayload:NnChatMessage = JSON.parse(JSON.stringify(payload));
-      if (
-        clonedPayload.channel == clonedState.network.selected.channel
-        || clonedPayload.channel == restrictedChannels[1]
-      ){ // if selected channel or announcement
-        clonedState.network.collections.messages.unshift(payload);
-      }
-      break;
     case 'setNetwork':
       clonedState.network.location = payload;
       break;
     case 'setSelected':
       clonedState.network.selected = merge.all([clonedState.network.selected, payload]);
       break;
+    case 'receiveMessage': {
+      const msg:NnChatMessage = JSON.parse(JSON.stringify(payload));
+      const msgChannel = msg.channel as string;
+      if (msgChannel === clonedState.network.selected.channel) {
+        clonedState.network.collections.messages.unshift(msg);
+      }
+      const myAccount = clonedState.network.selected.account;
+      if (msg.fromid !== myAccount) {
+        const current: LooseObject = clonedState.network.selected.unread || {};
+        clonedState.network.selected.unread = { ...current, [msgChannel]: (current[msgChannel] || 0) + 1 };
+      }
+      break;
+    }
     case 'setUnreadCount':
       clonedState.network.selected.unread = payload;
       break;
+    case 'clearChannelUnread': {
+      const ch = payload as unknown as string;
+      const current: LooseObject = clonedState.network.selected.unread || {};
+      clonedState.network.selected.unread = { ...current, [ch]: 0 };
+      break;
+    }
   }
   newState = {...state, ...clonedState};
-  const cookieState = JSON.parse(JSON.stringify(newState));
-  delete cookieState.entity;
+  const cookieState = {
+    network: {
+      selected: newState.network.selected,
+      location: newState.network.location,
+    },
+    user: {
+      profile: newState.user.profile,
+      wallets: newState.user.wallets,
+      channels: newState.user.channels,
+      factions: newState.user.factions,
+    },
+  };
   setCookieContext(cookieState);
   console.log('newState', newState);
   return newState;
 };
 
+const decodeJwtPayload = (token: string): any => {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return {};
+    // JWT uses base64url — convert to standard base64 before atob
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(window.atob(base64));
+  } catch {
+    return {};
+  }
+};
+
 export const initContext = (dispatch: DispatchFunc) => async () => {
   let onLoadUserContext = {};
   const cookieContextData = getCookieContext();
+  // Always decode JWT for authoritative user identity (handles base64url encoding)
+  const jwtPayload = decodeJwtPayload(getCookieToken());
+  const jwtId = jwtPayload.id ?? '';
+
   if (Object.keys(cookieContextData).length === 0) {
     // creates nnContext cookie if one does not exist
-    const cookieJWTData = getCookieToken();
-    const cookieDataArr = cookieJWTData.split('.');
-    const cookieDataObj =  JSON.parse(window.atob(cookieDataArr[1]));
     //creates empty default context with just the userID
     const jwtContext =  {
       network: {
         selected:{
-          account: cookieDataObj.id,
+          account: jwtId,
         },
         collections: {
           transactions: [
             {
-              id: cookieDataObj.id,
+              id: jwtId,
               collection: [],
             }
           ],
@@ -202,7 +290,7 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
       user: {
         profile: {
           auth: {
-            userid: cookieDataObj.id,
+            userid: jwtId,
           }
         }
       }
@@ -210,7 +298,16 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     onLoadUserContext = merge.all([onLoadUserContext, defaultNnContext, jwtContext]);
     setCookieContext(onLoadUserContext);
   } else {
-    onLoadUserContext = cookieContextData;
+    // Deep-merge cookie data onto defaultNnContext so collections and other
+    // defaults are always present, even if the cookie only has a subset of fields.
+    onLoadUserContext = merge.all([{}, defaultNnContext, cookieContextData]);
+    // Repair stale/empty identity fields using the JWT as source of truth
+    if (jwtId && !(onLoadUserContext as any)?.network?.selected?.account) {
+      (onLoadUserContext as any).network.selected.account = jwtId;
+    }
+    if (jwtId && !(onLoadUserContext as any)?.user?.profile?.auth?.userid) {
+      (onLoadUserContext as any).user.profile.auth.userid = jwtId;
+    }
   }
   //dispatches context to state
   dispatch({
@@ -223,28 +320,41 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
 export const { Context, Provider } = DataContextCreator(
   nnReducer,
   { 
+    addLocationReview,
+    addLocationPin,
     addRecentScan,
     addRepToFaction,
     addUserToFaction,
     adminUserToChannel,
+    banUserFromChannel,
     befriend,
     clearUnreadCountByType,
+    deleteChannelMessage,
     closeAlert,
     closeAnnouncement,
+    createFactionLocation,
+    createLocation,
     createNewChannel,
+    deleteLocation,
+    deleteLocationPins,
+    deleteLocationReview,
     fetchAllFactions,
+    fetchAllLocations,
     fetchChannelDetails,
     fetchChannelHistory,
     fetchChannelUsers,
+    fetchChannelsLatest,
     fetchContact,
     fetchClipboardEntities,
     fetchFactionDetails,
     fetchFactionStatuses,
+    fetchLocationPins,
     fetchNetworkStatus,
-    fetchUnreadCount,
     fetchUserChannels,
     fetchUserContacts,
     fetchUserFactions,
+    fetchLocationById,
+    fetchUnverifiedLocations,
     fetchUserProfile,
     fetchUserSetStatuses,
     fetchUserStatuses,
@@ -255,6 +365,7 @@ export const { Context, Provider } = DataContextCreator(
     joinFaction,
     joinUserToChannel,
     inviteUserToChannel,
+    leaveUserChannel,
     longPollMessages,
     patchUserToken,
     removeRepToFaction,
@@ -266,6 +377,7 @@ export const { Context, Provider } = DataContextCreator(
     sendChannelMessage,
     sendFactionPayment,
     sendPayment,
+    setAlert,
     setFactionUserStatus,
     setSelected,
     setUserHiddenStatus,
@@ -273,9 +385,20 @@ export const { Context, Provider } = DataContextCreator(
     toggleChannelScope,
     toggleStatusClass,
     unfriend,
+    updateFactionLocation,
     updateFactionProfile,
+    updateLocation,
     updateUserProfile,
     userSearch,
+    verifyLocation,
+    fetchAllEvents,
+    fetchUserEventsAttending,
+    fetchUserEventsMine,
+    fetchLocationEvents,
+    rsvpEvent,
+    updateEvent,
+    createEvent,
+    cancelEvent,
   },
   defaultNnContext,
 );

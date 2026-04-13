@@ -5,6 +5,7 @@ import styles from '../styles/generic.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnProfileAuth, NnProviderValues, } from './context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
+import { requestAndSubscribePush, unsubscribeFromPush } from './pwaManager';
 import {
   Container,
   Box,
@@ -20,12 +21,16 @@ import {
 } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 
 interface UserSecurityAppProps { };
 
-const passwordChangeUrl = 'https://auth.neonav.net/changepassword'
+const passwordChangeUrl = 'https://auth.neonav.net/changepassword';
+const logoutUrl = 'https://auth.neonav.net/logout';
 const defaultAuth = {
   userid: '',
   email: '',
@@ -68,6 +73,23 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
     return state?.network?.entity?.auth || defaultAuth;
   }, [state]);
   const [SecurityFetched, setSecurityFetched] = useState(false);
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission | null>(null);
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotifPermission(Notification.permission);
+    }
+  }, []);
+
+  const handleEnableNotifications = async () => {
+    const granted = await requestAndSubscribePush();
+    setNotifPermission(granted ? 'granted' : Notification.permission);
+  };
+
+  const handleDisableNotifications = async () => {
+    await unsubscribeFromPush();
+    setNotifPermission('default');
+  };
 
   const goFetchSecurity = useCallback(() => {
     if (!SecurityFetched) {
@@ -177,7 +199,7 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                           readOnly: true,
                         }}
                       />
-                      <Divider variant="middle" color="primary"><Typography variant="h6">Change Password</Typography></Divider>
+                      <Divider variant="middle" color="primary"><Typography variant="h6">NeoNav Auth</Typography></Divider>
                       <Link href={passwordChangeUrl}>
                         <Button
                           variant="contained"
@@ -185,9 +207,54 @@ export default function UserSecurityApp(props: UserSecurityAppProps): JSX.Elemen
                           endIcon={<ExitToAppIcon />}
                           style={input}
                         >
-                          Leave to Auth Portal
+                          Change Password
                         </Button>
                       </Link>
+                      <Link href={logoutUrl}>
+                        <Button
+                          variant="contained"
+                          component="label"
+                          endIcon={<ExitToAppIcon />}
+                          style={input}
+                        >
+                          Logout
+                        </Button>
+                      </Link>
+                      {notifPermission !== null && (
+                        <>
+                          <Divider variant="middle" color="primary"><Typography variant="h6">Push Notifications</Typography></Divider>
+                          {notifPermission === 'granted' && (
+                            <Button
+                              variant="outlined"
+                              endIcon={<NotificationsActiveIcon />}
+                              style={input}
+                              onClick={handleDisableNotifications}
+                            >
+                              Notifications Enabled — click to disable
+                            </Button>
+                          )}
+                          {notifPermission === 'denied' && (
+                            <Button
+                              variant="outlined"
+                              disabled
+                              endIcon={<NotificationsOffIcon />}
+                              style={input}
+                            >
+                              Notifications Blocked — enable in browser settings
+                            </Button>
+                          )}
+                          {notifPermission === 'default' && (
+                            <Button
+                              variant="contained"
+                              endIcon={<NotificationsIcon />}
+                              style={input}
+                              onClick={handleEnableNotifications}
+                            >
+                              Enable Notifications
+                            </Button>
+                          )}
+                        </>
+                      )}
                     </Stack>
                   </Box>
                 </SimpleScrollContainer>

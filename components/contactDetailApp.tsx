@@ -18,6 +18,7 @@ import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
 import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import { useRouter } from 'next/navigation';
 import { imageUrl } from '@/utilities/constants';
 import { CurrencyExchange } from '@mui/icons-material';
 
@@ -102,7 +103,18 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
     addRecentScan = (entity:any) => {},
     fetchUserContacts = () => {},
   }: NnProviderValues = useContext(NnContext);
+  const router = useRouter();
   const entityId:string = id || '';
+
+  useEffect(() => {
+    if (entityId && entityId[0].toUpperCase() === 'C') {
+      router.replace(`/factions/${entityId}`);
+    }
+    if (entityId && entityId[0].toUpperCase() === 'L') {
+      router.replace(`/map/${entityId}`);
+    }
+  }, [entityId, router]);
+
   const contacts:NnContact[] | NnSimpleEntity[] = useMemo(() => {
     return state?.network?.collections?.contacts || [];
   }, [state]);
@@ -214,8 +226,8 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                       alignItems="center"
                       sx={{ minHeight: '100%'}}
                     >
-                      <Typography variant='h5'>{entityId}</Typography>
-                      <Typography variant='h4'>{entity?.name}</Typography>
+                      <Typography variant='h5' sx={{ textShadow: '0 0 4px #000, 0 0 4px #000, 0 0 4px #000' }}>{entityId}</Typography>
+                      <Typography variant='h4' sx={{ textShadow: '0 0 4px #000, 0 0 4px #000, 0 0 4px #000' }}>{entity?.name}</Typography>
                     </Stack>
                   </div>
                 </div>
@@ -227,9 +239,9 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                   <SimpleScrollContainer>
                     <Stack>
                       <Typography variant='h6' color="primary">{name(entity?.meta?.firstname, entity?.meta?.lastname)}</Typography>
-                      <Typography variant='h6' color="primary">Occupation <span>{entity?.meta?.occupation || 'N/A'}</span></Typography>
-                      <Typography variant='h6' color="primary">Skills <span>{entity?.meta?.skills || 'N/A'}</span></Typography>
-                      <Typography variant='h6' color="primary">Description</Typography>
+                      <Typography variant='h6' color="primary">Occupation: <span>{entity?.meta?.occupation || 'N/A'}</span></Typography>
+                      <Typography variant='h6' color="primary">Skills: <span>{entity?.meta?.skills || 'N/A'}</span></Typography>
+                      <Typography variant='h6' color="primary">Description: </Typography>
                       <p>{entity?.description || 'N/A'}</p>
                     </Stack>
                   </SimpleScrollContainer>
@@ -245,6 +257,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 {
                   icon: <PersonRemoveIcon />,
                   handleAction: goUnfriend,
+                  tooltipText: "Unfriend",
                 }
                 :
                 {
@@ -254,6 +267,7 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
               secondHexProps={{
                 icon: <CurrencyExchange />,
                 link: `/cash/${entityId}`,
+                tooltipText: "Pay or Request c±sн",
               }}
               bigHexProps={isFriend ? 
                 {
@@ -263,14 +277,17 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                 {
                   icon: <PersonAddIcon />,
                   handleAction: goBefriend,
+                  tooltipText: "Add Friend",
                 }}
               thirdHexProps={{
                 icon: <LocalFloristIcon />,
                 link: `/garden/${entityId}`,
+                tooltipText: "Jaden/Garden",
               }}
               fourthHexProps={{
                 icon: <TocIcon />,
                 link: '/contacts',
+                tooltipText: "Contacts",
               }}
             />
           </Box>
