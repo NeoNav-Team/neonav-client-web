@@ -99,8 +99,9 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     if (notify) {
       return (channel && NOTIFY_CHANNELS.includes(channel)) ? channel : NOTIFICATIONS;
     }
+    if (idFromParams) return idFromParams;
     const validChannel = channel && !NOTIFY_CHANNELS.includes(channel) ? channel : null;
-    return validChannel || idFromParams || GLOBAL_CHAT;
+    return validChannel || GLOBAL_CHAT;
   }, [idFromParams, notify, state.network?.selected?.channel]);
 
   const unread:LooseObject = useMemo(() => {
