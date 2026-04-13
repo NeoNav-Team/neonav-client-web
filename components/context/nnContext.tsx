@@ -127,9 +127,17 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     case 'setAnnouncement':
       clonedState.network.announcement = payload;
       break;
-    case 'initContext':
+    case 'initContext': {
+      const preservedChannel = clonedState.network?.selected?.channel;
       clonedState = {...clonedState, ...payload};
+      if (preservedChannel) {
+        clonedState.network = {
+          ...clonedState.network,
+          selected: { ...clonedState.network.selected, channel: preservedChannel },
+        };
+      }
       break;
+    }
     case 'setUserChannels':
       clonedState.user.channels = payload;
       break;
@@ -221,8 +229,18 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
     }
   }
   newState = {...state, ...clonedState};
-  const cookieState = JSON.parse(JSON.stringify(newState));
-  delete cookieState.entity;
+  const cookieState = {
+    network: {
+      selected: newState.network.selected,
+      location: newState.network.location,
+    },
+    user: {
+      profile: newState.user.profile,
+      wallets: newState.user.wallets,
+      channels: newState.user.channels,
+      factions: newState.user.factions,
+    },
+  };
   setCookieContext(cookieState);
   console.log('newState', newState);
   return newState;
@@ -280,22 +298,15 @@ export const initContext = (dispatch: DispatchFunc) => async () => {
     onLoadUserContext = merge.all([onLoadUserContext, defaultNnContext, jwtContext]);
     setCookieContext(onLoadUserContext);
   } else {
-    onLoadUserContext = cookieContextData;
+    // Deep-merge cookie data onto defaultNnContext so collections and other
+    // defaults are always present, even if the cookie only has a subset of fields.
+    onLoadUserContext = merge.all([{}, defaultNnContext, cookieContextData]);
     // Repair stale/empty identity fields using the JWT as source of truth
     if (jwtId && !(onLoadUserContext as any)?.network?.selected?.account) {
-      (onLoadUserContext as any).network = {
-        ...(onLoadUserContext as any).network,
-        selected: { ...(onLoadUserContext as any).network?.selected, account: jwtId },
-      };
+      (onLoadUserContext as any).network.selected.account = jwtId;
     }
     if (jwtId && !(onLoadUserContext as any)?.user?.profile?.auth?.userid) {
-      (onLoadUserContext as any).user = {
-        ...(onLoadUserContext as any).user,
-        profile: {
-          ...(onLoadUserContext as any).user?.profile,
-          auth: { ...(onLoadUserContext as any).user?.profile?.auth, userid: jwtId },
-        },
-      };
+      (onLoadUserContext as any).user.profile.auth.userid = jwtId;
     }
   }
   //dispatches context to state
