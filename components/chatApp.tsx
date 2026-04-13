@@ -22,7 +22,7 @@ import InputMessage from './inputMessage';
 import { use100vh } from 'react-div-100vh';
 import executeAPI from '@/utilities/executeApi';
 import { getCookieToken } from '@/utilities/cookieContext';
-import { idbGetMessage } from '@/utilities/idbMessages';
+import { idbGetMessage, idbPutMessages } from '@/utilities/idbMessages';
 
 interface ChatAppProps {
   msgBtn?: boolean;
@@ -94,15 +94,20 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     deleteChannelMessage = (channelId:string, messageId:string) => {},
   }: NnProviderValues = useContext(NnContext);
 
+  const prevChannelRef = useRef<string>('');
+  const handledRedactionsRef = useRef<Set<string>>(new Set());
+  const [ initFetched, setInitFetched ] = useState<boolean>(false);
+  const [ initSelected, setInitSelected ] = useState<boolean>(false);
+
   const selectedChannel:string = useMemo(() => {
     const channel = state.network?.selected?.channel;
     if (notify) {
       return (channel && NOTIFY_CHANNELS.includes(channel)) ? channel : NOTIFICATIONS;
     }
-    if (idFromParams) return idFromParams;
+    if (idFromParams && !initSelected) return idFromParams;
     const validChannel = channel && !NOTIFY_CHANNELS.includes(channel) ? channel : null;
     return validChannel || GLOBAL_CHAT;
-  }, [idFromParams, notify, state.network?.selected?.channel]);
+  }, [idFromParams, initSelected, notify, state.network?.selected?.channel]);
 
   const unread:LooseObject = useMemo(() => {
     return state?.network?.selected?.unread || {};
@@ -115,11 +120,6 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     const last30 = chatLength > 30 ? orderChatArr.slice(0, 30) : orderChatArr;
     return last30;
   }, [state?.network?.collections?.messages]);
-
-  const prevChannelRef = useRef<string>('');
-  const handledRedactionsRef = useRef<Set<string>>(new Set());
-  const [ initFetched, setInitFetched ] = useState<boolean>(false);
-  const [ initSelected, setInitSelected ] = useState<boolean>(false);
   const [ lastUnread, setLastUnread ] = useState<string>('');
   const [ msg, setMsg ] = useState<string>('');
   const [ selectedMsg, setSelectedMsg ] = useState<NnChatMessage | null>(null);
@@ -270,6 +270,13 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   useEffect(() => { initChat(); }, [initChat]);
 
   useEffect(() => {
+    const channels = state.user?.channels;
+    if (!notify && initFetched && channels && channels.length > 0 && !channelFound) {
+      setSelected('channel', GLOBAL_CHAT);
+    }
+  }, [notify, initFetched, channelFound, state.user?.channels, setSelected]);
+
+  useEffect(() => {
     if (prevChannelRef.current === selectedChannel) return;
     const wasInitialized = prevChannelRef.current !== '';
     prevChannelRef.current = selectedChannel;
@@ -314,8 +321,9 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     const targetId = match?.[1];
     handledRedactionsRef.current.add(redactionMsg.id);
     if (!targetId) return;
-    idbGetMessage(targetId).then(cached => {
+    idbGetMessage(targetId).then(async cached => {
       if (cached && cached.text !== '[REDACTED]') {
+        await idbPutMessages([{ ...cached, text: '[REDACTED]' }]);
         fetchChannelHistory(selectedChannel);
       }
     });
