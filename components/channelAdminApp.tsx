@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import React, { useCallback, useContext, useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from '../styles/card.module.css';
 import { Context as NnContext } from './context/nnContext';
 import { NnChannel, NnContact, nnEntity, NnFaction, NnProviderValues, NnSimpleEntity } from './context/nnTypes';
@@ -76,6 +77,7 @@ const flexFooter = {
 export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element {
   const { params } = props;
   const { id } = params;
+  const router = useRouter();
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
@@ -189,9 +191,7 @@ export default function ChannelAdminApp(props: ChannelAdminAppProps):JSX.Element
 
   const goLeaveChannel = () =>  {
     leaveUserChannel(channelInfo?.id, userId);
-    if (channelInfo?.id === state.network?.selected?.channel) {
-      setSelected('channel', '');
-    }
+    router.push('/channels', { scroll: false });
   }
   const goSetChannelScope = () => {
     toggleChannelScope(channelInfo?.id);
