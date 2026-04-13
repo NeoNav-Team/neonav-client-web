@@ -92,7 +92,7 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
   const handleIDScan = (result:string) => {
     if (result.length >= 5) {
       handleModelClose();
-      router.push(`/contacts/${result}#scan`);
+      router.push(`/contacts/${result}#scan`, { scroll: false });
     }
   }
 
