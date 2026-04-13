@@ -19,7 +19,7 @@ const simplifyEntities =(entities: nnEntity[]): NnSimpleEntity[] => {
   })
 }
 
-export const setCookieContext = (state:NnStore) => {
+export const setCookieContext = (state: any) => {
   // removes all thumbnails from cookies as they were breaking the length of possible cookie values
   if (state.network && state.network.collections) {
     if (state?.network?.collections.contacts){
