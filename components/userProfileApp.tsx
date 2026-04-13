@@ -90,6 +90,7 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const isAdmin = accountId === profile.id;
   const [ profileFetched, setProfileFetched ] = useState(false);
   const [ editMode, setEditMode ] = useState(false);
+  const autoInitRef = React.useRef(false);
   const [ form, setForm ] = useState<Form>(defaultForm);
   const { username, firstname, lastname, skills, occupation, bio } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
@@ -114,10 +115,17 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   }, [goFetchProfile]);
 
   useEffect(() => {
-    if (profileFetched && Object.keys(profile).length === 0) {
+    if (profileFetched && Object.keys(profile).length === 0 && !autoInitRef.current) {
+      autoInitRef.current = true;
       setEditMode(true);
+      const doc = {
+        _id: state?.network?.entity?._id,
+        _rev: state?.network?.entity?._rev,
+      };
+      updateUserProfile(doc, defaultForm);
+      patchUserToken();
     }
-  }, [setEditMode, profileFetched, profile]);
+  }, [setEditMode, profileFetched, profile, state?.network?.entity, updateUserProfile, patchUserToken]);
 
   useEffect(() => {
     if (Object.keys(profile).length >= 3) {
