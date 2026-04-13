@@ -35,7 +35,7 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ElectricalServicesIcon from '@mui/icons-material/ElectricalServices';
 
 import AttributionIcon from '@mui/icons-material/Attribution'; // Individual Location Pin
-import AddIcon from '@mui/icons-material/Add'; // New Location
+import AddCircleIcon from '@mui/icons-material/AddCircle'; // New Location
 
 // TODO these should probably move to a constants file
 const MEGABLOCK_NW = 'L950362737';
@@ -141,7 +141,7 @@ export const VENUE_ICON_MAP = new Map<string, any>([
   ['road', {adminOnly: true}],
 
   ['location_pin', {icon: AttributionIcon, iconColor: white, pinColor: neoOrange, hidden: true}],
-  ['new_location', {icon: AddIcon, iconColor: red, pinColor: white, hidden: true}],
+  ['new_location', {icon: AddCircleIcon, iconColor: red, pinColor: white, hidden: true}],
 ]);
 
 const getVenueIconAndColor = (venuetype: string): { icon: React.ReactElement; color: string } => {
