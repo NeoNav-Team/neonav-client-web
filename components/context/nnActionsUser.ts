@@ -35,7 +35,7 @@ export const fetchUserProfile = (dispatch: DispatchFunc) => async () => {
     })
     return err;
   };
-  executeApi('profile', {token}, onSuccess, onError);
+  return executeApi('profile', {token}, onSuccess, onError);
 }
 
 //TODO: remove any of document
@@ -47,6 +47,12 @@ export const updateUserProfile = (dispatch: DispatchFunc) => async (doc:any, pro
       type: 'setEntity',
       payload: data,
     });
+    if ((data as any)?.accessToken) {
+      dispatch({
+        type: 'setAccessToken',
+        payload: data,
+      });
+    }
     return data;
   };
   const onError = (err:netcheckAPIResData) => {
