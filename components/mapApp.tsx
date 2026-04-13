@@ -650,17 +650,23 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     stateRef.current = infoModalState;
   }, [infoModalState]);
 
-  const locationsFetchedRef = useRef(false);
   useEffect(() => {
-    if (locationsFetchedRef.current) return;
-    locationsFetchedRef.current = true;
     fetchUnverifiedLocations();
     fetchLocationPins("all");
-    setInterval(() => {
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
       fetchUnverifiedLocations();
       fetchLocationPins("all");
-    }, 60 * 1000); // Once a minute
-  }, [fetchUnverifiedLocations]);
+      
+      if (selectedLocationId) {
+        fetchLocationById(selectedLocationId);
+      }
+    }, 60 * 1000);
+  
+    return () => clearInterval(interval); // Cleanup on unmount or ID change
+  }, [selectedLocationId, fetchUnverifiedLocations, fetchLocationPins, fetchLocationById]); 
 
   // Lots of things to do when the locations update
   useEffect(() => {
@@ -806,7 +812,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
               // Show owned locations if that layer is on
               || (layerStates.mylocations && (loc.owner === userId || loc.creator === userId))
             )
-            && loc.venuetype.toLowerCase() !== "dev")) // Hide all the dev markers from search
+            && loc?.venuetype?.toLowerCase() !== "dev")) // Hide all the dev markers from search
           .sort((a, b) => -b.name.localeCompare(a.name))
           .sort((a, b) => -b.venuetype.localeCompare(a.venuetype)) || []
       );
