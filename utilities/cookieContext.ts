@@ -1,4 +1,4 @@
-import { NnStore, nnEntity, NnSimpleEntity } from "@/components/context/nnTypes";
+import { nnEntity, NnSimpleEntity } from "@/components/context/nnTypes";
 import Cookies from "js-cookie";
 import { HotbarKey } from "./hotbarOptions";
 
@@ -13,53 +13,36 @@ const setSimpleEntity = (contact:nnEntity): NnSimpleEntity => {
     'username': contact?.username || '',
   }
 }
-const simplifyEntities =(entities: nnEntity[]): NnSimpleEntity[] => {
-  return entities.map(entity => {
-    return setSimpleEntity(entity);
-  })
-}
+
+// One-time migration: move nnContext from cookie to localStorage and delete the cookie.
+// Can be removed once all active sessions have rotated through.
+export const migrateContextCookie = () => {
+  if (typeof window === 'undefined') return;
+  const cookieValue = Cookies.get('nnContext');
+  if (!cookieValue) return;
+  try {
+    const parsed = JSON.parse(cookieValue);
+    if (!localStorage.getItem('nnContext')) {
+      localStorage.setItem('nnContext', JSON.stringify(parsed));
+    }
+  } catch {}
+  Cookies.remove('nnContext', { domain: '.neonav.net' });
+};
 
 export const setCookieContext = (state: any) => {
-  // removes all thumbnails from cookies as they were breaking the length of possible cookie values
-  if (state.network && state.network.collections) {
-    if (state?.network?.collections.contacts){
-      state.network.collections.contacts = 
-      simplifyEntities(state.network.collections.contacts)
-    }
-    if (state?.network?.collections.entityUsers){
-      state.network.collections.entityUsers = 
-      simplifyEntities(state.network.collections.entityUsers)
-    }
-    if (state?.network?.collections.factions){
-      state.network.collections.factions = 
-      simplifyEntities(state.network.collections.factions)
-    }
-    if (state?.network?.collections.clipboardEntities){
-      state.network.collections.clipboardEntities = 
-      simplifyEntities(state.network.collections.clipboardEntities)
-    }
-    if (state?.network?.collections.contacts){
-      state.network.collections.contacts = 
-      simplifyEntities(state.network.collections.contacts)
-    }
-  }
-  if (state.user) {
-    if (state?.user?.factions){
-      state.user.factions = 
-      simplifyEntities(state?.user?.factions)
-    }
-  }
-  const stringState = JSON.stringify(state);
-  const encodedStringState = window.btoa(unescape(encodeURIComponent(stringState)));
-  Cookies.remove('nnContext', { domain: '.neonav.net' });
-  Cookies.set('nnContext', encodedStringState, { domain: '.neonav.net', expires: 30 });
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem('nnContext', JSON.stringify(state));
+  } catch {}
 };
 
 export const getCookieContext = () => {
-  const encodedStringState = Cookies.get('nnContext') || '';
-  const stringState = encodedStringState.length >= 3 ? decodeURIComponent(escape(window.atob(encodedStringState))) : '{}';
-  const cookieContext = JSON.parse(stringState);
-  return cookieContext;
+  if (typeof window === 'undefined') return {};
+  try {
+    return JSON.parse(localStorage.getItem('nnContext') || '{}');
+  } catch {
+    return {};
+  }
 }
 
 export const getCookieToken = () => {
