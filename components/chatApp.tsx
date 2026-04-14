@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState, useMemo } 
 import { useRouter } from 'next/navigation';
 import { restrictedChannels, globalChannel, NEONAV_MAINT } from '../utilities/constants';
 import styles from '../styles/generic.module.css';
-import { Box, Button, Container, Dialog, DialogActions, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Dialog, DialogActions, DialogTitle, Stack, Typography } from '@mui/material';
 import SpeakerNotesOffIcon from '@mui/icons-material/SpeakerNotesOff';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -96,8 +96,12 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   const prevChannelRef = useRef<string>('');
   const handledRedactionsRef = useRef<Set<string>>(new Set());
+  const initChannelsRef = useRef(state.user?.channels);
   const [ initFetched, setInitFetched ] = useState<boolean>(false);
   const [ initSelected, setInitSelected ] = useState<boolean>(false);
+  const [ channelsLoaded, setChannelsLoaded ] = useState<boolean>(
+    () => (state.user?.channels?.length ?? 0) > 0
+  );
 
   const selectedChannel:string = useMemo(() => {
     const channel = state.network?.selected?.channel;
@@ -270,11 +274,17 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   useEffect(() => { initChat(); }, [initChat]);
 
   useEffect(() => {
+    if (!channelsLoaded && state.user?.channels !== initChannelsRef.current) {
+      setChannelsLoaded(true);
+    }
+  }, [state.user?.channels, channelsLoaded]);
+
+  useEffect(() => {
     const channels = state.user?.channels;
-    if (!notify && initFetched && channels && channels.length > 0 && !channelFound) {
+    if (!notify && initFetched && channelsLoaded && channels && channels.length > 0 && !channelFound) {
       setSelected('channel', GLOBAL_CHAT);
     }
-  }, [notify, initFetched, channelFound, state.user?.channels, setSelected]);
+  }, [notify, initFetched, channelsLoaded, channelFound, state.user?.channels, setSelected]);
 
   useEffect(() => {
     if (prevChannelRef.current === selectedChannel) return;
@@ -350,12 +360,18 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
           </Box>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {initFetched && !channelFound && (
-              <Stack direction="column" justifyContent="center" alignItems="center" spacing={0}>
-                <SpeakerNotesOffIcon sx={{fontSize:'100px'}}/>
-                <Typography variant="h3">404</Typography>
-                <Typography variant="h5">Channel not found</Typography>
-                <Typography sx={{margin: '10px auto'}}>Check if channel exists and you have access.</Typography>
-              </Stack>
+              !channelsLoaded ? (
+                <Stack direction="column" justifyContent="center" alignItems="center" spacing={0} sx={{minHeight: '50vh'}}>
+                  <CircularProgress color="secondary" />
+                </Stack>
+              ) : (
+                <Stack direction="column" justifyContent="center" alignItems="center" spacing={0}>
+                  <SpeakerNotesOffIcon sx={{fontSize:'100px'}}/>
+                  <Typography variant="h3">404</Typography>
+                  <Typography variant="h5">Channel not found</Typography>
+                  <Typography sx={{margin: '10px auto'}}>Check if channel exists and you have access.</Typography>
+                </Stack>
+              )
             )}
             <SimpleScrollContainer>
               <Box sx={{maxWidth: '100%'}}>
