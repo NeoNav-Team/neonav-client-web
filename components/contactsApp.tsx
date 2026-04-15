@@ -1,9 +1,10 @@
 'use client';
-import React, { 
+import React, {
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import styles from '../styles/generic.module.css';
@@ -112,6 +113,7 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   const [ scanning, setScanning ] = useState(false);
   const [ openModel, setOpenModel ] = useState(false);
   const [ lastEntity, setLastEntity ] = useState({});
+  const modalHistoryRef = useRef(false);
 
   const goFetchContacts = useCallback(() => {
     if (!contactsFetched) {
@@ -125,11 +127,30 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   }, [addRecentScan, scannedEntity]);
 
 
-  const handleModelOpen = (submenu: string) => {
+  const handleModelOpen = (_submenu?: string) => {
     setOpenModel(true);
+    window.history.pushState({ modal: true }, '');
+    modalHistoryRef.current = true;
   }
 
-  const handleModelClose = () => setOpenModel(false);
+  const handleModelClose = () => {
+    setOpenModel(false);
+    if (modalHistoryRef.current) {
+      modalHistoryRef.current = false;
+      window.history.back();
+    }
+  }
+
+  useEffect(() => {
+    const onPopState = () => {
+      if (modalHistoryRef.current) {
+        modalHistoryRef.current = false;
+        setOpenModel(false);
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const handleIDScan = (result:string) => {
     handleModelClose();

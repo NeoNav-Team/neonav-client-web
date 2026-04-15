@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ReactPlayer from 'react-player';
@@ -58,6 +58,7 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
 
   const [openModel, setOpenModel] = useState(false);
   const [submenu, setSubmenu] = useState('groupSettings');
+  const modalHistoryRef = useRef(false);
   const [hotbarKeys, setHotbarKeys] = useState<HotbarKey[]>(['map', 'myQRCode', 'qrScanner']);
   const router = useRouter();
 
@@ -84,11 +85,29 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
   const handleModelOpen = (submenu: string) => {
     setSubmenu(submenu);
     setOpenModel(true);
+    window.history.pushState({ modal: true }, '');
+    modalHistoryRef.current = true;
   }
   const handleModelClose = () => {
     setOpenModel(false);
     setSubmenu('groupSettings');
+    if (modalHistoryRef.current) {
+      modalHistoryRef.current = false;
+      window.history.back();
+    }
   }
+
+  useEffect(() => {
+    const onPopState = () => {
+      if (modalHistoryRef.current) {
+        modalHistoryRef.current = false;
+        setOpenModel(false);
+        setSubmenu('groupSettings');
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
   const handleIDScan = (result:string) => {
     if (result.length >= 5) {
       handleModelClose();
