@@ -165,7 +165,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   const goSendMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
-    if (!msg.trim()) return;
+    if (!msg.trim()) {
+      setMsg('');
+      return;
+    }
     sendChannelMessage(selectedChannel, msg);
     setMsg('');
   };
