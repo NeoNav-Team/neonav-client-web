@@ -7,7 +7,7 @@ import L from 'leaflet';
  */
 export function initStaticLayerGroups(
   mymap: L.Map,
-  layerData: Map<string, L.LayerGroup>,
+  layerData: Map<string, L.LayerGroup>
 ): void {
   // Location markers are always visible.
   layerData.set('locationMarkersLayer', L.layerGroup());

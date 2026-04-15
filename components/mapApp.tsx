@@ -74,7 +74,7 @@ const custom = function (options?: L.TileLayerOptions): CustomTileLayer {
   return new CustomTileLayer(options);
 };
 
-// Global variable to be able to reference map after it is initialized
+// Global variable to be able to reference map pieces after they are initialized
 const myMapObjects = new Map<string, any>();
 const layerData = new Map<string, L.LayerGroup>();
 
@@ -172,6 +172,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     mylocations: false,
     unverified: false,
   });
+  const stateRef = useRef(infoModalState);
   const [searchBarOptions, setSearchBarOptions] = useState([] as any);
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
@@ -422,6 +423,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       L.DomEvent.on(newArrow, 'click', (e) => {
         L.DomEvent.stop(e);
 
+        if (stateRef.current !== "view") return;
+
         const current = mymap.getBearing();
         const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
 
@@ -489,7 +492,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       tooltip: foundLocation?.tooltip || { name: '', lat: 0, long: 0, rotation: 0,}
     }, editLocationFormData);
     console.log('Reduced form data:', locationFormDiff);
-    if (infoModalState == 'edit') {
+    if (stateRef.current == 'edit') {
       updateLocation(selectedLocationId, locationFormDiff);
       // Give it a second for the location to be updated
       setTimeout(() => {
@@ -578,6 +581,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       const mymap = L.map(mapRef.current, options);
       
       mapInstanceRef.current = mymap;
+      mymap.createPane('roadlabels');
+      const pane = mymap.getPane('roadlabels');
+      if (pane) {
+        pane.style.zIndex = '450';
+        pane.style.pointerEvents = 'none'; 
+      }
 
       custom({maxZoom: 22,}).addTo(mymap);
 
@@ -637,17 +646,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
   // More violation access fixes
   useEffect(() => {
+    stateRef.current = infoModalState;
     if (infoModalState != 'view') {
       // Force focus out of the map/markers before the modal renders
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
     }
-  }, [infoModalState]);
-
-  const stateRef = useRef(infoModalState);
-  useEffect(() => {
-    stateRef.current = infoModalState;
   }, [infoModalState]);
 
   useEffect(() => {
@@ -741,7 +746,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         foundLocation.neosite = (state?.network?.entity as any).neosite;
       }
       setSelectedLocation(foundLocation);
-      if (infoModalState === 'view') {
+      if (stateRef.current === 'view') {
         setEditLocationFormData({
           name: foundLocation.name || '',
           lat: foundLocation.lat || 0,          // Hidden from input, but kept in state

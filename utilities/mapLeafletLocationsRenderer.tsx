@@ -249,7 +249,8 @@ export function renderLocationsToLeafletLayers(params: LeafletLocationsRendererP
     const leafletMarker: L.Marker = L.marker(latlng, {
       icon: getDivIcon(icon, color),
       autoPan: true,
-      draggable: (infoModalState === 'edit' && loc.id === selectedLocationId)
+      draggable: (infoModalState === 'edit' && loc.id === selectedLocationId),
+      zIndexOffset: 1000,
     })
       .addTo(targetLayer)
       .on('click', () => onMarkerClick(leafletMarker))
@@ -298,7 +299,7 @@ export function renderLocationPinsToLeafletLayers(params: LeafletLocationPinsRen
 
     // Create the marker
     const { icon, color } = getVenueIconAndColor('location_pin');
-    const leafletMarker: L.Marker = L.marker(latlng, { icon: getDivIcon(icon, color), autoPan: true })
+    const leafletMarker: L.Marker = L.marker(latlng, { icon: getDivIcon(icon, color), autoPan: true, zIndexOffset: 1000, })
       .addTo(layerData.get('pinsLayer')!)
       .on('click', () => onMarkerClick)
     ;
@@ -320,14 +321,12 @@ export function renderNewLocationPin(latLng: L.LatLng, mymap: L.Map, updateField
     icon: getDivIcon(icon, color),
     autoPan: true,
     draggable: true,
-    zIndexOffset: 1000,
+    zIndexOffset: 2000,
   }).on('dragend', (e) => {
     const newPos = e.target.getLatLng();
     updateField('lat', newPos.lat.toFixed(6)); // Your state for the DB
     updateField('long', newPos.lng.toFixed(6)); // Your state for the DB
   }).addTo(mymap);
-
-  newMarker.setZIndexOffset(2000);
 
   newMarker.bindTooltip('New Location', { permanent: true, direction: 'right' });
 
@@ -350,18 +349,32 @@ function drawLabels(location: any, latLng: L.LatLng, onMarkerClick: Function, la
 
   // Draw roads on the map with future proofing for "labels" venue
   if (location.venuetype.toLowerCase().startsWith("road") || location.venuetype.toLowerCase() === "label") {
-    const tooltip_a: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
-      .setLatLng(latLng)
-      .setContent(`<div style="transform: rotate(${rotationNU}deg); transform-origin: center center;">${location.name}</div>`)
-      .on('click', () => onMarkerClick(tooltip_a))
-      .addTo(northUp);
-    tooltip_a.id = location.id;
+    // Create a DivIcon for the label
+    const labelIconNU = L.divIcon({
+      className: 'road-label-icon', // Use a custom class to remove default marker styles
+      html: `<div style="transform: rotate(${rotationNU}deg); transform-origin: center center; text-align: center; white-space: nowrap;">${location.name}</div>`,
+      iconSize: [200, 20],
+      iconAnchor: [100, 10],
+    });
 
-    let tooltip_b: any = L.tooltip({permanent: true, direction: 'center', interactive: true, })
-      .setLatLng(latLng)
-      .setContent(`<div style="transform: rotate(${rotationNL}deg); transform-origin: center center;">${location.name}</div>`)
-      .on('click', () => onMarkerClick(tooltip_b))
-      .addTo(northLeft);
-    tooltip_b.id = location.id;
+    const labelIconNL = L.divIcon({
+      className: 'road-label-icon',
+      html: `<div style="transform: rotate(${rotationNL}deg); transform-origin: center center; text-align: center; white-space: nowrap;">${location.name}</div>`,
+      iconSize: [200, 20],
+      iconAnchor: [100, 10],
+    });
+
+    // Create a marker instead of a tooltip
+    const marker_nu: any = L.marker(latLng, {
+      icon: labelIconNU,
+      interactive: false
+    }).addTo(northUp);
+    marker_nu.id = location.id;
+
+    const marker_nl: any = L.marker(latLng, {
+      icon: labelIconNL,
+      interactive: false
+    }).addTo(northLeft);
+    marker_nl.id = location.id;
   }
 }
