@@ -3,6 +3,7 @@
 import 'styles/leaflet.css';
 import styles from '@/styles/generic.module.css';
 import React, {useEffect, useRef, useState} from 'react';
+
 import L from 'leaflet';
 import 'leaflet-rotate';
 import {
@@ -28,8 +29,8 @@ import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { DeleteForever } from '@mui/icons-material';
 
+import { DeleteForever } from '@mui/icons-material';
 import { MapInfoModal } from '@/components/mapInfoModal';
 import { Context as NnContext } from '@/components/context/nnContext';
 import { NnProviderValues } from '@/components/context/nnTypes';
@@ -220,9 +221,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }
 
   const closeInfoModal = () => {
-    if (infoModalState != 'view') {
-      return;
-    }
     setInfoModalSize(0);
     setInfoModalSizeStyle(modalStyle_0);
     setFooterStyle(flexFooter);
@@ -320,14 +318,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const stopEditMode = () => {
     if (infoModalState === 'edit') {
       setInfoModalSizeStyle(modalStyle_90);
-    } else {
-      // Do info modal close steps
-      setInfoModalSize(0);
-      setInfoModalSizeStyle(modalStyle_0);
-      setFooterStyle(flexFooter);
-      setTimeout(() => {
-        setShowInfoModal(false);
-      }, 100);
+    } else { // Close the modal from "create" mode
+      closeInfoModal();
     }
     setInfoModalState('view');
     // Timeout is required for animation to start
@@ -924,13 +916,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             handleAction: () => {
               deleteLocation(selectedLocationId);
               stopEditMode();
-              // Do info modal close steps
-              setInfoModalSize(0);
-              setInfoModalSizeStyle(modalStyle_0);
-              setFooterStyle(flexFooter);
+              closeInfoModal();
               setTimeout(() => {
-                setShowInfoModal(false);
-              }, 100);
+                fetchUnverifiedLocations(); // Pull latest location data after delete
+              }, 1000);
             }
           }}
           secondHexProps={{
@@ -956,7 +945,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           handleClose={() => {
             setTimeout(() => {
               fetchLocationById(selectedLocationId); // Pull latest location data after posting review
-            }, 100);
+            }, 1000);
             setReviewDialogOpen(false);
           }}
         />
