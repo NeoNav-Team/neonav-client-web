@@ -3,6 +3,7 @@
 import 'styles/leaflet.css';
 import styles from '@/styles/generic.module.css';
 import React, {useEffect, useRef, useState} from 'react';
+
 import L from 'leaflet';
 import 'leaflet-rotate';
 import {
@@ -28,8 +29,8 @@ import LocationDisabledIcon from '@mui/icons-material/LocationDisabled';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { DeleteForever } from '@mui/icons-material';
 
+import { DeleteForever } from '@mui/icons-material';
 import { MapInfoModal } from '@/components/mapInfoModal';
 import { Context as NnContext } from '@/components/context/nnContext';
 import { NnProviderValues } from '@/components/context/nnTypes';
@@ -74,7 +75,7 @@ const custom = function (options?: L.TileLayerOptions): CustomTileLayer {
   return new CustomTileLayer(options);
 };
 
-// Global variable to be able to reference map after it is initialized
+// Global variable to be able to reference map pieces after they are initialized
 const myMapObjects = new Map<string, any>();
 const layerData = new Map<string, L.LayerGroup>();
 
@@ -172,6 +173,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     mylocations: false,
     unverified: false,
   });
+  const stateRef = useRef(infoModalState);
   const [searchBarOptions, setSearchBarOptions] = useState([] as any);
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
@@ -219,9 +221,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }
 
   const closeInfoModal = () => {
-    if (infoModalState != 'view') {
-      return;
-    }
     setInfoModalSize(0);
     setInfoModalSizeStyle(modalStyle_0);
     setFooterStyle(flexFooter);
@@ -319,14 +318,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const stopEditMode = () => {
     if (infoModalState === 'edit') {
       setInfoModalSizeStyle(modalStyle_90);
-    } else {
-      // Do info modal close steps
-      setInfoModalSize(0);
-      setInfoModalSizeStyle(modalStyle_0);
-      setFooterStyle(flexFooter);
-      setTimeout(() => {
-        setShowInfoModal(false);
-      }, 100);
+    } else { // Close the modal from "create" mode
+      closeInfoModal();
     }
     setInfoModalState('view');
     // Timeout is required for animation to start
@@ -422,6 +415,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       L.DomEvent.on(newArrow, 'click', (e) => {
         L.DomEvent.stop(e);
 
+        if (stateRef.current !== "view") return;
+
         const current = mymap.getBearing();
         const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
 
@@ -489,7 +484,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       tooltip: foundLocation?.tooltip || { name: '', lat: 0, long: 0, rotation: 0,}
     }, editLocationFormData);
     console.log('Reduced form data:', locationFormDiff);
-    if (infoModalState == 'edit') {
+    if (stateRef.current == 'edit') {
       updateLocation(selectedLocationId, locationFormDiff);
       // Give it a second for the location to be updated
       setTimeout(() => {
@@ -578,6 +573,12 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       const mymap = L.map(mapRef.current, options);
       
       mapInstanceRef.current = mymap;
+      mymap.createPane('roadlabels');
+      const pane = mymap.getPane('roadlabels');
+      if (pane) {
+        pane.style.zIndex = '450';
+        pane.style.pointerEvents = 'none'; 
+      }
 
       custom({maxZoom: 22,}).addTo(mymap);
 
@@ -637,17 +638,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
   // More violation access fixes
   useEffect(() => {
+    stateRef.current = infoModalState;
     if (infoModalState != 'view') {
       // Force focus out of the map/markers before the modal renders
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
     }
-  }, [infoModalState]);
-
-  const stateRef = useRef(infoModalState);
-  useEffect(() => {
-    stateRef.current = infoModalState;
   }, [infoModalState]);
 
   useEffect(() => {
@@ -741,7 +738,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         foundLocation.neosite = (state?.network?.entity as any).neosite;
       }
       setSelectedLocation(foundLocation);
-      if (infoModalState === 'view') {
+      if (stateRef.current === 'view') {
         setEditLocationFormData({
           name: foundLocation.name || '',
           lat: foundLocation.lat || 0,          // Hidden from input, but kept in state
@@ -919,13 +916,10 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             handleAction: () => {
               deleteLocation(selectedLocationId);
               stopEditMode();
-              // Do info modal close steps
-              setInfoModalSize(0);
-              setInfoModalSizeStyle(modalStyle_0);
-              setFooterStyle(flexFooter);
+              closeInfoModal();
               setTimeout(() => {
-                setShowInfoModal(false);
-              }, 100);
+                fetchUnverifiedLocations(); // Pull latest location data after delete
+              }, 1000);
             }
           }}
           secondHexProps={{
@@ -951,7 +945,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           handleClose={() => {
             setTimeout(() => {
               fetchLocationById(selectedLocationId); // Pull latest location data after posting review
-            }, 100);
+            }, 1000);
             setReviewDialogOpen(false);
           }}
         />

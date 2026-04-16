@@ -54,6 +54,7 @@ import {
   inviteUserToChannel,
   fetchUserChannels,
   fetchChannelHistory,
+  fetchMoreChannelHistory,
   fetchChannelDetails,
   fetchChannelUsers,
   longPollMessages,
@@ -105,6 +106,7 @@ import { nnSchema } from "./nnSchema";
 import {
   getCookieContext,
   getCookieToken,
+  migrateContextCookie,
   setCookieContext,
   setCookieToken,
 } from "@/utilities/cookieContext";
@@ -259,14 +261,19 @@ const decodeJwtPayload = (token: string): any => {
 };
 
 export const initContext = (dispatch: DispatchFunc) => async () => {
+  migrateContextCookie();
   let onLoadUserContext = {};
   const cookieContextData = getCookieContext();
   // Always decode JWT for authoritative user identity (handles base64url encoding)
   const jwtPayload = decodeJwtPayload(getCookieToken());
   const jwtId = jwtPayload.id ?? '';
 
-  if (Object.keys(cookieContextData).length === 0) {
-    // creates nnContext cookie if one does not exist
+  // Detect account switch: if stored context belongs to a different user, discard it
+  const storedAccount = cookieContextData?.network?.selected?.account ?? '';
+  const contextIsStale = jwtId && storedAccount && storedAccount !== jwtId;
+
+  if (Object.keys(cookieContextData).length === 0 || contextIsStale) {
+    // creates nnContext if one does not exist or belongs to a different account
     //creates empty default context with just the userID
     const jwtContext =  {
       network: {
@@ -342,6 +349,7 @@ export const { Context, Provider } = DataContextCreator(
     fetchAllLocations,
     fetchChannelDetails,
     fetchChannelHistory,
+    fetchMoreChannelHistory,
     fetchChannelUsers,
     fetchChannelsLatest,
     fetchContact,

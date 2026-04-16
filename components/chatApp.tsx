@@ -4,7 +4,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState, useMemo } 
 import { useRouter } from 'next/navigation';
 import { restrictedChannels, globalChannel, NEONAV_MAINT } from '../utilities/constants';
 import styles from '../styles/generic.module.css';
-import { Box, Button, Container, Dialog, DialogActions, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Dialog, DialogActions, DialogTitle, Stack, Typography } from '@mui/material';
 import SpeakerNotesOffIcon from '@mui/icons-material/SpeakerNotesOff';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -83,6 +83,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     state,
     fetchUserChannels = () => {},
     fetchChannelHistory = (channelId:string) => {},
+    fetchMoreChannelHistory = async (channelId:string, limit:number) => {},
     setSelected = (indexType:string, channelId:string) => {},
     sendChannelMessage = (channelId:string, text: string) => {},
     clearUnreadCountByType = (channelId:string) => {},
@@ -96,8 +97,16 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   const prevChannelRef = useRef<string>('');
   const handledRedactionsRef = useRef<Set<string>>(new Set());
+  const initChannelsRef = useRef(state.user?.channels);
+  const historyLimitRef = useRef(0);
+  const scrollFetchingRef = useRef(false);
+  const preLoadScrollRef = useRef<{scrollTop: number; scrollHeight: number} | null>(null);
+  const historyExhaustedRef = useRef(false);
   const [ initFetched, setInitFetched ] = useState<boolean>(false);
   const [ initSelected, setInitSelected ] = useState<boolean>(false);
+  const [ channelsLoaded, setChannelsLoaded ] = useState<boolean>(
+    () => (state.user?.channels?.length ?? 0) > 0
+  );
 
   const selectedChannel:string = useMemo(() => {
     const channel = state.network?.selected?.channel;
@@ -115,10 +124,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   const messages:NnChatMessage[] = useMemo(() => {
     const chatArr = state?.network?.collections?.messages || [];
-    const orderChatArr = orderbyDate(chatArr, 'ts');
-    const chatLength = orderChatArr.length;
-    const last30 = chatLength > 30 ? orderChatArr.slice(0, 30) : orderChatArr;
-    return last30;
+    return orderbyDate(chatArr, 'ts');
   }, [state?.network?.collections?.messages]);
   const [ lastUnread, setLastUnread ] = useState<string>('');
   const [ msg, setMsg ] = useState<string>('');
@@ -161,6 +167,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   const goSendMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
+    if (!msg.trim()) {
+      setMsg('');
+      return;
+    }
     sendChannelMessage(selectedChannel, msg);
     setMsg('');
   };
@@ -270,16 +280,26 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   useEffect(() => { initChat(); }, [initChat]);
 
   useEffect(() => {
+    if (!channelsLoaded && state.user?.channels !== initChannelsRef.current) {
+      setChannelsLoaded(true);
+    }
+  }, [state.user?.channels, channelsLoaded]);
+
+  useEffect(() => {
     const channels = state.user?.channels;
-    if (!notify && initFetched && channels && channels.length > 0 && !channelFound) {
+    if (!notify && initFetched && channelsLoaded && channels && channels.length > 0 && !channelFound) {
       setSelected('channel', GLOBAL_CHAT);
     }
-  }, [notify, initFetched, channelFound, state.user?.channels, setSelected]);
+  }, [notify, initFetched, channelsLoaded, channelFound, state.user?.channels, setSelected]);
 
   useEffect(() => {
     if (prevChannelRef.current === selectedChannel) return;
     const wasInitialized = prevChannelRef.current !== '';
     prevChannelRef.current = selectedChannel;
+    historyLimitRef.current = 0;
+    scrollFetchingRef.current = false;
+    preLoadScrollRef.current = null;
+    historyExhaustedRef.current = false;
     if (!wasInitialized) return;
     fetchChannelHistory(selectedChannel);
   }, [selectedChannel, fetchChannelHistory]);
@@ -297,9 +317,38 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [idFromParams, initSelected, notify, setSelected, state.network?.selected?.channel]);
 
   useEffect(() => {
+    if (notify) return;
     const scroller = document.getElementById('simpleScoll');
-    if (scroller && !notify) scroller.scrollTop = scroller.scrollHeight;
+    if (!scroller) return;
+    if (preLoadScrollRef.current) {
+      const { scrollTop, scrollHeight } = preLoadScrollRef.current;
+      preLoadScrollRef.current = null;
+      scrollFetchingRef.current = false;
+      if (messages.length < historyLimitRef.current) {
+        historyExhaustedRef.current = true;
+      }
+      scroller.scrollTop = scrollTop + (scroller.scrollHeight - scrollHeight);
+    } else {
+      scroller.scrollTop = scroller.scrollHeight;
+    }
   }, [messages, notify]);
+
+  useEffect(() => {
+    if (notify) return;
+    const scroller = document.getElementById('simpleScoll');
+    if (!scroller) return;
+    const handleScroll = () => {
+      if (scrollFetchingRef.current) return;
+      if (historyExhaustedRef.current) return;
+      if (scroller.scrollTop > 50) return;
+      scrollFetchingRef.current = true;
+      preLoadScrollRef.current = { scrollTop: scroller.scrollTop, scrollHeight: scroller.scrollHeight };
+      historyLimitRef.current = historyLimitRef.current === 0 ? 100 : historyLimitRef.current + 100;
+      fetchMoreChannelHistory(selectedChannel, historyLimitRef.current);
+    };
+    scroller.addEventListener('scroll', handleScroll);
+    return () => scroller.removeEventListener('scroll', handleScroll);
+  }, [notify, selectedChannel, fetchMoreChannelHistory]);
 
   useEffect(() => {
     if (lastUnread !== selectedChannel) {
@@ -350,12 +399,18 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
           </Box>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT }}>
             {initFetched && !channelFound && (
-              <Stack direction="column" justifyContent="center" alignItems="center" spacing={0}>
-                <SpeakerNotesOffIcon sx={{fontSize:'100px'}}/>
-                <Typography variant="h3">404</Typography>
-                <Typography variant="h5">Channel not found</Typography>
-                <Typography sx={{margin: '10px auto'}}>Check if channel exists and you have access.</Typography>
-              </Stack>
+              !channelsLoaded ? (
+                <Stack direction="column" justifyContent="center" alignItems="center" spacing={0} sx={{minHeight: '50vh'}}>
+                  <CircularProgress color="secondary" />
+                </Stack>
+              ) : (
+                <Stack direction="column" justifyContent="center" alignItems="center" spacing={0}>
+                  <SpeakerNotesOffIcon sx={{fontSize:'100px'}}/>
+                  <Typography variant="h3">404</Typography>
+                  <Typography variant="h5">Channel not found</Typography>
+                  <Typography sx={{margin: '10px auto'}}>Check if channel exists and you have access.</Typography>
+                </Stack>
+              )
             )}
             <SimpleScrollContainer>
               <Box sx={{maxWidth: '100%'}}>
@@ -363,6 +418,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                   {messages.map((item, index) => (
                     <div
                       key={`message-${index}-${item.ts}`}
+                      id={item.id ? `msg-${item.id}` : undefined}
                       onClick={(e) => { e.stopPropagation(); handleMsgClick(item); }}
                       style={{ outline: selectedMsg?.id === item.id ? '1px solid var(--color-1, #ff00ff)' : undefined }}
                     >

@@ -68,17 +68,19 @@ export default function GardenApp(props: GardenAppProps):JSX.Element {
     fetchUserSetStatuses = (id:string) => {},
   }: NnProviderValues = useContext(NnContext);
   const [ filter, setFilter ] = useState(true)
+  const sortByTs = (arr: NnStatus[]) =>
+    arr.slice().sort((a, b) => new Date(a.ts || '').valueOf() - new Date(b.ts || '').valueOf());
   const statusesPublic:NnStatus[]  = useMemo(() => {
     const statuses = state?.network?.collections?.statuses || [];
-    return filter ? statuses.filter(status => status.class === 'public') : statuses;
+    return sortByTs(filter ? statuses.filter(s => s.class === 'public') : statuses);
   }, [filter, state?.network?.collections?.statuses]);
   const statusesPrivate:NnStatus[]  = useMemo(() => {
     const statuses = state?.network?.collections?.statuses || [];
-    return filter ? statuses.filter(status => status.class !== 'public') : statuses;
+    return sortByTs(filter ? statuses.filter(s => s.class !== 'public') : statuses);
   }, [filter, state?.network?.collections?.statuses]);
   const statusesHidden:NnStatus[]  = useMemo(() => {
     const statuses = state?.network?.collections?.statuses || [];
-    return filter ? statuses.filter(status => status.class === 'hidden') : statuses;
+    return sortByTs(filter ? statuses.filter(s => s.class === 'hidden') : statuses);
   }, [filter, state?.network?.collections?.statuses]);
   const userId = state?.user?.profile?.auth?.userid || '';
   const [ collectionFetched, setCollectionFetched ] = useState(false);

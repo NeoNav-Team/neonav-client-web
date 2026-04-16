@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
@@ -105,6 +105,7 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   const [ scanning, setScanning ] = useState(false);
   const [ openModel, setOpenModel ] = useState(false);
   const [ hashPlaced, setHashPlaced ] = useState(false);
+  const modalHistoryRef = useRef(false);
   const [ lastEntity, setLastEntity ] = useState({});
   const [ processTypeValue, setProcessTypeValue ] = useState(requests[0].value); // TODO: refactor to payload form object
   const [ transactionValue, setTransactionValue ] = useState<number | string>(0); // TODO: refactor to payload form object
@@ -149,11 +150,30 @@ export default function CashApp(props: CashAppProps):JSX.Element {
     }
   }, [loading, fetchContact]);
 
-  const handleModelOpen = (submenu: string) => {
+  const handleModelOpen = (_submenu?: string) => {
     setOpenModel(true);
+    window.history.pushState({ modal: true }, '');
+    modalHistoryRef.current = true;
   }
 
-  const handleModelClose = () => setOpenModel(false);
+  const handleModelClose = () => {
+    setOpenModel(false);
+    if (modalHistoryRef.current) {
+      modalHistoryRef.current = false;
+      window.history.back();
+    }
+  }
+
+  useEffect(() => {
+    const onPopState = () => {
+      if (modalHistoryRef.current) {
+        modalHistoryRef.current = false;
+        setOpenModel(false);
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const handleIDScan = (result:string) => {
     handleModelClose();

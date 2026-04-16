@@ -82,6 +82,8 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
 
   const [ fetched, setFetched ] = useState(false);
   const [ refetched, setRefetched ] = useState(false);
+  const initStatusesRef = useRef(statuses);
+  const [ statusesLoaded, setStatusesLoaded ] = useState(false);
 
   const goFetchUserStatuses = useCallback(() => {
     if (!fetched) {
@@ -93,6 +95,12 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
   useEffect(() => {
     goFetchUserStatuses();
   }, [goFetchUserStatuses, userId]);
+
+  useEffect(() => {
+    if (!statusesLoaded && statuses !== initStatusesRef.current) {
+      setStatusesLoaded(true);
+    }
+  }, [statuses, statusesLoaded]);
 
   useEffect(() => {
     if (alertShow && !refetched)  {
@@ -123,7 +131,9 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
       >
         <Box sx={{...flexContainer, minHeight: FLEX_HEIGHT, maxHeight: FLEX_HEIGHT}}>
           <Box sx={{...flexBody, maxHeight: SCROLL_HEIGHT, height: SCROLL_HEIGHT }}>
-            {fetched ? (
+            {!fetched || !statusesLoaded ? (
+              <LinearProgress color="secondary" />
+            ) : (
               <Container>
                 <>
                   <Divider variant="middle" color="primary">
@@ -150,8 +160,6 @@ export default function StatusAdminApp(props: StatusAdminAppProps):JSX.Element {
                   </Divider>
                 </>
               </Container>
-            ) : (
-              <LinearProgress color="secondary" />
             )}
           </Box>
           <Box sx={flexFooter}>
