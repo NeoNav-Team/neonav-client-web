@@ -74,10 +74,11 @@ export default function GardenApp(props: GardenAppProps): JSX.Element {
   }: NnProviderValues = useContext(NnContext);
   const [filter, setFilter] = useState(true);
   const statuses: NnStatus[] = useMemo(() => {
-    const statuses = state?.network?.collections?.statuses || [];
-    return filter
-      ? statuses.filter((status) => status.class === "public")
-      : statuses;
+    const all = state?.network?.collections?.statuses || [];
+    const filtered = filter ? all.filter((s) => s.class === "public") : all;
+    return filtered.slice().sort((a, b) =>
+      new Date(a.ts || '').valueOf() - new Date(b.ts || '').valueOf()
+    );
   }, [filter, state?.network?.collections?.statuses]);
   const entity: nnEntity = useMemo(() => {
     return state?.network?.entity || {};
