@@ -215,6 +215,18 @@ export const fetchChannelHistory = (dispatch: DispatchFunc) => async (id: string
   executeApi('chatHistory', {token, id}, onSuccess, onError);
 }
 
+export const fetchMoreChannelHistory = (dispatch: DispatchFunc) => async (id: string, limit: number) => {
+  const token = getCookieToken();
+  try {
+    const url = `${apiUrl.protocol}://${apiUrl.hostname}/api/chat/channels/${id}/history?limit=${limit}`;
+    const res = await axios.get(url, { headers: { 'x-access-token': token } });
+    const msgs: NnChatMessage[] = Array.isArray(res?.data) ? res.data : [];
+    dispatch({ type: 'setMessageHistory', payload: msgs });
+  } catch {
+    // silent fail — user keeps whatever is currently displayed
+  }
+};
+
 export const sendChannelMessage = (dispatch: DispatchFunc) => async (id:string, text: string) => {
   const token = getCookieToken();
   const onSuccess = (_response:APIResponse) => {};

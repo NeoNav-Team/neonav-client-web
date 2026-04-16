@@ -83,6 +83,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     state,
     fetchUserChannels = () => {},
     fetchChannelHistory = (channelId:string) => {},
+    fetchMoreChannelHistory = async (channelId:string, limit:number) => {},
     setSelected = (indexType:string, channelId:string) => {},
     sendChannelMessage = (channelId:string, text: string) => {},
     clearUnreadCountByType = (channelId:string) => {},
@@ -97,6 +98,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   const prevChannelRef = useRef<string>('');
   const handledRedactionsRef = useRef<Set<string>>(new Set());
   const initChannelsRef = useRef(state.user?.channels);
+  const historyLimitRef = useRef(0);
+  const scrollFetchingRef = useRef(false);
+  const preLoadScrollRef = useRef<{scrollTop: number; scrollHeight: number} | null>(null);
+  const historyExhaustedRef = useRef(false);
   const [ initFetched, setInitFetched ] = useState<boolean>(false);
   const [ initSelected, setInitSelected ] = useState<boolean>(false);
   const [ channelsLoaded, setChannelsLoaded ] = useState<boolean>(
@@ -119,10 +124,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
 
   const messages:NnChatMessage[] = useMemo(() => {
     const chatArr = state?.network?.collections?.messages || [];
-    const orderChatArr = orderbyDate(chatArr, 'ts');
-    const chatLength = orderChatArr.length;
-    const last30 = chatLength > 30 ? orderChatArr.slice(0, 30) : orderChatArr;
-    return last30;
+    return orderbyDate(chatArr, 'ts');
   }, [state?.network?.collections?.messages]);
   const [ lastUnread, setLastUnread ] = useState<string>('');
   const [ msg, setMsg ] = useState<string>('');
@@ -294,6 +296,10 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
     if (prevChannelRef.current === selectedChannel) return;
     const wasInitialized = prevChannelRef.current !== '';
     prevChannelRef.current = selectedChannel;
+    historyLimitRef.current = 0;
+    scrollFetchingRef.current = false;
+    preLoadScrollRef.current = null;
+    historyExhaustedRef.current = false;
     if (!wasInitialized) return;
     fetchChannelHistory(selectedChannel);
   }, [selectedChannel, fetchChannelHistory]);
@@ -311,9 +317,38 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
   }, [idFromParams, initSelected, notify, setSelected, state.network?.selected?.channel]);
 
   useEffect(() => {
+    if (notify) return;
     const scroller = document.getElementById('simpleScoll');
-    if (scroller && !notify) scroller.scrollTop = scroller.scrollHeight;
+    if (!scroller) return;
+    if (preLoadScrollRef.current) {
+      const { scrollTop, scrollHeight } = preLoadScrollRef.current;
+      preLoadScrollRef.current = null;
+      scrollFetchingRef.current = false;
+      if (messages.length < historyLimitRef.current) {
+        historyExhaustedRef.current = true;
+      }
+      scroller.scrollTop = scrollTop + (scroller.scrollHeight - scrollHeight);
+    } else {
+      scroller.scrollTop = scroller.scrollHeight;
+    }
   }, [messages, notify]);
+
+  useEffect(() => {
+    if (notify) return;
+    const scroller = document.getElementById('simpleScoll');
+    if (!scroller) return;
+    const handleScroll = () => {
+      if (scrollFetchingRef.current) return;
+      if (historyExhaustedRef.current) return;
+      if (scroller.scrollTop > 50) return;
+      scrollFetchingRef.current = true;
+      preLoadScrollRef.current = { scrollTop: scroller.scrollTop, scrollHeight: scroller.scrollHeight };
+      historyLimitRef.current = historyLimitRef.current === 0 ? 100 : historyLimitRef.current + 100;
+      fetchMoreChannelHistory(selectedChannel, historyLimitRef.current);
+    };
+    scroller.addEventListener('scroll', handleScroll);
+    return () => scroller.removeEventListener('scroll', handleScroll);
+  }, [notify, selectedChannel, fetchMoreChannelHistory]);
 
   useEffect(() => {
     if (lastUnread !== selectedChannel) {
@@ -383,6 +418,7 @@ export default function ChatApp(props:ChatAppProps):JSX.Element {
                   {messages.map((item, index) => (
                     <div
                       key={`message-${index}-${item.ts}`}
+                      id={item.id ? `msg-${item.id}` : undefined}
                       onClick={(e) => { e.stopPropagation(); handleMsgClick(item); }}
                       style={{ outline: selectedMsg?.id === item.id ? '1px solid var(--color-1, #ff00ff)' : undefined }}
                     >
