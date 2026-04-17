@@ -278,6 +278,7 @@ export type NnProviderDispatch = {
     fetchAllFactions: () => void;
     fetchClipboardEntities: () => void;
     fetchChannelHistory: (_channelId:string) => void;
+    fetchMoreChannelHistory: (_channelId:string, _limit:number) => Promise<void>;
     fetchChannelDetails: (_channelId:string) => void;
     fetchChannelUsers: (_channelId:string) => void;
     fetchFactionDetails: (_factionId:string) => void;

@@ -153,7 +153,8 @@ export default function ContactsApp(props: ContactsAppProps):JSX.Element {
   }, []);
 
   const handleIDScan = (result:string) => {
-    handleModelClose();
+    modalHistoryRef.current = false;
+    setOpenModel(false);
     setScanning(true);
     setLoading(true);
     goFetchUser(result);

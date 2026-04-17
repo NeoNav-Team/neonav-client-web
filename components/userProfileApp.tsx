@@ -76,11 +76,10 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const FULL_HEIGHT = use100vh() || 600;
   const FLEX_HEIGHT = FULL_HEIGHT - 75;
   const SCROLL_HEIGHT = FULL_HEIGHT - 114;
-  const { 
+  const {
     state,
     fetchUserProfile = () => {},
     updateUserProfile = (document:any, update:any) => {},
-    patchUserToken = () => {},
   }: NnProviderValues = useContext(NnContext);
   const profile:nnEntity = useMemo(() => {
     return state?.network?.entity?.profile || {};
@@ -123,9 +122,8 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
         _rev: state?.network?.entity?._rev,
       };
       updateUserProfile(doc, defaultForm);
-      patchUserToken();
     }
-  }, [setEditMode, profileFetched, profile, state?.network?.entity, updateUserProfile, patchUserToken]);
+  }, [setEditMode, profileFetched, profile, state?.network?.entity, updateUserProfile]);
 
   useEffect(() => {
     if (Object.keys(profile).length >= 3) {
@@ -170,7 +168,6 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const bigButtonAction = ()=> {
     if (editMode) {
       saveProfileChanges();
-      patchUserToken();
     } else {
       goFetchProfile(); //get latest before editing
     }
