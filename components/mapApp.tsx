@@ -197,6 +197,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     fetchFactionDetails = (id: string) => {},
   }: NnProviderValues = React.useContext(NnContext);
 
+  const EVENT_CENTER = L.latLng(35.081840, -117.822262);
+
   const options: L.MapOptions = {
     center: L.latLng(35.0798889, -117.8222298), // Intersection of Main & Alpha
     zoom: 18,
@@ -205,7 +207,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     zoomSnap: 0.5,
     rotate: true,
     bearing: 0,
-    maxBounds: L.latLng(35.081840, -117.822262).toBounds(1400), // Roughly center of whole venue
+    maxBounds: EVENT_CENTER.toBounds(1400), // Roughly center of whole venue
     keyboard: false,  // Disable keyboard interaction; breaks a ton of stuff when editing a location
   };
 
@@ -281,7 +283,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
     // Create new leaflet marker at the center of user view or current user's location if they are on site
     let currentUserLocation = mapInstanceRef.current?.getCenter() as L.LatLng;
-    if (userLocationKnown && L.latLng(35.0798889, -117.8222298).toBounds(1400).contains(lastKnownLocation)) {
+    if (userLocationKnown && EVENT_CENTER.toBounds(1400).contains(lastKnownLocation)) {
       currentUserLocation = lastKnownLocation;
     }
     const newMarker = renderNewLocationPin(currentUserLocation, mapInstanceRef.current, updateField);
@@ -420,6 +422,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         const current = mymap.getBearing();
         const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
 
+        // Swap road label layers so they are oriented correctly
         if (next == 0) {
           mymap.removeLayer(layerData.get('labelsNorthLeft'));
           mymap.addLayer(layerData.get('labelsNorthUp'));
@@ -584,22 +587,24 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       handleRotate();
 
-      L.imageOverlay(LRG_SVG_MAP_FILE, L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]]), {
+      // These coords have to be hand dialed to get the svg to overlay just right.
+      const imageBounds = L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]]);
+      L.imageOverlay(LRG_SVG_MAP_FILE, imageBounds, {
         opacity: 1,
       }).addTo(mymap);
 
-      //L.rectangle(L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]])).addTo(mymap);
+      // useful for aligning the map svg
+      // L.rectangle(imageBounds).addTo(mymap);
 
       L.control.scale({
         position: 'topright',
         imperial: false
       }).addTo(mymap);
 
-      // Default lat-long 35.085124, -117.825341 (main entrance of event space) - use this for testing
-
       // Set up structural layers (location markers + zoom-toggled megablock/megamall).
       initStaticLayerGroups(mymap, layerData);
 
+      // Fetch cookie that stores layer toggle state
       const saved = getSettingsCookie().mapLayers;
       if (saved) setLayerStates(saved);
 
@@ -612,7 +617,18 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         setLastKnownLocation(e.latlng);
         let circle = myMapObjects.get('myLocationCircle');
         if (!circle) {
-          circle = L.circleMarker(e.latlng, {radius: 5});
+          circle = L.circleMarker(e.latlng, 
+            {
+              radius: 7,
+              color: '#FFFFFF',
+              weight: 3,
+              fill: true,
+              fillColor: '#42c6ff',
+              fillOpacity: 0.7,
+              interactive: false,
+              pane: 'tooltipPane'
+            }
+          );
           myMapObjects.set('myLocationCircle', circle);
           circle.addTo(mymap);
         }
@@ -649,13 +665,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
   useEffect(() => {
     fetchUnverifiedLocations();
-    fetchLocationPins("all");
+    fetchLocationPins('all');
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       fetchUnverifiedLocations();
-      fetchLocationPins("all");
+      fetchLocationPins('all');
       
       if (selectedLocationId) {
         fetchLocationById(selectedLocationId);
@@ -1016,6 +1032,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             handleAction: () => {
               if (mapRef.current && userLocationKnown) {
                 addLocationPin(lastKnownLocation.lat.toString(), lastKnownLocation.lng.toString());
+                setTimeout(() => { // Grab latest pins since we just updated
+                  fetchLocationPins('all');
+                }, 1000);
               }
             },
             disabled: !userLocationKnown,
@@ -1044,6 +1063,42 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                 let mymap = mapInstanceRef.current;
                 if (userLocationKnown) {
                   mymap.panTo(lastKnownLocation);
+                  // Flash the user's location marker to help it be visible
+                  setTimeout(() =>{
+                    console.log("flash");
+                    const circleMarker = myMapObjects.get("myLocationCircle") as L.CircleMarker;
+                    if (circleMarker) {
+                      const oldStyle = {
+                        radius: circleMarker.options.radius,
+                        weight: circleMarker.options.weight || 0,
+                        fillColor: circleMarker.options.fillColor,
+                      };
+                      const newStyle = {
+                        radius: oldStyle.radius + 2,
+                        weight: oldStyle.weight + 1,
+                        fillColor: '#FFFFFF',
+                      }
+                      // I mean... this is _a_ way to do it
+                      setTimeout(() => {
+                        circleMarker.setStyle(newStyle);
+                      }, 100)
+                      setTimeout(() => {
+                        circleMarker.setStyle(oldStyle);
+                      }, 200)
+                      setTimeout(() => {
+                        circleMarker.setStyle(newStyle);
+                      }, 300)
+                      setTimeout(() => {
+                        circleMarker.setStyle(oldStyle);
+                      }, 400)
+                      setTimeout(() => {
+                        circleMarker.setStyle(newStyle);
+                      }, 500)
+                      setTimeout(() => {
+                        circleMarker.setStyle(oldStyle);
+                      }, 600)
+                    }
+                  }, 500)
                 } else {
                   // If the user clicks the location button but we don't know where they are, try kicking off locate again 
                   mymap.locate({watch: true, maximumAge: 15000});
@@ -1059,6 +1114,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             handleAction: () => {
               if (mapRef.current) {
                 deleteLocationPins();
+                setTimeout(() =>{  // Grab latest pins since we just updated
+                  fetchLocationPins('all');
+                }, 1000)
               }
             },
           }}

@@ -114,6 +114,7 @@ const white = '#FFFFFF'; // #FFFFFF
 const red = '#FF0000'; // #FF0000
 
 // TODO this should be synced with the list in mapInfoModal in some way
+// There are some currently unused attributes on these that should make the sync easier in the future
 export const VENUE_ICON_MAP = new Map<string, any>([
   ['arcade', {icon: SportsEsportsIcon, iconColor: cyberYellow, pinColor: cyberPurple}],
   ['chapel', {icon: TempleBuddhistIcon, iconColor: cyberYellow, pinColor: cyberOrange}],
@@ -140,7 +141,7 @@ export const VENUE_ICON_MAP = new Map<string, any>([
   ['security', {icon: LocalPoliceIcon, iconColor: white, pinColor: red, adminOnly: true}],
   ['road', {adminOnly: true}],
 
-  ['location_pin', {icon: AttributionIcon, iconColor: white, pinColor: neoOrange, hidden: true}],
+  ['location_pin', {icon: AttributionIcon, iconColor: neoGreen, pinColor: cyberBlueDark, hidden: true}],
   ['new_location', {icon: AddCircleIcon, iconColor: cyberGreen, pinColor: white, hidden: true}],
 ]);
 
