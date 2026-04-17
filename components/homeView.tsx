@@ -110,7 +110,9 @@ export default function HomeView(_props: HomeViewProps): JSX.Element {
   }, []);
   const handleIDScan = (result:string) => {
     if (result.length >= 5) {
-      handleModelClose();
+      modalHistoryRef.current = false;
+      setOpenModel(false);
+      setSubmenu('groupSettings');
       router.push(`/contacts/${result}#scan`, { scroll: false });
     }
   }

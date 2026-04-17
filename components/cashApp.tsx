@@ -176,7 +176,8 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   }, []);
 
   const handleIDScan = (result:string) => {
-    handleModelClose();
+    modalHistoryRef.current = false;
+    setOpenModel(false);
     setScanning(true);
     setLoading(true);
     goFetchUser(result);
@@ -344,13 +345,13 @@ export default function CashApp(props: CashAppProps):JSX.Element {
   useEffect(() => {
     const clipboardEntities:any[] = state?.network?.collections?.clipboardEntities || [];
     const hasEntity = scannedEntity && typeof scannedEntity?.id !== 'undefined';
-    const newEntity = hasEntity && !clipboardEntities.some(item => item.id == scannedEntity.id);
-    if (newEntity && scanning) {
-      goSetRecentScan();
-      setScanning(false);
-      setLoading(false);
-    }
-  }, [goSetRecentScan, scannedEntity, scanning, state?.network?.collections?.clipboardEntities]);
+    if (!hasEntity || !scanning) return;
+    const isNewEntity = !clipboardEntities.some(item => item.id == scannedEntity.id);
+    if (isNewEntity) addRecentScan(scannedEntity);
+    handleRecipient([scannedEntity.id || '']);
+    setScanning(false);
+    setLoading(false);
+  }, [addRecentScan, handleRecipient, scannedEntity, scanning, state?.network?.collections?.clipboardEntities]);
 
 
   return (
