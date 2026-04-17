@@ -120,9 +120,11 @@ export const nnReducer = (state:NnProviderValues, action: Action) => {
   switch (type) {
     case 'addMessage': 
       break;
-    case 'setAccessToken':
+    case 'setAccessToken': {
       const tokenPayload = JSON.parse(JSON.stringify(payload));
       setCookieToken(tokenPayload.accessToken);
+      break;
+    }
     case 'setAlert':
       clonedState.network.alert = {...clonedState.network.alert, ...payload}
       break;
