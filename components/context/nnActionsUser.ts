@@ -41,18 +41,13 @@ export const fetchUserProfile = (dispatch: DispatchFunc) => async () => {
 //TODO: remove any of document
 export const updateUserProfile = (dispatch: DispatchFunc) => async (doc:any, profile: any) => {
   const token = getCookieToken();
-  const onSuccess = (response:APIResponse) => {
+  const onSuccess = async (response:APIResponse) => {
     const { data } = response;
     dispatch({
       type: 'setEntity',
       payload: data,
     });
-    if ((data as any)?.accessToken) {
-      dispatch({
-        type: 'setAccessToken',
-        payload: data,
-      });
-    }
+    await patchUserToken(dispatch)();
     return data;
   };
   const onError = (err:netcheckAPIResData) => {
