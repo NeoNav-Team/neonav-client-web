@@ -207,7 +207,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     zoomSnap: 0.5,
     rotate: true,
     bearing: 0,
-    maxBounds: EVENT_CENTER.toBounds(1400), // Roughly center of whole venue
+    // maxBounds: EVENT_CENTER.toBounds(1400), // Roughly center of whole venue
     keyboard: false,  // Disable keyboard interaction; breaks a ton of stuff when editing a location
   };
 
