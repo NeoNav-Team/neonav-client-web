@@ -1062,7 +1062,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
               if (mapInstanceRef.current) {
                 let mymap = mapInstanceRef.current;
                 if (userLocationKnown) {
-                  mymap.panTo(lastKnownLocation);
+                  mymap.flyTo(lastKnownLocation, 21);
                   // Flash the user's location marker to help it be visible
                   setTimeout(() =>{
                     console.log("flash");
