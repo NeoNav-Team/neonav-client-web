@@ -613,18 +613,28 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       // == Set up listeners/hooks ==
       mymap.on('locationfound', (e) => {
+        console.log('location accuracy: ' + e.accuracy);
         setUserLocationKnown(true);
         setLastKnownLocation(e.latlng);
         let circle = myMapObjects.get('myLocationCircle');
         if (!circle) {
-          circle = L.circleMarker(e.latlng, 
+          const color = '#42c6ff'
+          const circleSvg = {
+            mapIconUrl: `
+              <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+                <circle fill="${color}" stroke-width="3px" stroke="#FFFFFF" cx="9" cy="9" r="7" fill-opacity="70%"/>
+              </svg>`,
+            mapIconColor: color
+          };
+          const circleIcon = L.divIcon({
+            className: 'road-label-icon', // Use a custom class to remove default marker styles
+            html: L.Util.template(circleSvg.mapIconUrl, circleSvg),
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+          });
+          const circle = L.marker(e.latlng, 
             {
-              radius: 7,
-              color: '#FFFFFF',
-              weight: 3,
-              fill: true,
-              fillColor: '#42c6ff',
-              fillOpacity: 0.7,
+              icon: circleIcon,
               interactive: false,
               pane: 'tooltipPane'
             }
@@ -1064,8 +1074,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                 if (userLocationKnown) {
                   mymap.flyTo(lastKnownLocation, 21);
                   // Flash the user's location marker to help it be visible
+                  /* DISABLED WHILE DEBUGGING
                   setTimeout(() =>{
-                    console.log("flash");
                     const circleMarker = myMapObjects.get("myLocationCircle") as L.CircleMarker;
                     if (circleMarker) {
                       const oldStyle = {
@@ -1099,6 +1109,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                       }, 600)
                     }
                   }, 500)
+                  */
                 } else {
                   // If the user clicks the location button but we don't know where they are, try kicking off locate again 
                   mymap.locate({watch: true, maximumAge: 15000});
