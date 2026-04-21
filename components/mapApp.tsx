@@ -157,6 +157,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const mapInstanceRef = useRef<L.Map | null>(null);
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
+  const [lastKnownLocationAccuracy, setLastKnownLocationAccuracy] = useState(1400);
+  const [lastKnownLocationHeading, setLastKnownLocationHeading] = useState(0);  // Currently unused but available
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [linkedLocationId, setLinkedLocationId] = useState('');
   const [markerFromLinkShown, setMarkerFromLinkShown] = useState(false);
@@ -198,6 +200,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   }: NnProviderValues = React.useContext(NnContext);
 
   const EVENT_CENTER = L.latLng(35.081840, -117.822262);
+  const ACCURACY_LIMIT = 200;
 
   const options: L.MapOptions = {
     center: L.latLng(35.0798889, -117.8222298), // Intersection of Main & Alpha
@@ -283,7 +286,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
     // Create new leaflet marker at the center of user view or current user's location if they are on site
     let currentUserLocation = mapInstanceRef.current?.getCenter() as L.LatLng;
-    if (userLocationKnown && EVENT_CENTER.toBounds(1400).contains(lastKnownLocation)) {
+    if (userLocationKnown && EVENT_CENTER.toBounds(1400).contains(lastKnownLocation) && lastKnownLocationAccuracy < ACCURACY_LIMIT) {
       currentUserLocation = lastKnownLocation;
     }
     const newMarker = renderNewLocationPin(currentUserLocation, mapInstanceRef.current, updateField);
@@ -616,6 +619,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         console.log('location accuracy: ' + e.accuracy);
         setUserLocationKnown(true);
         setLastKnownLocation(e.latlng);
+        setLastKnownLocationAccuracy(e.accuracy);
+        setLastKnownLocationHeading(e.heading);
         let circle = myMapObjects.get('myLocationCircle');
         if (!circle) {
           const color = '#42c6ff'
@@ -1038,7 +1043,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           firstHexProps={{
             icon: <PersonPinCircleIcon/>,
             tooltipText: userLocationKnown ? 'Share Your Location' : 'Location Unavailable To Share',
-            dialog: 'Broadcast your position? Your coordinates will be shared with your factions and mutual friends.',
+            dialog: lastKnownLocationAccuracy > ACCURACY_LIMIT ? 
+              'Broadcast your position? Your coordinates will be shared with your factions and mutual friends. Your location data currently has low accuracy.' :
+              'Broadcast your position? Your coordinates will be shared with your factions and mutual friends.',
             handleAction: () => {
               if (mapRef.current && userLocationKnown) {
                 addLocationPin(lastKnownLocation.lat.toString(), lastKnownLocation.lng.toString());
