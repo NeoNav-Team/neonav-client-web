@@ -75,11 +75,12 @@ const custom = function (options?: L.TileLayerOptions): CustomTileLayer {
   return new CustomTileLayer(options);
 };
 
-// Global variable to be able to reference map pieces after they are initialized
+// Global variable to be able to reference map pieces after they are initialized. TODO probably should be in a more react-ful storage
 const myMapObjects = new Map<string, any>();
 const layerData = new Map<string, L.LayerGroup>();
 
 export default function MapApp(props: PageContainerProps): JSX.Element {
+  // A wall of styles to animate and resize the modal, footer, and map container
   const modalStyle_0 = {
     position: 'absolute' as 'absolute',
     top: '100dvh',
@@ -210,7 +211,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     zoomSnap: 0.5,
     rotate: true,
     bearing: 0,
-    // maxBounds: EVENT_CENTER.toBounds(1400), // Roughly center of whole venue
+    maxBounds: EVENT_CENTER.toBounds(1400), // Roughly center of whole venue
     keyboard: false,  // Disable keyboard interaction; breaks a ton of stuff when editing a location
   };
 
@@ -865,9 +866,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     });
   }, [state?.network?.collections?.locationPins]);
 
-  // Search bar over map -- optional
-  // <div><TextField style={{position: 'absolute', top: '12px', left: '54px', zIndex: '1100', backgroundColor: '#120458', width:'calc(100% - 108px'}}/></div>
-
   return (
     <Container disableGutters style={{
       height: 'calc(100% - 64px)',
@@ -936,6 +934,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         onToggle={handleLayerSwitch}
         showDev={state?.network?.selected?.account === NEONAV_MAINT}
       />
+      {/* TODO Move Footer into dedicated modual */}
       {/* Footer for editing locations */}
       <Box sx={footerStyle} hidden={!showInfoModal || infoModalState === 'view'}> 
         <FooterNav
@@ -1080,43 +1079,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
                 let mymap = mapInstanceRef.current;
                 if (userLocationKnown) {
                   mymap.flyTo(lastKnownLocation, 21);
-                  // Flash the user's location marker to help it be visible
-                  /* DISABLED WHILE DEBUGGING
-                  setTimeout(() =>{
-                    const circleMarker = myMapObjects.get("myLocationCircle") as L.CircleMarker;
-                    if (circleMarker) {
-                      const oldStyle = {
-                        radius: circleMarker.options.radius,
-                        weight: circleMarker.options.weight || 0,
-                        fillColor: circleMarker.options.fillColor,
-                      };
-                      const newStyle = {
-                        radius: oldStyle.radius + 2,
-                        weight: oldStyle.weight + 1,
-                        fillColor: '#FFFFFF',
-                      }
-                      // I mean... this is _a_ way to do it
-                      setTimeout(() => {
-                        circleMarker.setStyle(newStyle);
-                      }, 100)
-                      setTimeout(() => {
-                        circleMarker.setStyle(oldStyle);
-                      }, 200)
-                      setTimeout(() => {
-                        circleMarker.setStyle(newStyle);
-                      }, 300)
-                      setTimeout(() => {
-                        circleMarker.setStyle(oldStyle);
-                      }, 400)
-                      setTimeout(() => {
-                        circleMarker.setStyle(newStyle);
-                      }, 500)
-                      setTimeout(() => {
-                        circleMarker.setStyle(oldStyle);
-                      }, 600)
-                    }
-                  }, 500)
-                  */
                 } else {
                   // If the user clicks the location button but we don't know where they are, try kicking off locate again 
                   mymap.locate({watch: true, maximumAge: 15000});
