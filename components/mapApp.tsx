@@ -75,11 +75,12 @@ const custom = function (options?: L.TileLayerOptions): CustomTileLayer {
   return new CustomTileLayer(options);
 };
 
-// Global variable to be able to reference map pieces after they are initialized
+// Global variable to be able to reference map pieces after they are initialized. TODO probably should be in a more react-ful storage
 const myMapObjects = new Map<string, any>();
 const layerData = new Map<string, L.LayerGroup>();
 
 export default function MapApp(props: PageContainerProps): JSX.Element {
+  // A wall of styles to animate and resize the modal, footer, and map container
   const modalStyle_0 = {
     position: 'absolute' as 'absolute',
     top: '100dvh',
@@ -157,6 +158,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   const mapInstanceRef = useRef<L.Map | null>(null);
   const [userLocationKnown, setUserLocationKnown] = useState(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
+  const [lastKnownLocationAccuracy, setLastKnownLocationAccuracy] = useState(1400);
+  const [lastKnownLocationHeading, setLastKnownLocationHeading] = useState(0);  // Currently unused but available
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [linkedLocationId, setLinkedLocationId] = useState('');
   const [markerFromLinkShown, setMarkerFromLinkShown] = useState(false);
@@ -197,6 +200,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     fetchFactionDetails = (id: string) => {},
   }: NnProviderValues = React.useContext(NnContext);
 
+  const EVENT_CENTER = L.latLng(35.081840, -117.822262);
+  const ACCURACY_LIMIT = 200;
+
   const options: L.MapOptions = {
     center: L.latLng(35.0798889, -117.8222298), // Intersection of Main & Alpha
     zoom: 18,
@@ -205,7 +211,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     zoomSnap: 0.5,
     rotate: true,
     bearing: 0,
-    maxBounds: L.latLng(35.081840, -117.822262).toBounds(1400), // Roughly center of whole venue
+    maxBounds: EVENT_CENTER.toBounds(1400), // Roughly center of whole venue
     keyboard: false,  // Disable keyboard interaction; breaks a ton of stuff when editing a location
   };
 
@@ -281,7 +287,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
     // Create new leaflet marker at the center of user view or current user's location if they are on site
     let currentUserLocation = mapInstanceRef.current?.getCenter() as L.LatLng;
-    if (userLocationKnown && L.latLng(35.0798889, -117.8222298).toBounds(1400).contains(lastKnownLocation)) {
+    if (userLocationKnown && EVENT_CENTER.toBounds(1400).contains(lastKnownLocation) && lastKnownLocationAccuracy < ACCURACY_LIMIT) {
       currentUserLocation = lastKnownLocation;
     }
     const newMarker = renderNewLocationPin(currentUserLocation, mapInstanceRef.current, updateField);
@@ -420,6 +426,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         const current = mymap.getBearing();
         const next = Math.abs(current - headingA) < 0.1 ? headingB : headingA;
 
+        // Swap road label layers so they are oriented correctly
         if (next == 0) {
           mymap.removeLayer(layerData.get('labelsNorthLeft'));
           mymap.addLayer(layerData.get('labelsNorthUp'));
@@ -584,22 +591,24 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       handleRotate();
 
-      L.imageOverlay(LRG_SVG_MAP_FILE, L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]]), {
+      // These coords have to be hand dialed to get the svg to overlay just right.
+      const imageBounds = L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]]);
+      L.imageOverlay(LRG_SVG_MAP_FILE, imageBounds, {
         opacity: 1,
       }).addTo(mymap);
 
-      //L.rectangle(L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]])).addTo(mymap);
+      // useful for aligning the map svg
+      // L.rectangle(imageBounds).addTo(mymap);
 
       L.control.scale({
         position: 'topright',
         imperial: false
       }).addTo(mymap);
 
-      // Default lat-long 35.085124, -117.825341 (main entrance of event space) - use this for testing
-
       // Set up structural layers (location markers + zoom-toggled megablock/megamall).
       initStaticLayerGroups(mymap, layerData);
 
+      // Fetch cookie that stores layer toggle state
       const saved = getSettingsCookie().mapLayers;
       if (saved) setLayerStates(saved);
 
@@ -608,11 +617,34 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       // == Set up listeners/hooks ==
       mymap.on('locationfound', (e) => {
+        console.log('location accuracy: ' + e.accuracy);
         setUserLocationKnown(true);
         setLastKnownLocation(e.latlng);
+        setLastKnownLocationAccuracy(e.accuracy);
+        setLastKnownLocationHeading(e.heading);
         let circle = myMapObjects.get('myLocationCircle');
         if (!circle) {
-          circle = L.circleMarker(e.latlng, {radius: 5});
+          const color = '#42c6ff'
+          const circleSvg = {
+            mapIconUrl: `
+              <svg version="1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+                <circle fill="${color}" stroke-width="3px" stroke="#FFFFFF" cx="9" cy="9" r="7" fill-opacity="70%"/>
+              </svg>`,
+            mapIconColor: color
+          };
+          const circleIcon = L.divIcon({
+            className: 'road-label-icon', // Use a custom class to remove default marker styles
+            html: L.Util.template(circleSvg.mapIconUrl, circleSvg),
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+          });
+          const circle = L.marker(e.latlng, 
+            {
+              icon: circleIcon,
+              interactive: false,
+              pane: 'tooltipPane'
+            }
+          );
           myMapObjects.set('myLocationCircle', circle);
           circle.addTo(mymap);
         }
@@ -649,13 +681,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
   useEffect(() => {
     fetchUnverifiedLocations();
-    fetchLocationPins("all");
+    fetchLocationPins('all');
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       fetchUnverifiedLocations();
-      fetchLocationPins("all");
+      fetchLocationPins('all');
       
       if (selectedLocationId) {
         fetchLocationById(selectedLocationId);
@@ -834,9 +866,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     });
   }, [state?.network?.collections?.locationPins]);
 
-  // Search bar over map -- optional
-  // <div><TextField style={{position: 'absolute', top: '12px', left: '54px', zIndex: '1100', backgroundColor: '#120458', width:'calc(100% - 108px'}}/></div>
-
   return (
     <Container disableGutters style={{
       height: 'calc(100% - 64px)',
@@ -905,6 +934,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         onToggle={handleLayerSwitch}
         showDev={state?.network?.selected?.account === NEONAV_MAINT}
       />
+      {/* TODO Move Footer into dedicated modual */}
       {/* Footer for editing locations */}
       <Box sx={footerStyle} hidden={!showInfoModal || infoModalState === 'view'}> 
         <FooterNav
@@ -1012,10 +1042,15 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           firstHexProps={{
             icon: <PersonPinCircleIcon/>,
             tooltipText: userLocationKnown ? 'Share Your Location' : 'Location Unavailable To Share',
-            dialog: 'Broadcast your position? Your coordinates will be shared with your factions and mutual friends.',
+            dialog: lastKnownLocationAccuracy > ACCURACY_LIMIT ? 
+              'Broadcast your position? Your coordinates will be shared with your factions and mutual friends. Your location data currently has low accuracy.' :
+              'Broadcast your position? Your coordinates will be shared with your factions and mutual friends.',
             handleAction: () => {
               if (mapRef.current && userLocationKnown) {
                 addLocationPin(lastKnownLocation.lat.toString(), lastKnownLocation.lng.toString());
+                setTimeout(() => { // Grab latest pins since we just updated
+                  fetchLocationPins('all');
+                }, 1000);
               }
             },
             disabled: !userLocationKnown,
@@ -1043,7 +1078,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
               if (mapInstanceRef.current) {
                 let mymap = mapInstanceRef.current;
                 if (userLocationKnown) {
-                  mymap.panTo(lastKnownLocation);
+                  mymap.flyTo(lastKnownLocation, 21);
                 } else {
                   // If the user clicks the location button but we don't know where they are, try kicking off locate again 
                   mymap.locate({watch: true, maximumAge: 15000});
@@ -1059,6 +1094,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
             handleAction: () => {
               if (mapRef.current) {
                 deleteLocationPins();
+                setTimeout(() =>{  // Grab latest pins since we just updated
+                  fetchLocationPins('all');
+                }, 1000)
               }
             },
           }}

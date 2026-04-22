@@ -1,4 +1,4 @@
-export type HotbarKey = 'tanchat' | 'cash' | 'channels' | 'map' | 'sites' | 'garden' | 'qrScanner' | 'myQRCode';
+export type HotbarKey = 'tanchat' | 'cash' | 'channels' | 'map' | 'sites' | 'garden' | 'events' | 'qrScanner' | 'myQRCode';
 
 export interface HotbarOption {
   label: string;
@@ -12,6 +12,7 @@ export const HOTBAR_OPTIONS: Record<HotbarKey, HotbarOption> = {
   map:       { label: 'Map',             action: '/map' },
   sites:     { label: 'NeoSites',        action: '/sites' },
   garden:    { label: 'Jaden / Garden',  action: '/garden' },
+  events:    { label: 'Events',          action: '/events' },
   qrScanner: { label: 'QR Scanner',      action: 'qrCodeScan' },
   myQRCode:  { label: 'My QR Code',      action: 'myQRCode' },
 };

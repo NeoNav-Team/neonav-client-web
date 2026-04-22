@@ -4,7 +4,7 @@ import pLimit from 'p-limit';
 import z from 'zod';
 import styles from '../styles/generic.module.css';
 import { Context as NnContext } from '../components/context/nnContext';
-import { nnEntity, NnProviderValues } from '../components/context/nnTypes';
+import { nnEntity, NnContact, NnFaction, NnSimpleEntity, NnProviderValues } from '../components/context/nnTypes';
 import SimpleScrollContainer from './simpleScrollContainer';
 import InputBalance from './inputBalance';
 import QrCodeReader from './qrCodeReader';
@@ -133,7 +133,11 @@ export default function CashApp(props: CashAppProps):JSX.Element {
       label: 'Scanned',
       value: 'scanned',
       icon: <AssignmentIcon />,
-      users: state?.network?.collections?.clipboardEntities || [],
+      users: (state?.network?.collections?.clipboardEntities as (NnContact | NnFaction | NnSimpleEntity)[]).filter((entity) => {
+        const id = String(entity.id || '');
+        // Only allow factions and users. Swede told me I can't send money to locations :(
+        return id.startsWith('C') || /^\d/.test(id);
+      }) || [],
     },
     { 
       label: 'Faction',

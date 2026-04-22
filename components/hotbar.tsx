@@ -4,6 +4,7 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import LocalFloristIcon from '@mui/icons-material/LocalFlorist';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Map from './svgr/map';
 import TanChat from './svgr/tanchat';
 import Cash from './svgr/cash';
@@ -18,6 +19,7 @@ const ICON_MAP: Record<HotbarKey, JSX.Element> = {
   map:       <Map />,
   sites:     <NeoSites />,
   garden:    <LocalFloristIcon />,
+  events:    <CalendarMonthIcon />,
   qrScanner: <QrCodeScannerIcon />,
   myQRCode:  <QrCodeIcon />,
 };
