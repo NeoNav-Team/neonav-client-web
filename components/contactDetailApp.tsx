@@ -11,6 +11,7 @@ import {
   Box,
   Typography,
   LinearProgress,
+  Tooltip,
 } from '@mui/material';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -19,7 +20,8 @@ import TocIcon from '@mui/icons-material/Toc';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
 import { useRouter } from 'next/navigation';
-import { imageUrl } from '@/utilities/constants';
+import { imageUrl, apiUrl } from '@/utilities/constants';
+import { getCookieToken } from '@/utilities/cookieContext';
 import { CurrencyExchange } from '@mui/icons-material';
 
 
@@ -127,6 +129,8 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
   const [ fetched, setFetched ] = useState(false);
   const [ scanned, setScanned ] = useState(false);
   const [ updated, setUpdated ] = useState(false);
+  const [ badges, setBadges ] = useState<{name: string, image: string, description: string | null}[]>([]);
+  const [ openTooltip, setOpenTooltip ] = useState<number | null>(null);
 
   const homieCheck = () => {
     let myHomie = false;
@@ -170,8 +174,20 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
   }, [entity, goFetchUser, goSetRecentScan, id, scanned]);
 
   useEffect(() => {
+    if (entityId) {
+      const token = getCookieToken();
+      fetch(`${apiUrl.protocol}://${apiUrl.hostname}/api/user/${entityId}/badges`, {
+        headers: { 'x-access-token': token || '' },
+      })
+        .then(res => res.ok ? res.json() : [])
+        .then(data => Array.isArray(data) && setBadges(data))
+        .catch(() => {});
+    }
+  }, [entityId]);
+
+  useEffect(() => {
     if (
-      alert?.show === true 
+      alert?.show === true
       && updated == false
     ) {
       fetchUserContacts();
@@ -243,6 +259,36 @@ export default function ContactDetailApp(props: ContactsAppProps):JSX.Element {
                       <Typography variant='h6' color="primary">Skills: <span>{entity?.meta?.skills || 'N/A'}</span></Typography>
                       <Typography variant='h6' color="primary">Description: </Typography>
                       <p>{entity?.description || 'N/A'}</p>
+                      {badges.length > 0 && (
+                        <>
+                          <Typography variant='h6' color="primary" sx={{ mt: 1 }}>Achievements:</Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '8px', mt: 0.5 }}>
+                            {badges.map((badge, i) => (
+                              <Tooltip
+                                key={i}
+                                title={badge.description || badge.name}
+                                open={openTooltip === i}
+                                onClose={() => setOpenTooltip(null)}
+                                disableFocusListener
+                                disableHoverListener
+                                disableTouchListener
+                                arrow
+                              >
+                                <Box
+                                  onClick={() => setOpenTooltip(openTooltip === i ? null : i)}
+                                  sx={{ cursor: 'pointer' }}
+                                >
+                                  <img
+                                    src={badge.image}
+                                    alt={badge.name}
+                                    style={{ maxWidth: '20vw', maxHeight: '192px', width: 'auto', height: 'auto', display: 'block' }}
+                                  />
+                                </Box>
+                              </Tooltip>
+                            ))}
+                          </Box>
+                        </>
+                      )}
                     </Stack>
                   </SimpleScrollContainer>
                 </div>
