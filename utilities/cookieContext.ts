@@ -68,6 +68,7 @@ interface NnSettings {
   eventsUnverified?: boolean;
   hotbar?: HotbarKey[];
   mapLayers?: Record<string, boolean>;
+  mapGlitch?: boolean;
 }
 
 export const getSettingsCookie = (): NnSettings => {

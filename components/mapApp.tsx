@@ -55,8 +55,8 @@ interface RotateControl extends L.Control {
   getContainer(): HTMLElement;
 }
 
-const SVG_MAP_FILE = '/Winter2026v2.svg'
 const LRG_SVG_MAP_FILE = '/Winter2026_large_v1.svg'
+const GLTCH_SVG_MAP_FILE = '/Winter2026_large_v1_glitch.svg'
 
 const EMPTY_LOCATION = {id: '', name: '', description: '', venuetype: '', openState: '', nextTimeMsg: '', prettyhours: [], rating: '', ownerisfaction: false, owner: '', ownername: '', ownerlink: '', creator: '', reviews: [], neosite: '', verified: false, tooltip: {name: '', lat: 0, long: 0}};
 
@@ -156,19 +156,19 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
   };
   const mapRef = useRef(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const [userLocationKnown, setUserLocationKnown] = useState(false);
+  const [userLocationKnown, setUserLocationKnown] = useState<boolean>(false);
   const [lastKnownLocation, setLastKnownLocation] = useState<L.LatLng>(L.latLng(0, 0));
   const [lastKnownLocationAccuracy, setLastKnownLocationAccuracy] = useState(1400);
   const [lastKnownLocationHeading, setLastKnownLocationHeading] = useState(0);  // Currently unused but available
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [linkedLocationId, setLinkedLocationId] = useState('');
-  const [markerFromLinkShown, setMarkerFromLinkShown] = useState(false);
+  const [markerFromLinkShown, setMarkerFromLinkShown] = useState<boolean>(false);
   const [selectedLocation, setSelectedLocation] = useState(EMPTY_LOCATION);
-  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const [infoModalSizeStyle, setInfoModalSizeStyle] = useState(modalStyle_0);
   const [infoModalSize, setInfoModalSize] = useState(0);
   const [infoModalState, setInfoModalState] = useState<'view' | 'edit' | 'create'>('view');
-  const [showLayerModal, setShowLayerModal] = useState(false);
+  const [showLayerModal, setShowLayerModal] = useState<boolean>(false);
   const [layerModalSizeStyle, setLayerModalSizeStyle] = useState(modalStyle_0);
   const [layerStates, setLayerStates] = useState<Record<string, boolean>>({
     pinsLayer: false,
@@ -176,12 +176,13 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     mylocations: false,
     unverified: false,
   });
+  const [isGlitchActive, setGlitchActive] = useState<boolean>(false);
   const stateRef = useRef(infoModalState);
   const [searchBarOptions, setSearchBarOptions] = useState([] as any);
   const [footerStyle, setFooterStyle] = useState(flexFooter);
   const [mapStyle, setMapStyle] = useState(mapFull);
   const [mapBearing, setMapBearing] = useState(0);
-  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState<boolean>(false);
   const [editLocationFormData, setEditLocationFormData] = React.useState({name: '', lat: 0, long: 0, owner: '', description: '', venuetype: '', hours: [] as any, tooltip: {name: '', lat: 0, long: 0, rotation: 0,}});
 
   const { state,
@@ -593,9 +594,16 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
 
       // These coords have to be hand dialed to get the svg to overlay just right.
       const imageBounds = L.latLngBounds([[35.085470, -117.825445], [35.078589, -117.819928]]);
-      L.imageOverlay(LRG_SVG_MAP_FILE, imageBounds, {
+      const normalMap = L.imageOverlay(LRG_SVG_MAP_FILE, imageBounds, {
         opacity: 1,
       }).addTo(mymap);
+
+      const glitchMap = L.imageOverlay(GLTCH_SVG_MAP_FILE, imageBounds, {
+        opacity: 1,
+      });
+
+      myMapObjects.set("normalMapImageOverlay", normalMap);
+      myMapObjects.set("glitchMapImageOverlay", glitchMap);
 
       // useful for aligning the map svg
       // L.rectangle(imageBounds).addTo(mymap);
@@ -611,6 +619,8 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       // Fetch cookie that stores layer toggle state
       const saved = getSettingsCookie().mapLayers;
       if (saved) setLayerStates(saved);
+      // Easter Egg cookie
+      setGlitchActive(getSettingsCookie().mapGlitch || false);
 
       // Listen to zoom level changes to toggle megablock and megamall layers.
       wireZoomLayerVisibility(mymap, layerData);
@@ -658,6 +668,19 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           maximumAge: 15000 // Return cached location if less than this amount of milliseconds passed since last geolocation response
         });
       }
+
+      mymap.on('contextmenu', (e) => {
+        const target = L.latLng(35.076387, -117.829411);
+        if (e.latlng.distanceTo(target) < 50) {
+          // Use functional update to avoid stale closures
+          setGlitchActive(prev => {
+            const nextValue = !prev;
+            setSettingsCookie({ mapGlitch: nextValue });
+            setAlert(nextValue ? 'success' : 'error', 'ḠĿ𐪌𐌕ꛕ𖩘');
+            return nextValue;
+          });
+        }
+      });
     }
 
     // Cleanup function
@@ -667,6 +690,23 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapRef]);
+
+  // Easter Egg for glitched map
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+  
+    const normal = myMapObjects.get('normalMapImageOverlay');
+    const glitch = myMapObjects.get('glitchMapImageOverlay');
+  
+    if (isGlitchActive) {
+      if (map.hasLayer(normal)) map.removeLayer(normal);
+      glitch.addTo(map);
+    } else {
+      if (map.hasLayer(glitch)) map.removeLayer(glitch);
+      normal.addTo(map);
+    }
+  }, [isGlitchActive]);
 
   // More violation access fixes
   useEffect(() => {
@@ -880,7 +920,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
         style={{position: 'absolute', top: '12px', left: '70px', zIndex: '1100', backgroundColor: '#120458', border: '1px solid #ff00ff', borderRadius: '5px', width:'calc(100% - 180px'}}
         options={searchBarOptions}
         groupBy={(option: any) => option.venuetype}
-        getOptionLabel={(option: any) => option.name}
+        getOptionLabel={(option: any) => `${option.name} [${option.id}]`}
         renderInput={(params) => <TextField {...params} label='Search' />}
         onChange={(event, location, reason) => {
           if (reason === 'selectOption' && location && location.lat && location.long) {
