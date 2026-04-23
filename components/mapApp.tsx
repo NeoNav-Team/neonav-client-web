@@ -214,8 +214,6 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     bearing: 0,
     maxBounds: EVENT_CENTER.toBounds(1400), // Roughly center of whole venue
     keyboard: false,  // Disable keyboard interaction; breaks a ton of stuff when editing a location
-    touchZoom: 'center', // Forces zoom to stay centered, preventing drift
-    bounceAtZoomLimits: false,
   };
 
   const openInfoModal = () => {
