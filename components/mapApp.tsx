@@ -4,7 +4,7 @@ import 'styles/leaflet.css';
 import styles from '@/styles/generic.module.css';
 import React, {useEffect, useRef, useState} from 'react';
 
-import L from 'leaflet';
+import L, { map } from 'leaflet';
 import 'leaflet-rotate';
 import {
   Autocomplete,
@@ -670,6 +670,15 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
           maximumAge: 15000 // Return cached location if less than this amount of milliseconds passed since last geolocation response
         });
       }
+
+      // Loop through each image overlay and resync its position
+      mymap.on('moveend', function() {
+        mymap.eachLayer(function(layer) {
+            if (layer instanceof L.ImageOverlay) {
+                layer.setBounds(layer.getBounds());
+            }
+        });
+      });
 
       mymap.on('contextmenu', (e) => {
         const target = L.latLng(35.076387, -117.829411);
