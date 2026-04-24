@@ -462,15 +462,39 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     }
   });
 
-  function getShallowDiff<T extends object>(obj1: T, obj2: T): Partial<T> {
-    const diff: Partial<T> = {};
-    
-    // Get all unique keys from both objects
+  function getDeepDiff<T>(obj1: T, obj2: T): Partial<T> {
+    // If they are the same reference or primitive value, no diff
+    if (obj1 === obj2) return {} as Partial<T>;
+  
+    // If either isn't an object (or is null), the second one is the "diff"
+    if (!obj1 || !obj2 || typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+      return obj2 as any;
+    }
+  
+    // Handle Arrays
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+      if (JSON.stringify(obj1) === JSON.stringify(obj2)) return {} as any;
+      return obj2 as any; // Usually, for arrays, you return the whole new array
+    }
+  
+    const diff: any = {};
     const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]) as Set<keyof T>;
   
-    allKeys.forEach(key => {
-      if (obj1[key] !== obj2[key]) {
-        diff[key] = obj2[key];
+    allKeys.forEach((key) => {
+      const val1 = obj1[key];
+      const val2 = obj2[key];
+  
+      if (val1 !== val2) {
+        if (typeof val1 === 'object' && typeof val2 === 'object' && val1 !== null && val2 !== null) {
+          // Recurse for nested objects
+          const nestedDiff = getDeepDiff(val1, val2);
+          if (Object.keys(nestedDiff).length > 0) {
+            diff[key] = nestedDiff;
+          }
+        } else {
+          // Primitive change
+          diff[key] = val2;
+        }
       }
     });
   
@@ -481,7 +505,7 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
     console.log('Saving form data:', editLocationFormData);
     const foundLocation = state?.network?.collections?.locations?.find(loc => loc.id === selectedLocationId);
     // TODO This is used twice, onces for the diff and once when we create the form, this should be in a function
-    const locationFormDiff = getShallowDiff({
+    const locationFormDiff = getDeepDiff({
       name: foundLocation?.name || '',
       lat: foundLocation?.lat || 0,
       long: foundLocation?.long || 0,
