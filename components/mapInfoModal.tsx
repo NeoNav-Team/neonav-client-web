@@ -270,7 +270,12 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
 
     // Default: Assign to Current User if creating
     if (currentUserId) {
-      options.set(currentUserId, `(You)`);
+      let prettyName = '';
+      if (currentUserId.startsWith('C')) {
+        const factionName = state?.user?.factions?.find(faction => faction.id === currentUserId)?.name;
+        prettyName = `${factionName} `;
+      }
+      options.set(currentUserId, `${prettyName}(You)`);
     }
 
     // 2. Existing Owner (if different)
