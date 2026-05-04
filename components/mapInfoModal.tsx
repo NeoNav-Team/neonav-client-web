@@ -272,7 +272,8 @@ const EditLocationForm = ({ location, formData, isAdmin, ...handlers}: any) => {
     if (currentUserId) {
       let prettyName = '';
       if (currentUserId.startsWith('C')) {
-        const factionName = state?.user?.factions?.find(faction => faction.id === currentUserId)?.name;
+        const factions = state?.user?.factions as any[] | undefined;
+        const factionName = factions?.find(f => f.id === currentUserId)?.name || '';
         prettyName = `${factionName} `;
       }
       options.set(currentUserId, `${prettyName}(You)`);

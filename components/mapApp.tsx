@@ -696,9 +696,9 @@ export default function MapApp(props: PageContainerProps): JSX.Element {
       // Loop through each image overlay and resync its position
       mymap.on('moveend', function() {
         mymap.eachLayer(function(layer) {
-            if (layer instanceof L.ImageOverlay) {
-                layer.setBounds(layer.getBounds());
-            }
+          if (layer instanceof L.ImageOverlay) {
+            layer.setBounds(layer.getBounds());
+          }
         });
       });
 

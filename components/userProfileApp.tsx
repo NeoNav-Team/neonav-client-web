@@ -19,12 +19,14 @@ import {
   Avatar,
   TextField,
   Button,
+  Tooltip,
 } from '@mui/material';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import SaveIcon from '@mui/icons-material/Save';
 import { Stack } from '@mui/system';
 import { use100vh } from 'react-div-100vh';
+import { apiUrl } from '@/utilities/constants';
 
 interface UserProfileAppProps {};
 
@@ -93,6 +95,8 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
   const [ form, setForm ] = useState<Form>(defaultForm);
   const { username, firstname, lastname, skills, occupation, bio } = form;
   const [ photo, setPhoto ] = useState<string | undefined>();
+  const [ badges, setBadges ] = useState<{name: string, image: string, description: string | null}[]>([]);
+  const [ openTooltip, setOpenTooltip ] = useState<number | null>(null);
 
   const goFetchProfile = useCallback(async () => {
     if (!profileFetched) {
@@ -124,6 +128,18 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
       updateUserProfile(doc, defaultForm);
     }
   }, [setEditMode, profileFetched, profile, state?.network?.entity, updateUserProfile]);
+
+  useEffect(() => {
+    if (userId) {
+      const token = getCookieToken();
+      fetch(`${apiUrl.protocol}://${apiUrl.hostname}/api/user/${userId}/badges`, {
+        headers: { 'x-access-token': token || '' },
+      })
+        .then(res => res.ok ? res.json() : [])
+        .then(data => Array.isArray(data) && setBadges(data))
+        .catch(() => {});
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (Object.keys(profile).length >= 3) {
@@ -255,6 +271,43 @@ export default function UserProfileApp(props: UserProfileAppProps):JSX.Element {
                         </>
                       ) : (
                         <p>{profile?.bio}</p>
+                      )}
+                      {editMode? (
+                        <>
+                        </>
+                      ) : (
+                        <>
+                          {badges.length > 0 && (
+                            <>
+                              <Typography variant='h6' color="primary" sx={{ mt: 1 }}>Achievements:</Typography>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '8px', mt: 0.5 }}>
+                                {badges.map((badge, i) => (
+                                  <Tooltip
+                                    key={i}
+                                    title={badge.description || badge.name}
+                                    open={openTooltip === i}
+                                    onClose={() => setOpenTooltip(null)}
+                                    disableFocusListener
+                                    disableHoverListener
+                                    disableTouchListener
+                                    arrow
+                                  >
+                                    <Box
+                                      onClick={() => setOpenTooltip(openTooltip === i ? null : i)}
+                                      sx={{ cursor: 'pointer' }}
+                                    >
+                                      <img
+                                        src={badge.image}
+                                        alt={badge.name}
+                                        style={{ maxWidth: '20vw', maxHeight: '192px', width: 'auto', height: 'auto', display: 'block' }}
+                                      />
+                                    </Box>
+                                  </Tooltip>
+                                ))}
+                              </Box>
+                            </>
+                          )}
+                        </>
                       )}
                     </Stack>
                   </Box>
